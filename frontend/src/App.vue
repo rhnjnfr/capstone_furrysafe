@@ -1,30 +1,40 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
   <router-view/>
 </template>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.lightgraycolor{
+    background: #F5F5F5;
+}
+.graycolor{
+    color: #5A5A5A;
+}
+.lightgreen{
+  background-color: #40d494;
+}
+.hover\:bg-lightgreen:hover {
+    --tw-bg-opacity: 1;
+    background-color: #35c184;
+}
+.bgorange{
+    --tw-bg-opacity: 1;
+    background-color: #f7b34c;
 }
 
-nav {
-  padding: 30px;
+.bgdarkorange{
+    --tw-bg-opacity: 1;
+    background-color: #d19132;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.hover\:bg-darkorange:hover {
+    --tw-bg-opacity: 1;
+    background-color: #d19132;
+}
+.bgteal{
+  background-color: #5AC3C3;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.hover\:bg-bgteal:hover {
+    --tw-bg-opacity: 1;
+    background-color: #43abab;
 }
 </style>
