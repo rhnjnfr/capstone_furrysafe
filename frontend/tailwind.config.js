@@ -6,13 +6,12 @@ module.exports = {
   ],
   theme: {
     screens: {
-    'sm': '300px',
-    'md': '830px',
-    'lg': '1024px',
-    'xl': '1280px',
-    '2xl': '1536px', // extra extra large screens (very wide desktops)
-  },
-    extend: {},
+      'sm': '300px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    }
   },
   plugins: [],
 }

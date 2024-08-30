@@ -1,12 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-// importing the router created in src if u manually created this...
-import router from './router'
+import router from './router' // importing the router created in src if u manually created this...
 
-// importing the css Tailwind directives
-import './assets/css/style.css'
+import './assets/css/style.css' // importing the css tailwind directives
 
 const app = createApp(App)
-    app.use(router) // using the router...
-    app.mount('#app')
+app.use(router) // using the router you've imported...
+app.mount('#app')

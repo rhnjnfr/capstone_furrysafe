@@ -1,132 +1,71 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// layouts
-import landingpage from '@/layouts/Admin/index.vue'
-import adminDashboard from '../layouts/Admin/Dashboard.vue'
-import shelterDashboard from '../layouts/Client/Shelter/Dashboard.vue'
-
-// views
-import homeContent from '../views/LandingPage/index.vue'
-import registration from '../views/registration.vue'
-import login from '../views/login.vue'
-
-  //admin
-import dashboardContent from '../views/Admin/dashboard.vue'
-import managepetsContent from '../views/Admin/pets.vue'
-import applicationContent from '../views/Admin/application.vue'
-import userContent from '../views/Admin/user.vue'
-import mapContent from '../views/Admin/map.vue'
-import profileContent from '../views/Admin/userprofile.vue'
-
-//shelter
-import sdashboardContent from '../views/Shelter/dashboard.vue'
-import myshelterContent from '../views/Shelter/myShelter.vue'
-import animalprofileContent from '../views/Shelter/animalProfile.vue'
-import rescueOperationContent from '../views/Shelter/rescueOperation.vue'
-import editprofileContent from '../views/Shelter/editProfile.vue'
+import landingpage from '../views/index.vue'
+// Shelter Views
+import shelterDashboard from '../layouts/Client/Shelter/dashboard.vue' 
+import shelterdashboardContent from '../views/Shelter/dashboard.vue'
+import shelterprofile from "../views/Shelter/myshelter.vue";
+import editshelterprofile from "../views/Shelter/shelter_EditProfile.vue";
+import shelteranimalprofile from "../views/Shelter/animalprofile.vue"
+import createanimalprofile from "../views/Shelter/animalprofile_CreateNewProfile.vue"
+import viewanimalprofile from "../views/Shelter/animalprofile_ViewProfile.vue"
+import editanimalprofile from "../views/Shelter/animalprofile_EditProfile.vue"
+import rescueoperation from "../views/Shelter/rescueoperation.vue"
 
 const routes = [
-  { //index
+  {
     path: '/',
     name: 'landingpage',
-    component: landingpage,
-    redirect: '/FurrySafe',
-    children: // landing page navigation path
-      [
-        { // dashboard
-          path: '/FurrySafe',
-          name: 'homeContent',
-          component: homeContent
-        },
-      ]
+    component: landingpage
   },
-  { //login
-    path: '/loginform',
-    name: 'login',
-    component: login
-  },
-  { //register
-    path: '/registrationform',
-    name: 'registration',
-    component: registration
-  },
-  { // admin dashboard
-    path: '/admin',
-    name: 'adminDashboard',
-    component: adminDashboard,
-    redirect: '/dashboard',
-    children: 
-      [
-        { // dashboard
-          path: '/dashboard',
-          name: 'dashboardContent',
-          component: dashboardContent
-        },
-        { // manage pets
-          path: '/managepets',
-          name: 'managepetsContent',
-          component: managepetsContent
-        },
-        { // manage application
-          path: '/manageapplication',
-          name: 'applicationContent',
-          component: applicationContent
-        },
-        { // manage pets
-          path: '/manageuser',
-          name: 'userContent',
-          component: userContent
-        },
-        { // manage pets
-          path: '/managemap',
-          name: 'mapContent',
-          component: mapContent
-        },
-        { // Profile
-          path: '/yourprofile',
-          name: 'profileContent',
-          component: profileContent
-        },
-      ]
-  },
-  { // shelter dashboard
-    path: '/shelter',
+  {
+    path: '/FurrySafe',
     name: 'shelterDashboard',
     component: shelterDashboard,
     redirect: '/shelterdashboard',
-    children: 
+    children:
       [
         { // dashboard
           path: '/shelterdashboard',
-          name: 'sdashboardContent',
-          component: sdashboardContent
+          name: 'dashboardContent',
+          component: shelterdashboardContent
         },
-        { // My shelter
-          path: '/shelter',
-          name: 'myshelterContent',
-          component: myshelterContent
+        { // my shelter
+          path: '/myshelter',
+          name: 'shelterprofile',
+          component: shelterprofile
         },
-        { // Animal Profile
+        { // my shelter - Edit Profile
+          path: '/edit_shelterprofile',
+          name: 'editshelterprofile',
+          component: editshelterprofile
+        },
+        { // animal profile
           path: '/animalprofile',
-          name: 'animalprofileContent',
-          component: animalprofileContent
+          name: 'animalprofile',
+          component: shelteranimalprofile
         },
-        { // Rescue Operation
+        { // create animal profile
+          path: '/create_animalprofileform',
+          name: 'createanimalprofile',
+          component: createanimalprofile
+        },
+        { // view animal profile
+          path: '/view_animalprofileform',
+          name: 'viewanimalprofile',
+          component: viewanimalprofile
+        },
+        { // edit animal profile
+          path: '/edit_animalprofileform',
+          name: 'editanimalprofile',
+          component: editanimalprofile
+        },
+        { // rescue operation
           path: '/rescueoperation',
-          name: 'rescueOperationContent',
-          component: rescueOperationContent
+          name: 'rescueoperation',
+          component: rescueoperation
         },
-        { // 
-          path: '/editprofileform',
-          name: 'editprofileContent',
-          component: editprofileContent
-        },
-        { // Profile change this
-          path: '/yourprofile',
-          name: 'profileContent',
-          component: profileContent
-        },
-      ]
+      ],
   },
 ]
 
