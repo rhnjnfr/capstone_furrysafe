@@ -1,29 +1,3 @@
-<script>
-import Dropdown from "../components/dropdown.vue";
-import passwordunhide from "../components/password.vue";
-
-export default {
-    components: { 
-        Dropdown,
-        passwordunhide 
-    },
-    data() {
-        return {
-        //icons or images
-        dog: require('@/assets/images/animalshelterdog.png'),
-        back: require('@/assets/images/Back.png'),
-        gender: ""
-
-        }  
-    },
-    methods: {
-        navigateTo(path) {
-        this.$router.push(path);
-        },
-    },
-}
-</script>
-
 <template>
     <div class="w-full h-screen flex items-center justify-center">
         <div class="border w-screen md:flex md:items-center">
@@ -41,11 +15,11 @@ export default {
                             <input type="text" id="fname" placeholder="Firstname"
                               class="border rounded-lg py-2 px-5">
                         </div>
-                        <div class="field grid sm:text-[10px] sm:pt-5 sm:space-y-2 md:text-[12px] md:space-y-3 lg:text-[15px]">
+                        <!-- <div class="field grid sm:text-[10px] sm:pt-5 sm:space-y-2 md:text-[12px] md:space-y-3 lg:text-[15px]">
                             <label for="mname">Middle Name </label>
                             <input type="text" id="mname" placeholder="Middlename"
                               class="border rounded-lg py-2 px-5">
-                        </div>
+                        </div> -->
                         <div class="field grid sm:text-[10px] sm:pt-5 sm:space-y-2 md:text-[12px] md:space-y-3 lg:text-[15px]">
                             <label for="lname">Last Name </label>
                             <input type="text" id="lname" placeholder="Lastname"
@@ -76,7 +50,7 @@ export default {
                         </div>
                     </div>
                     <div class="flex justify-center mt-[3rem]">
-                        <button @click="navigateTo('')"
+                        <button @click.prevent="handleSignup()"
                           class="px-6 bg-slate-900 rounded-lg p-2 text-white w-full sm:text-[10px] md:text-[12px] lg:text-[15px]">
                           Signup
                         </button>
@@ -89,3 +63,71 @@ export default {
         </div>
     </div>
 </template>
+
+<script>
+import axios from "axios";
+import Dropdown from "../components/dropdown.vue";
+import passwordunhide from "../components/password.vue";
+
+export default {
+    components: { 
+        Dropdown,
+        passwordunhide 
+    },
+    data() {
+        return {
+        //icons or images
+        dog: require('@/assets/images/animalshelterdog.png'),
+        back: require('@/assets/images/Back.png'),
+        gender: "",
+        //registration 
+        email: '',
+        password: '',
+        items: [],
+        }  
+    },
+    methods: {
+        navigateTo(path) {
+            this.$router.push(path);
+        },
+        async handleSignup(){   
+            try{
+                const userEmail = document.getElementById('email');
+                const userPass = document.getElementById('password');
+                //add data to email & pass 
+                this.email = userEmail.value;
+                this.password = userPass.value;
+
+                //console.log(this.email + ' ' + this.password)
+                await this.setUser();
+            }
+            catch(err){
+                console.log("error", err)
+            }
+        },
+        async setUser(){
+            try{
+                const response = await axios.post("http://localhost:5000/registration", 
+                {
+                    email: this.email,
+                    password: this.password
+                } 
+            )
+                this.items = response.data
+                console.log("response: ", response.data); 
+                if (response.data.success) {
+                    
+                    // console.log("data: " , response.data[1])
+                } else {
+                    // Handle login failure
+                    //dapat naa ni ui change pag invalid ang credentials 
+                    console.log("Invalid login credentials");
+                }
+            }
+            catch(err){
+                console.log("An ERROR occured: " + err);
+            }
+        }
+    },
+}
+</script>

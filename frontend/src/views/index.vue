@@ -24,9 +24,9 @@
                     </div>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:items-center gap-4">
-                    <RouterLink to="" class="hover:text-lightorange">
+                    <RouterLink to="login" class="hover:text-lightorange">
                         Login</RouterLink>
-                    <RouterLink to="" class="bgteal text-white p-1.5 px-4 rounded-lg font-medium hover:bg-lightorange">
+                    <RouterLink to="registration" class="bgteal text-white p-1.5 px-4 rounded-lg font-medium hover:bg-lightorange">
                         Sign-Up</RouterLink>
                 </div>
                 <div class="-mr-2 flex items-center sm:hidden">

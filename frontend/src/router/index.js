@@ -12,7 +12,22 @@ import viewanimalprofile from "../views/Shelter/animalprofile_ViewProfile.vue"
 import editanimalprofile from "../views/Shelter/animalprofile_EditProfile.vue"
 import rescueoperation from "../views/Shelter/rescueoperation.vue"
 
+//jene
+import login from "../views/login.vue"
+import registration from "../views/registration.vue"
+
 const routes = [
+  //jene loginhelp huehfjkgjgsad
+  {
+    path:'/login',
+    name: 'login',
+    component:login
+  },
+  {
+    path: '/registration',
+    name: 'registration',
+    component: registration
+  },
   {
     path: '/',
     name: 'landingpage',
@@ -75,3 +90,4 @@ const router = createRouter({
 })
 
 export default router
+

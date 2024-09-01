@@ -1,27 +1,3 @@
-<script>
-import passwordunhide from "../components/password.vue";
-
-export default {
-    components: { passwordunhide },
-    data() {
-        return {
-        //icons or images
-        dog: require('@/assets/images/animalshelterdog.png'),
-        back: require('@/assets/images/Back.png'),
-        // for password hide
-        passwordError: false,
-        showPassword: false,
-        
-        }
-    },
-    methods: { // navigation na dele mo load
-        navigateTo(path) {
-        this.$router.push(path);
-        },
-    },
-}
-</script>
-
 <template>
     <div class="w-full h-screen flex items-center justify-center">
         <div class="border w-screen md:flex md:items-center">
@@ -62,7 +38,7 @@ export default {
                       </div>
                     </div>
                     <div class="flex justify-center mt-[3rem]">
-                        <button @click="navigateTo('/admin')"
+                        <button @click.prevent="handleLogin()" 
                           class="px-6 bg-slate-900 rounded-lg p-2 text-white w-full sm:text-[10px] md:text-[12px] lg:text-[15px]">
                           Login
                         </button>
@@ -81,3 +57,78 @@ export default {
         </div>
     </div>
 </template>
+
+<script>
+// import { fetchUsers } from "@/"
+import axios from "axios";
+import passwordunhide from "../components/password.vue";
+
+export default {
+    components: { passwordunhide },
+    data() {
+        return {
+        //icons or images
+        dog: require('@/assets/images/animalshelterdog.png'),
+        back: require('@/assets/images/Back.png'),
+        // for password hide
+        passwordError: false,
+        showPassword: false,
+        //credential input
+        userEmail: '',
+        userPassword: '',
+        items: [],
+        }
+    },
+    // retrieve(){
+    //     this.getUser();
+    // },
+    mounted() {
+    //calls function within load 
+    //this.getUser(); // Call getUser when the component is mounted
+    },
+    methods: {
+        navigateTo(path) {
+        this.$router.push(path);
+        },
+        async handleLogin(){
+            try{
+            //retrieving input from email & pass textbox 
+            const UserEmail = document.getElementById('email');
+            const UserPassword = document.getElementById('password');
+            //getting value from id
+            this.userEmail = UserEmail.value;
+            this.userPassword = UserPassword.value;
+
+            await this.getUser();
+                //this.navigateTo('/')
+            }
+            catch (err){
+                console.log(err)
+            }
+        },
+        async getUser(){
+            
+            try{
+                const response = await axios.post("http://localhost:5000/login", 
+                {
+                    email: this.userEmail,
+                    password: this.userPassword
+                }
+                )
+                this.items = response.data
+                console.log("response: ", response.data); 
+                if (response.data.success) {
+                    console.log("data: " , response.data[1])
+                } else {
+                    // Handle login failure
+                    //dapat naa ni ui change pag invalid ang credentials 
+                    console.log("Invalid login credentials");
+                }
+            }
+            catch (err){
+                console.log("An ERROR occured: " + err);
+            }
+        },
+    },
+}
+</script>
