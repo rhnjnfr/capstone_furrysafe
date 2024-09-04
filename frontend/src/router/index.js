@@ -10,13 +10,14 @@ import shelteranimalprofile from "../views/shelter/animalprofile.vue"
 import createanimalprofile from "../views/shelter/animalprofile_CreateNewProfile.vue"
 import viewanimalprofile from "../views/shelter/animalprofile_ViewProfile.vue"
 import editanimalprofile from "../views/shelter/animalprofile_EditProfile.vue"
-import rescueoperation from "../views/shelter/rescueoperation.vue"
+// import rescueoperation from "../views/shelter/rescueoperation.vue"
+import rescueoperation from "../views/shelter/try.vue"
 
 const routes = [
   {
     path: '/',
     name: 'landingpage',
-    component: landingpage
+    component: landingpage,
   },
   {
     path: '/FurrySafe',

@@ -54,7 +54,7 @@ export default {
 };
 </script>
 <template>
-    <div>
+    <div class="h-screen flex flex-col">
         <div class="flex justify-between items-center">
             <div class="graycolor">
                 <textvalue msg="My Shelter" />
@@ -112,7 +112,7 @@ export default {
                                 <span class="sr-only">header space</span>
                             </div>
                             <div class="w-full bg-slate-50">
-                                <img class="mx-auto flex-shrink-0" :src="post.imageUrl" alt="image post" />
+                                <img class="mx-auto flex-shrink-0 w-[50rem]" :src="post.imageUrl" alt="image post" />
                             </div>
                             <div class="px-[2rem] py-[2rem]">
                                 <div class="grid grid-flow-col justify-between">

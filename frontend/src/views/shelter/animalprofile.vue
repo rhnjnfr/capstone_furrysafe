@@ -68,10 +68,10 @@ export default {
 }
 </script>
 <template>
-    <div>
-        <div class="flex justify-between items-center">
+    <div class="h-screen flex flex-col">
+        <header class="flex justify-between items-center">
             <div class="graycolor">
-                <textvalue msg="Dashboard" />
+                <textvalue msg="Animal Profile" />
             </div>
             <div class="flex gap-x-3 sm:gap-1 items-center">
                 <div class="bgorange py-[.40rem] px-[2rem] sm:px-[12px] rounded-md hover:bg-bgdarkorange">
@@ -85,8 +85,8 @@ export default {
                     <datetoday />
                 </div>
             </div>
-        </div>
-        <div class="mt-[1rem]">
+        </header>
+        <main class="mt-[1rem]">
             <ul id="profile-columns" role="list"
                 class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <li v-for="pets in profiles" :key="pets.name"
@@ -108,8 +108,8 @@ export default {
                     </div>
                 </li>
             </ul>
-        </div>
-        <footer>
+        </main>
+        <footer class="mt-auto">
             <div>
                 <linkfooter />
             </div>
