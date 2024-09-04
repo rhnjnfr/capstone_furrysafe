@@ -105,23 +105,22 @@ export default {
                 console.log("error", err)
             }
         },
+        //create user
         async setUser(){
             try{
                 const response = await axios.post("http://localhost:5000/registration", 
                 {
                     email: this.email,
                     password: this.password
-                } 
-            )
+                })
                 this.items = response.data
                 console.log("response: ", response.data); 
                 if (response.data.success) {
-                    
-                    // console.log("data: " , response.data[1])
+                    this.navigateTo('/');
                 } else {
                     // Handle login failure
                     //dapat naa ni ui change pag invalid ang credentials 
-                    console.log("Invalid login credentials");
+                    console.log("ERRORRRRRRRRRRRRRRRRRRRRRR");
                 }
             }
             catch(err){

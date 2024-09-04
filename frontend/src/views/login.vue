@@ -59,7 +59,6 @@
 </template>
 
 <script>
-// import { fetchUsers } from "@/"
 import axios from "axios";
 import passwordunhide from "../components/password.vue";
 
@@ -70,7 +69,7 @@ export default {
         //icons or images
         dog: require('@/assets/images/animalshelterdog.png'),
         back: require('@/assets/images/Back.png'),
-        // for password hide
+        // for password hide/unhide
         passwordError: false,
         showPassword: false,
         //credential input
@@ -79,49 +78,42 @@ export default {
         items: [],
         }
     },
-    // retrieve(){
-    //     this.getUser();
-    // },
-    mounted() {
-    //calls function within load 
-    //this.getUser(); // Call getUser when the component is mounted
-    },
     methods: {
         navigateTo(path) {
         this.$router.push(path);
         },
         async handleLogin(){
             try{
-            //retrieving input from email & pass textbox 
-            const UserEmail = document.getElementById('email');
-            const UserPassword = document.getElementById('password');
-            //getting value from id
-            this.userEmail = UserEmail.value;
-            this.userPassword = UserPassword.value;
+                //retrieving input from email & pass textbox 
+                const UserEmail = document.getElementById('email');
+                const UserPassword = document.getElementById('password');
+                //getting value from id
+                this.userEmail = UserEmail.value;
+                this.userPassword = UserPassword.value;
 
-            await this.getUser();
-                //this.navigateTo('/')
+                await this.getUser();
             }
             catch (err){
                 console.log(err)
             }
         },
         async getUser(){
-            
+            //login function
             try{
                 const response = await axios.post("http://localhost:5000/login", 
                 {
+                    //pass inputs
                     email: this.userEmail,
                     password: this.userPassword
                 }
                 )
                 this.items = response.data
-                console.log("response: ", response.data); 
                 if (response.data.success) {
-                    console.log("data: " , response.data[1])
+                    //handles login success 
+                    this.navigateTo('/')
+                    //console.log("Success data: " , response.data[1])
                 } else {
-                    // Handle login failure
-                    //dapat naa ni ui change pag invalid ang credentials 
+                    // Handle login failure dapat naa ni ui change pag invalid ang credentials 
                     console.log("Invalid login credentials");
                 }
             }
