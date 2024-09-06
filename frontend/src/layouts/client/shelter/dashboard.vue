@@ -83,10 +83,10 @@
         <!-- Static sidebar for desktop -->
         <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             <!-- Sidebar component, swap this element with another sidebar if you like -->
-            <div class="flex grow flex-col gap-y-5 overflow-y-auto bgorange border-r">
-                <div class="flex h-[3.97rem] shrink-0 items-center bg-white pl-[3rem]">
+            <div class="flex grow flex-col gap-y-5 overflow-y-auto bgorange drop-shadow-xl">
+                <div class="flex h-[3.97rem] shrink-0 items-center pl-[3rem] mt-4">
                     <img :src="logo" alt="Logout Icon" class="w-10" aria-hidden="true" />
-                    <h1 class="pl-3 font-extrabold text-2xl text-gray-600">FurrySafe</h1>
+                    <h1 class="pl-3 font-extrabold text-2xl text-white">FurrySafe</h1>
                 </div>
                 <nav class="flex flex-1 flex-col pt-10 text-white font-medium">
                     <div class="flex gap-2 mx-6 py-3">

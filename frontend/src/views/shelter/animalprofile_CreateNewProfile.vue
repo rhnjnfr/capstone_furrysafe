@@ -144,7 +144,6 @@
 
                             </div>
                         </div>
-
                         <div id="gender" class="lg:col-span-1 sm:col-span-full">
                             <label for="animalGender"
                                 class="block text-sm font-medium leading-6 text-gray-900">Gender</label>
@@ -161,7 +160,7 @@
                             <label for="coatfur" class="block text-sm font-medium leading-6 text-gray-900">
                                 Coat / Fur</label>
                             <div class="mt-2">
-                                <input type="text" name="coatfur" id="coatfur"
+                                <input type="text" name="coatfur" id="coatfur" placeholder="ex. Short, dark-brown coat with a slight wave"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -212,15 +211,29 @@
                                     following vaccination options this animal has received. )</p>
                             </div>
                             <div
-                                class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-3 text-sm leading-6 mx-6">
-                                <div v-for="(option, index) in vaccinesoptions" :key="index" class="flex items-center">
-                                    <input type="checkbox" :id="`checkbox${index + 1}`" v-model="Vaccines"
-                                        :value="option"
-                                        class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600">
-                                    <label :for="`checkbox${index + 1}`"
-                                        class="font-medium text-gray-600 pl-[.50rem]">{{
-                                            option }}</label>
+                                class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-1 gap-y-2 text-sm leading-6">
+                                <div v-for="(option, index) in displayVaccines" :key="index"
+                                    class="flex items-center mx-6">
+                                    <div>
+                                        <input type="checkbox" :id="`checkbox${index + 1}`" v-model="Vaccines"
+                                            :value="option"
+                                            class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600">
+                                    </div>
+                                    <div>
+                                        <label :for="`checkbox${index + 1}`"
+                                            class="font-medium text-gray-600 pl-[.50rem]">{{ option }}</label>
+                                    </div>
                                 </div>
+                                <div class="col-span-full">
+                                    <label for="" class="block text-sm font-medium leading-6 text-gray-900">
+                                        Other Vaccines
+                                    </label>
+                                    <div class="mt-2 flex gap-x-3">
+                                        <textarea type="text" v-model="otherVaccines" name="" id=""
+                                            class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
+                                    </div>
+                                </div>
+                                <p class="text-[13px]">Selected Vaccines: {{ allVaccines.join(', ') }}</p>
                             </div>
                         </div>
                         <div class="col-span-full">
@@ -247,73 +260,37 @@
                             </h4>
                             <div class="mt-2 ml-[2rem] gap-x-5">
                                 <div class="mt-4 space-y-2">
-                                    <div class="relative flex gap-x-3">
+                                    <div v-for="(option, index) in spayNeuterOptions" :key="index"
+                                        class="relative flex gap-x-3">
                                         <div class="flex h-6 items-center">
-                                            <input id="spayed" name="spayNeuterStatus" type="radio" value="Spayed"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" />
+                                            <input :id="option.id" name="spayNeuterStatus" type="radio"
+                                                :value="option.value"
+                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600"
+                                                @input="selectedValue = $event.target.value" />
                                         </div>
                                         <div class="lg:flex text-sm leading-6">
-                                            <label for="spayed" class="font-medium text-gray-700 pr-[1rem]">
-                                                Yes -Spayed</label>
-                                            <p class="text-gray-600">This animal is a female that has been spayed.</p>
+                                            <label :for="option.id" class="font-medium text-gray-700 pr-[1rem]">
+                                                {{ option.label }}
+                                            </label>
+                                            <p class="text-gray-600">{{ option.description }}</p>
                                         </div>
                                     </div>
-                                    <div class="relative flex gap-x-3">
-                                        <div class="flex h-6 items-center">
-                                            <input id="neutered" name="spayNeuterStatus" type="radio" value="Neutered"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" />
-                                        </div>
-                                        <div class="lg:flex text-sm leading-6">
-                                            <label for="neutered" class="font-medium text-gray-700 pr-[1rem]">
-                                                Yes - Neutered</label>
-                                            <p class="text-gray-600">This animal is a male that has been neutered.</p>
-                                        </div>
-                                    </div>
-                                    <div class="relative flex gap-x-3">
-                                        <div class="flex h-6 items-center">
-                                            <input id="intact" name="spayNeuterStatus" type="radio" value="Intact"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" />
-                                        </div>
-                                        <div class="lg:flex text-sm leading-6">
-                                            <label for="intact" class="font-medium text-gray-700 pr-[1rem]">
-                                                No - Intact</label>
-                                            <p class="text-gray-600">This animal has not been spayed or neutered.</p>
-                                        </div>
-                                    </div>
-                                    <div class="relative flex gap-x-3">
-                                        <div class="flex h-6 items-center">
-                                            <input id="notApplicable" name="spayNeuterStatus" type="radio"
-                                                value="Not Applicable"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" />
-                                        </div>
-                                        <div class="lg:flex text-sm leading-6">
-                                            <label for="notApplicable" class="font-medium text-gray-700 pr-[1rem]">
-                                                Not Applicable</label>
-                                            <p class="text-gray-600">
-                                                This animal is too young or not eligible for spaying/neutering.</p>
-                                        </div>
-                                    </div>
-                                    <div class="relative flex gap-x-3">
-                                        <div class="flex h-6 items-center">
-                                            <input id="unknown" name="spayNeuterStatus" type="radio" value="Unknown"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" />
-                                        </div>
-                                        <div class="lg:flex text-sm leading-6">
-                                            <label for="unknown"
-                                                class="font-medium text-gray-700 pr-[1rem] ">Unknown</label>
-                                            <p class="text-gray-600">This animal's spay/neuter status is unknown.</p>
-                                        </div>
+                                    <div>
+                                        <span class="text-[13px]">Selected value: {{ selectedValue }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-full border-t border-gray-900/10">
                             <div class="border-b border-gray-900/10 py-5">
-                                <h2 class="text-base font-semibold leading-7 text-gray-900">Other Information</h2>
+                                <h2 class="text-base font-semibold leading-7 text-gray-900">Other Information
+                                </h2>
                                 <p class="mt-1 text-sm leading-6 text-gray-600">
-                                    Share other important information related to this furry animal. This information
+                                    Share other important information related to this furry animal. This
+                                    information
                                     you've provided for this animal can
-                                    help potential adopters to learn more about its background, personality, and needs.
+                                    help potential adopters to learn more about its background, personality, and
+                                    needs.
                                 </p>
                             </div>
                         </div>
@@ -356,7 +333,8 @@
                                         <img width="24" height="24"
                                             src="https://img.icons8.com/fluency/48/stack-of-photos.png"
                                             alt="stack-of-photos" />
-                                        <span class="font-medium text-gray-700 text-[14px]">Add more photos</span>
+                                        <span class="font-medium text-gray-700 text-[14px]">Add more
+                                            photos</span>
                                     </label>
                                 </div>
                             </div>
@@ -416,52 +394,112 @@ const selectedAnimalBreed = ref('');
 const dogBreeds = ['Labrador Retriever', 'Golden Retriever', 'Bulldog', 'German Shepherd', 'Pit bull', 'Beagle', 'Rottweiler', 'Boxer', 'Dachshund', 'Yorkshire Terrier', 'Maltese', 'Chihuahua', 'Poodle', 'German Shepherd', 'Shih Tzu', 'Mixed breed'];
 const catBreeds = ['Siamese', 'Persian', 'Maine Coon', 'British Shorthair', 'Domestic Shorthair', 'American Shorthair', 'Domestic Longhair', 'Domestic Medium Hair', 'Bengal', 'Ragdoll', 'Mixed breed'];
 
-const clearAnimalTypeInput = () => {
-    animaltype.value = '';
-    selectedAnimalType.value = ''; // reset the selected animal type
-};
 
 watch(selectedAnimalType, (newVal, oldVal) => {
     if (newVal !== oldVal) {
         selectedAnimalBreed.value = ''; // reset selectedAnimalBreed when selectedAnimalType changes
+        Vaccines.value = []; // reset the selected vaccines when animal type changes
+        // otherVaccines.value = ''; // reset the other vaccines when animal type changes
     }
 });
 
+const clearAnimalTypeInput = () => {
+    animaltype.value = '';
+    selectedAnimalType.value = ''; // reset the selected animal type
+};
 const clearAnimalTypeBreed = () => {
     animalbreed.value = '';
     selectedAnimalBreed.value = ''; // reset the selected animal breed
 };
 
 // For Vaccines options
-let Vaccines = ref([])
-let vaccinesoptions = [
-    'Rabies',
-    'Distemper',
-    'Parvovirus',
-    'Adenovirus (Hepatitis)',
-    'Parainfluenza',
-    'Bordetella (Kennel Cough)',
-    'Leptospirosis',
-    'Lyme Disease',
-    'Canine Influenza',
-    'Coronavirus',
-    'Rattlesnake Vaccine',
-    'Feline Viral Rhinotracheitis (FVR)',
-    'Feline Calicivirus (FCV)',
-    'Panleukopenia (FPV)',
-    'Feline Leukemia Virus (FeLV)',
-    'Feline Immunodeficiency Virus (FIV)',
-    'Feline Infectious Peritonitis (FIP)',
-    'Myxomatosis',
-    'Viral Hemorrhagic Disease (VHD)',
-    'Tetanus',
-    'Eastern and Western Equine Encephalitis',
-    'West Nile Virus',
-    'Avian Influenza',
-    'Newcastle Disease',
-]
+const vaccines = ref({
+    "Dogs": [
+        "Rabies",
+        "Distemper",
+        "Hepatitis",
+        "Parvovirus (Parvo)",
+        "Adenovirus (CAV-2)",
+        "Parainfluenza",
+        "Bordetella (Kennel Cough)",
+        "Lyme disease",
+        "Leptospirosis",
+        "Canine influenza",
+        "Coronavirus",
+        "Rotavirus",
+        "Norovirus"
+    ],
+    "Cats": [
+        "Rabies",
+        "Feline viral rhinotracheitis (FVR)",
+        "Feline calicivirus (FCV)",
+        "Feline leukemia virus (FeLV)",
+        "Panleukopenia (FPV)",
+        "Feline immunodeficiency virus (FIV)",
+        "Feline infectious peritonitis (FIP)"
+    ],
+    "Other": [
+        "Rabies",
+        "Distemper",
+        "Influenza",
+        "Tetanus",
+        "Bovine viral diarrhea (BVD)"
+    ]
+});
 
-let selectedOptions = computed(() => Vaccines.value.join(', ')) // to get vaccines selected options
+const displayVaccines = computed(() => {
+    if (selectedAnimalType.value === 'Dog') {
+        return vaccines.value["Dogs"];
+    } else if (selectedAnimalType.value === 'Cat') {
+        return vaccines.value["Cats"];
+    } else if (selectedAnimalType.value === 'Other type of animal') {
+        return vaccines.value["Other"];
+    } else {
+        return [];
+    }
+});
+
+const Vaccines = ref([]); // initialize an empty array to store the selected vaccines
+const otherVaccines = ref(''); // initialize an empty string to store the other vaccines
+
+const allVaccines = computed(() => {
+    return [...Vaccines.value, ...otherVaccines.value.split(',').filter(Boolean)]; // to get all vaccines selected options and type
+});
+
+// spayed or neutered
+const spayNeuterOptions = ref([
+    {
+        id: 'spayed',
+        value: 'Spayed',
+        label: 'Yes - Spayed',
+        description: 'This animal is a female that has been spayed.'
+    },
+    {
+        id: 'neutered',
+        value: 'Neutered',
+        label: 'Yes - Neutered',
+        description: 'This animal is a male that has been neutered.'
+    },
+    {
+        id: 'intact',
+        value: 'Intact',
+        label: 'No - Intact',
+        description: 'This animal has not been spayed or neutered.'
+    },
+    {
+        id: 'notApplicable',
+        value: 'Not Applicable',
+        label: 'Not Applicable',
+        description: 'This animal is too young or not eligible for spaying/neutering.'
+    },
+    {
+        id: 'unknown',
+        value: 'Unknown',
+        label: 'Unknown',
+        description: 'This animal\'s spay/neuter status is unknown.'
+    }
+])
+const selectedValue = ref('')
 
 // multiple images
 const files = ref([])

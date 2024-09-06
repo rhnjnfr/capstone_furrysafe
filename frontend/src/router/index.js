@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import landingpage from '../views/index.vue'
+// import regis from '../views/shelter_registration.vue'
+import landingpage from '../layouts/index.vue'
+import landingcontent from '../views/index.vue'
 // Shelter Views
 import shelterDashboard from '../layouts/client/shelter/dashboard.vue'
 import shelterdashboardContent from '../views/shelter/dashboard.vue'
@@ -10,14 +12,22 @@ import shelteranimalprofile from "../views/shelter/animalprofile.vue"
 import createanimalprofile from "../views/shelter/animalprofile_CreateNewProfile.vue"
 import viewanimalprofile from "../views/shelter/animalprofile_ViewProfile.vue"
 import editanimalprofile from "../views/shelter/animalprofile_EditProfile.vue"
-// import rescueoperation from "../views/shelter/rescueoperation.vue"
-import rescueoperation from "../views/shelter/try.vue"
+import rescueoperation from "../views/shelter/rescueoperation.vue"
 
 const routes = [
   {
     path: '/',
     name: 'landingpage',
     component: landingpage,
+    redirect: '/landingcontent',
+    children:
+      [
+        { // dashboard
+          path: '/landingcontent',
+          name: 'landingcontent',
+          component: landingcontent
+        }
+      ],
   },
   {
     path: '/FurrySafe',

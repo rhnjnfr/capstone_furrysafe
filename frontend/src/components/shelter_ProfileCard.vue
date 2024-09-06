@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-white md:flex md:items-center md:justify-between md:space-x-5 border rounded-lg p-[2rem] lg:px-[5rem] shadow-md">
+        class="bg-white md:flex md:items-center md:justify-between md:space-x-5 border-b-2 border-t p-[2rem] lg:px-[5rem]">
         <div class="flex items-center space-x-5 sm:justify-center">
             <div class="flex-shrink-0">
                 <div class="relative">
@@ -17,7 +17,7 @@
             class="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:space-x-3 sm:space-y-0 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
             <router-link to="/edit_shelterprofile">
                 <button type="button"
-                    class="inline-flex justify-center rounded-md bg-white sm:px-[3rem]  md:px-[2rem] lg:px-[13px]  py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    class="inline-flex justify-center rounded-md bg-white sm:px-[3rem]  md:px-[2rem] lg:px-[13px]  py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                     <PencilIcon class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                     <span class="sm:text-[13.5px] md:text-[14px]">Edit Profile</span>
                 </button>
