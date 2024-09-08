@@ -22,7 +22,8 @@
                                 ID Number</label>
                             <div class="mt-2">
                                 <input type="text" v-model="idNum" name="idNum" id="idNum"
-                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" readonly>
+                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
+                                    readonly>
                             </div>
                         </div>
                         <div class="md:col-span-3 sm:col-span-full">
@@ -161,7 +162,8 @@
                             <label for="coatfur" class="block text-sm font-medium leading-6 text-gray-900">
                                 Coat / Fur</label>
                             <div class="mt-2">
-                                <input type="text" name="coatfur" id="coatfur" placeholder="ex. Short, dark-brown coat with a slight wave"
+                                <input type="text" name="coatfur" id="coatfur"
+                                    placeholder="ex. Short, dark-brown coat with a slight wave"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -345,12 +347,15 @@
                 <div class="flex items-center justify-end gap-x-6">
                     <RouterLink to="/animalprofile" class="text-sm font-semibold leading-6 text-gray-900">
                         Cancel</RouterLink>
-                    <button type="submit"
-                        class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">Create
-                        Profile</button>
+                    <button type="button"
+                        class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                        @click="showPrompt">
+                        Save Changes
+                    </button>
                 </div>
             </div>
         </form>
+        <prompt v-model:isOpen="isModalpromptOpen" @save-clicked="handleSaveClick"/>
         <footer class="mt-auto">
             <div>
                 <linkfooter />
@@ -363,6 +368,19 @@
 import { ref, watch, computed } from 'vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid'
 import linkfooter from '@/components/footerLink.vue'
+import prompt from '@/components/prompt_savechange.vue'
+
+const isModalpromptOpen = ref(false)
+
+// Toggle the modal's visibility
+function showPrompt() {
+  isModalpromptOpen.value = true
+}
+
+function handleSaveClick() {
+  console.log('Save button clicked!')
+  // Perform actions when the Save button is clicked
+}
 
 const idNum = ref('') //idnumber
 

@@ -118,10 +118,11 @@
             </div>
             <div class="mt-6 flex items-center justify-end gap-x-6">
                 <router-link to="/myshelter" class="text-sm font-semibold leading-6 text-gray-900">Cancel</router-link>
-                <button type="submit"
-                    class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save
-                    Changes</button>
+                <button type="button"  @click="showPrompt"
+                    class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Save Changes</button>
             </div>
+            <prompt v-model:isOpen="isModalpromptOpen" @save-clicked="handleSaveClick"/>
         </div>
     </form>
 </template>
@@ -129,7 +130,19 @@
 <script setup>
 import { ref } from 'vue';
 import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid'
+import prompt from '@/components/prompt_savechange.vue'
 
+const isModalpromptOpen = ref(false)
+
+// Toggle the modal's visibility
+function showPrompt() {
+  isModalpromptOpen.value = true
+}
+
+function handleSaveClick() {
+  console.log('Save button clicked!')
+  // Perform actions when the Save button is clicked
+}
 const fileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element.
 const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
 const links = ref([{ value: '' }]);

@@ -167,8 +167,8 @@ import { Bars3Icon, XMarkIcon, IdentificationIcon, HomeModernIcon, ChatBubbleLef
 import { PuzzlePieceIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
 
 //my components for popup modals
-import popupNewpost from '@/components/shelter_NewPost.vue'
-import popupNewEvent from '@/components/shelter_EventPost.vue'
+import popupNewpost from '@/components/shelter_NewPostModal.vue'
+import popupNewEvent from '@/components/shelter_EventPostModal.vue'
 
 import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
 import shelterICON from '@/assets/images/Footprint.png' // icon

@@ -2,118 +2,13 @@
 import textvalue from '@/components/textString.vue'
 import datetoday from '@/components/dateCard.vue'
 import linkfooter from '@/components/footerLink.vue'
-import statusbuttons from '@/components/shelter_ReportStatusButtons.vue'
+import reports from '@/components/shelter_ReportsCard.vue'
 import { RouterLink } from 'vue-router';
 
 export default {
     components: {
-        textvalue, datetoday, linkfooter, statusbuttons
+        textvalue, datetoday, linkfooter, reports
     },
-    data() {
-        return {
-            isOpen: false, // dropdown
-            showRescueCancelButtons: false,
-            showSuccessMessage: false,
-            reports: [
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/eric.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bals.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/charles.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bert.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/eric.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bals.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/charles.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bert.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/eric.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bals.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/charles.png'),
-                    badge: 'rescuer',
-                },
-                {
-                    type: 'Missing Dog',
-                    caption: 'Found this dog at abandoned lot near STI College Davao',
-                    location: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
-                    animalstatus: 'Severe',
-                    imageUrl: require('@/assets/images/bert.png'),
-                    badge: 'rescuer',
-                },
-            ]
-        }
-    }
 };
 </script>
 <template>
@@ -136,27 +31,7 @@ export default {
                         <span class="graycolor font-semibold">Reports Feed</span>
                     </div>
                     <div class="overflow-y-scroll h-[50rem] p-[1rem]">
-                        <div v-for="(report, index) in reports" :key="index" class="bg-white shadow-md rounded-lg mb-4">
-                            <div class="h-[2rem] bg-white border-b-2 rounded-t-lg" />
-                            <div class="w-full bg-gray-50 border-b-2">
-                                <img class="mx-auto flex-shrink-0 w-[20rem]" :src="report.imageUrl" alt="image post" />
-                            </div>
-                            <div class="px-[2rem] py-3 text-gray-700 grid gap-y-1">
-                                <p class=" border-b-2 py-4 font-semibold text-[15px]">{{ report.caption }}</p>
-                                <div class="my-[1rem]">
-                                    <span class="flex gap-5 text-[14px]">Report Type:
-                                        <h1 class="font-bold text-[15px] flex gap-3">{{ report.type }}</h1>
-                                    </span>
-                                    <span class="flex text-[14px] gap-3">Animal Status:
-                                        <span class="font-semibold text-[15px]">{{ report.animalstatus }}</span>
-                                    </span>
-                                    <span class="flex gap-10 text-[14px]">Location:
-                                        <p class="font-semibold text-[15px]">{{ report.location }}</p>
-                                    </span>
-                                </div>
-                            </div>
-                            <statusbuttons/>
-                        </div>
+                        <reports />
                     </div>
                 </div>
                 <div class="border rounded-lg w-3/5 h-full bg-slate-50">

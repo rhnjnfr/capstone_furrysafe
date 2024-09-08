@@ -6,12 +6,13 @@ import detailCard from '@/components/shelter_DetailsCard.vue'
 import linkfooter from '@/components/footerLink.vue'
 
 // pop-up modals
-import popupNewpost from '@/components/shelter_NewPost.vue'
-import popupNewEvent from '@/components/shelter_EventPost.vue'
+import popupNewpost from '@/components/shelter_NewPostModal.vue'
+import popupNewEvent from '@/components/shelter_EventPostModal.vue'
+import eventsCard from '@/components/shelter_EventFeaturedCard.vue'
 
 export default {
     components: {
-        textvalue, datetoday, profileCard, detailCard, linkfooter, popupNewpost, popupNewEvent
+        textvalue, datetoday, profileCard, detailCard, linkfooter, popupNewpost, popupNewEvent, eventsCard
     },
     methods: {
         toggleModalPost() {
@@ -19,7 +20,7 @@ export default {
         },
         toggleModalEvent() {
             this.showModalNewEvent = !this.showModalNewEvent
-        }
+        },
     },
     data() {
         return {
@@ -28,70 +29,10 @@ export default {
             // pop up new post
             showModalCreatePost: false,
             isOpen: false,
-            //event
-            events: [
-                {
-                    title: 'Example Title 1',
-                    dateStarted: '2022-01-01',
-                    dateEnded: '2022-01-31',
-                    caption: 'Upcomming event dbsjdlhskhdslk dhslakdhl sdasdsd sdasddas sdasdasdsa dsadsguisad dgsuiadgsakdksua dugsaudgsaud gsuagdusg dusagduosagdus gduisgadiug duisaguidgs',
-                    imageUrl: require('@/assets/images/eric.png'),
-                },
-                {
-                    title: 'Example Title 2',
-                    dateStarted: '2022-02-01',
-                    dateEnded: '2022-02-28',
-                    caption: 'Another event caption',
-                    imageUrl: require('@/assets/images/bals.png'),
-                },
-                {
-                    title: 'Example Title 1',
-                    dateStarted: '2022-01-01',
-                    dateEnded: '2022-01-31',
-                    caption: 'Upcomming event dbsjdlhskhdslk dhslakdhl sdasdsd sdasddas sdasdasdsa',
-                    imageUrl: require('@/assets/images/charles.png'),
-                },
-                {
-                    title: 'Example Title 1',
-                    dateStarted: '2022-01-01',
-                    dateEnded: '2022-01-31',
-                    caption: 'Upcomming event dbsjdlhskhdslk dhslakdhl sdasdsd sdasddas sdasdasdsa',
-                    imageUrl: require('@/assets/images/homepage.png'),
-                },
-                // Add more events here
-            ],
             // to show hidden events
             showEventInfo: false,
-
-            // newsfeed
-            shelterpost: [
-                {
-                    caption: 'You can’t buy love, but you can rescue it.',
-                    who: 'Eric',
-                    imageUrl: require('@/assets/images/rescue.png'),
-                    dropdownOpen: false
-                },
-                // more post details
-                {
-                    caption: 'Saving on dog will not change the world, but surely for that one dog, the world will change forever.” - Karen Davison',
-                    who: 'Jeneh',
-                    imageUrl: require('@/assets/images/animalshelterdog.png'),
-                    dropdownOpen: false
-                },
-                {
-                    caption: 'Do you believe in love at first sight, or should I wag my tail again?',
-                    who: 'Cyril',
-                    imageUrl: require('@/assets/images/homepage.png'),
-                    dropdownOpen: false
-                },
-            ],
         }
     },
-    methods: {
-        eventDisplay() {
-            this.showEventInfo = !this.showEventInfo;
-        }
-    }
 };
 </script>
 <template>
@@ -119,32 +60,18 @@ export default {
                             class="flex justify-between items-center bg-amber-50 rounded-lg py-2 sm:px-[2rem] lg:px-[3rem]">
                             <div><span class="sm:text-[14px]">Event Posts</span></div>
                             <div>
-                                <button @click="eventDisplay">
+                                <button @click="$nextTick(() => {
+                                    this.showEventInfo = !this.showEventInfo;
+                                    this.$refs.eventCard.toggleEventInfo()
+                                })">
                                     <img width="13" height="13"
                                         :src="showEventInfo ? 'https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/4D4D4D/external-Up-arrows-tanah-basah-glyph-tanah-basah-6.png' : 'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/24/4D4D4D/external-chevron-arrows-tanah-basah-basic-outline-tanah-basah-4.png'"
                                         alt="external-chevron-arrows-tanah-basah-basic-outline-tanah-basah-4" />
                                 </button>
                             </div>
                         </div>
-                        <div v-if="showEventInfo" class="mt-[1rem] py-2 w-full overflow-x-auto">
-                            <div class="flex">
-                                <div v-for="(event, index) in events" :key="index"
-                                    class="border bg-white rounded-lg sm:w-[20rem] lg:w-[30rem] mx-2 flex-shrink-0">
-                                    <div class="px-[1rem] py-2 border-b">
-                                        <span class="font-semibold text-lg">{{ event.title }}</span>
-                                    </div>
-                                    <div class="flex flex-col px-[1rem] py-3 gap-1 sm:text-[11px] lg:text-[14px]">
-                                        <span>Event Starts: <b class="font-medium sm:text-[11px] lg:text-[14px] pl-2">{{ event.dateStarted
-                                                }}</b></span>
-                                        <span>Event Ends: <b class="font-medium sm:text-[11px] lg:text-[14px] pl-2.5">{{ event.dateEnded
-                                                }}</b></span>
-                                        <p class="font-medium lg:text-[14px] mb-2">{{ event.caption }}</p>
-                                        <div class="flex justify-center items-center border-t-2 mt-2">
-                                            <img :src="event.imageUrl" alt="event image" id="imgsize" class="lg:w-[23rem] lg:h-[20rem] mt-2">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div>
+                            <eventsCard ref="eventCard" />
                         </div>
                     </div>
                     <div>
@@ -182,50 +109,7 @@ export default {
                         </div>
 
                         <div class="my-[1rem]">
-                            <div v-for="(post, index) in shelterpost" :key="index"
-                                class="border rounded-lg bg-white w-full h-fit mb-4">
-                                <div
-                                    class="px-[2rem] py-[10px] border-b-2 grid grid-flow-col items-center justify-between">
-                                    <span class="sr-only">header space</span>
-                                </div>
-                                <div class="w-full bg-slate-50">
-                                    <img class="mx-auto flex-shrink-0 w-[50rem]" :src="post.imageUrl"
-                                        alt="image post" />
-                                </div>
-
-                                <div class="px-[2rem] py-[2rem]">
-                                    <div class="grid grid-flow-col justify-between">
-                                        <h1 class="flex items-center gap-4">
-                                            <img width="25" height="25"
-                                                src="https://img.icons8.com/color/48/dog-paw-print.png"
-                                                alt="dog-paw-print" />
-                                            {{ post.who }}
-                                        </h1>
-                                        <div class="relative">
-                                            <button @click="post.dropdownOpen = !post.dropdownOpen"
-                                                class="flex items-center">
-                                                <img width="12" height="12"
-                                                    src="https://img.icons8.com/ios-filled/50/4D4D4D/menu-2.png"
-                                                    alt="menu-2" />
-                                            </button>
-                                            <div v-if="post.dropdownOpen"
-                                                class="absolute right-0 mt-2 w-[8rem] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                                <div class="py-1" role="menu" aria-orientation="vertical"
-                                                    aria-labelledby="options-menu">
-                                                    <RouterLink to=""
-                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                        role="menuitem">View post</RouterLink>
-                                                    <RouterLink to=""
-                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                        role="menuitem">Edit post</RouterLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <p class="text-sm font-medium text-gray-900 pt-[1rem]">{{ post.caption }}</p>
-                                </div>
-                            </div>
+                            <RouterView />
                         </div>
                     </div>
                 </div>

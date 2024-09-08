@@ -344,12 +344,13 @@
                 <div class="flex items-center justify-end gap-x-6">
                     <RouterLink to="/animalprofile" class="text-sm font-semibold leading-6 text-gray-900">
                         Cancel</RouterLink>
-                    <button type="submit"
-                        class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">Create
-                        Profile</button>
+                    <button type="button" @click="showPrompt"
+                        class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+                        Create Profile</button>
                 </div>
             </div>
         </form>
+        <prompt v-model:isOpen="isModalpromptOpen" @yes-clicked="handleYesClick"/>
         <footer class="mt-auto">
             <div>
                 <linkfooter />
@@ -362,6 +363,19 @@
 import { ref, watch, computed } from 'vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid'
 import linkfooter from '@/components/footerLink.vue'
+import prompt from '@/components/prompt_savecreatedacc.vue'
+
+const isModalpromptOpen = ref(false)
+
+// Toggle the modal's visibility
+function showPrompt() {
+  isModalpromptOpen.value = true
+}
+
+function handleYesClick() {
+  console.log('Yes button clicked!')
+  // Perform actions when the Save button is clicked
+}
 
 const idNum = ref('') //idnumber
 
