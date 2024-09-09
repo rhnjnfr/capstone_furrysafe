@@ -1,5 +1,6 @@
 import supabase from "../config/database.js";
 
+//REGISTRATION FUNCTIONS
 //create shelter (saves User_ID, and retrieves Shelter_id)
 export const createShelter = async (userID, shelter_name, req, res)=> {
     console.log("shelter model")
@@ -29,6 +30,42 @@ export const createShelter = async (userID, shelter_name, req, res)=> {
 
 //create shelter details 
 export const createShelterDetails = async (shelterId, shelterName, req, res)=> {
-    console.log("shelter model: create details: ", shelterName, shelterId)
+    //console.log("shelter model: create details: ", shelterName, shelterId)
+    try{
+        const {data, error} = await supabase
+        .from('tbl_shelter_details')
+        .insert([
+            {shelter_id: shelterId, shelter_name: shelterName}
+        ])
+    }
+    catch(err){
+        console.log("error in shelter model, creating shelter details: ", err)
+    }
 }
-export default createShelter;
+
+//save documents to documents tbl 
+
+//LOGIN FUNCTIONS 
+//verify if shelter is verified 
+export const verifyShelter = async (userID)=>{
+    try{
+        //console.log("verify shelter with id: ", userID); 
+        const {data, error} = await supabase 
+        .from('tbl_shelter')
+        .select('verified')
+        .eq('user_id', userID)
+
+        const shelter_status = data[0]?.verified
+        if(shelter_status == true){
+            console.log(true)
+        }
+        else{
+            console.log("titeshdfhkga")
+        }
+    }
+    catch(err){
+        console.log("error in verifying shelter: ", err);
+        throw err; 
+    }
+}
+export default createShelter;    

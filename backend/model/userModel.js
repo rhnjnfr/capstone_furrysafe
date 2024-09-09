@@ -1,11 +1,12 @@
 import bcrypt from "bcrypt"
 import supabase from "../config/database.js"
 import { createBuddy } from "./buddyModel.js"
-import { createShelter } from "./shelterModel.js";
+import { createShelter, verifyShelter } from "./shelterModel.js";
 
 //check if user credentials exist in DATABASE
 export const validateUser = async (req, res) => {
-    const { email, password } = req.body
+    try{
+        const { email, password } = req.body
 
     const { data, error } = await supabase 
         .from('tbl_user')
@@ -13,19 +14,84 @@ export const validateUser = async (req, res) => {
         .eq('user_email', email);
 
     if (error) {
+        console.log("retrieve failed")
         res.status(500).json({ error: error.message });
         return;
     }
 
+    // if (data && data.length > 0) {
+    //     //Compare salted hash password to input
+    //     if(await bcrypt.compare(password, data[0].user_password)){
+    //         //return success if salted-hash password is similar
+    //         res.status(200).json({ success: true, message: 'User validated successfully', user: data[0] });
+    //     }
+    // } else {
+    //     // User not found or credentials don't match
+    //     res.status(401).json({ success: false, message: 'Invalid email or password' });
+    // }
+
+    console.log("data", data)
     if (data && data.length > 0) {
-        //Compare salted hash password to input
-        if(await bcrypt.compare(password, data[0].user_password)){
-            //return success if salted-hash password is similar
-            res.status(200).json({ success: true, message: 'User validated successfully', user: data[0] });
+        const user = data[0];
+
+        // Compare salted hash password to input
+        const passwordMatch = await bcrypt.compare(password, user.user_password);
+        if (!passwordMatch) {
+            res.status(401).json({ success: false, message: 'Invalid email or password' });
+            return;
         }
-    } else {
+        
+        // Step 2: Check which table the user belongs to - shelter or buddy
+        const userID = user.user_id;
+        const { data: shelterData, error: shelterError } = await supabase
+            .from('tbl_shelter')
+            .select('shelter_id')
+            .eq('user_id', userID);
+        
+            
+        //nothing is returned from shelter
+        if (shelterError) {
+            console.log("shelter error:")
+            res.status(500).json({ error: shelterError.message });
+            return;
+        }
+    
+        //user is shelter 
+        if (shelterData && shelterData.length > 0) {
+            res.status(200).json({ success: true, message: 'User validated successfully', userType: 'shelter', user: user });
+            //return;
+            verifyShelter(user.user_id)
+            console.log("shelter details", shelterData)
+            return;
+        }
+    
+        // If not found in sheltertbl, check buddytbl
+        const { data: buddyData, error: buddyError } = await supabase
+            .from('tbl_shelter')
+            .select('buddy_id')
+            .eq('user_id', userID);
+    
+        if (buddyError) {
+            console.log("buddy error:")
+            res.status(500).json({ error: buddyError.message });
+            return;
+        }
+    
+        if (buddyData && buddyData.length > 0) {
+          // User is a buddy
+            // res.status(200).json({ success: true, message: 'User validated successfully', userType: 'buddy', user: user });
+            // return;
+        }
+    
+        // If the user is not found in either table, consider it an error
+        res.status(401).json({ success: false, message: 'User type not determined' });
+    
+      } else {
         // User not found or credentials don't match
         res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
+    }catch(err){
+        console.log("error in verifying user", err)
     }
 };
 //create user in DATABASE
