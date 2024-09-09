@@ -47,7 +47,7 @@ export const createShelterDetails = async (shelterId, shelterName, req, res)=> {
 
 //LOGIN FUNCTIONS 
 //verify if shelter is verified 
-export const verifyShelter = async (userID)=>{
+export const verifyShelter = async (userID, req, res)=>{
     try{
         //console.log("verify shelter with id: ", userID); 
         const {data, error} = await supabase 
@@ -57,10 +57,10 @@ export const verifyShelter = async (userID)=>{
 
         const shelter_status = data[0]?.verified
         if(shelter_status == true){
-            console.log(true)
+            return { success: true };
         }
         else{
-            console.log("titeshdfhkga")
+            return { success: false };
         }
     }
     catch(err){

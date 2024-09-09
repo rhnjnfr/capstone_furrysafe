@@ -58,16 +58,22 @@ export const validateUser = async (req, res) => {
     
         //user is shelter 
         if (shelterData && shelterData.length > 0) {
-            res.status(200).json({ success: true, message: 'User validated successfully', userType: 'shelter', user: user });
-            //return;
-            verifyShelter(user.user_id)
-            console.log("shelter details", shelterData)
-            return;
+            const verificationResult = await verifyShelter(userID); 
+
+            if (verificationResult.success) {
+                // Shelter is verified
+                res.status(200).json({ success: true, message: 'User validated and shelter verified successfully', userType: 'shelter', user: user });
+                return;
+            } else {
+                // Shelter is not verified
+                res.status(403).json({ success: false, message: 'Shelter is not verified' });
+                return;
+            }
         }
     
         // If not found in sheltertbl, check buddytbl
         const { data: buddyData, error: buddyError } = await supabase
-            .from('tbl_shelter')
+            .from('tbl_buddy')
             .select('buddy_id')
             .eq('user_id', userID);
     
@@ -79,8 +85,8 @@ export const validateUser = async (req, res) => {
     
         if (buddyData && buddyData.length > 0) {
           // User is a buddy
-            // res.status(200).json({ success: true, message: 'User validated successfully', userType: 'buddy', user: user });
-            // return;
+            res.status(200).json({ success: true, message: 'User validated successfully', userType: 'buddy', user: user });
+            return;
         }
     
         // If the user is not found in either table, consider it an error
@@ -118,7 +124,7 @@ export const createUser = async (req, res) =>{
     } else {
         //sample logic
         const userID = data[0]?.user_id;
-        console.log(userID)
+        //console.log(userID)
         if(regtype.match("buddy")){
             //console.log("buddy")
             await createBuddy(userID);

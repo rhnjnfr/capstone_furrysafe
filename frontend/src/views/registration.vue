@@ -81,6 +81,11 @@ export default {
         back: require('@/assets/images/Back.png'),
         gender: "",
         //registration 
+        firstname: '', 
+        lastname: '', 
+        username: '', 
+        dob: '',
+        gender: '',
         email: '',
         password: '',
         reg_type: 'buddy',

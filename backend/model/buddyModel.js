@@ -1,5 +1,7 @@
 import supabase from "../config/database.js";
 
+//REGISTRATION FUNCTIONS
+//create buddy in buddy tbl 
 export const createBuddy = async (userID) => {
     console.log("buddy model")
     try {
@@ -9,13 +11,14 @@ export const createBuddy = async (userID) => {
             .insert([
                 { user_id: userID } // Insert the userID into the buddy table
             ])
-            .select
+            .select()
 
+            const buddyid = data[0]?.buddy_id
         if (error) {
             console.error("Error creating buddy:", error);
             throw error; // Throw error if insertion fails
         } else {
-            //console.log("Buddy successfully created with userID:", userID);
+            
         }
     } catch (err) {
         console.error("Unexpected error:", err);
@@ -23,4 +26,6 @@ export const createBuddy = async (userID) => {
     }
 };
 
+//create buddy in buddy details
+//export const createBuddyDetails = async (buddyid, )
 export default createBuddy;

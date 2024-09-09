@@ -110,8 +110,15 @@ export default {
                 this.items = response.data
                 if (response.data.success) {
                     //handles login success s
-                    this.navigateTo('/')
-                    //console.log("Success data: " , response.data[1])
+                    const userType = response.data.userType
+                    
+                    if(userType == 'shelter'){
+                        this.navigateTo('/shelterDashboard')
+                    }
+                    if(userType == 'buddy'){
+                        this.navigateTo('/')
+                    }
+
                 } else {
                     // Handle login failure dapat naa ni ui change pag invalid ang credentials 
                     console.log("Invalid login credentials");
