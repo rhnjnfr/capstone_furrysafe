@@ -15,6 +15,7 @@ import rescueoperation from "../views/Shelter/rescueoperation.vue"
 //jene
 import login from "../views/login.vue"
 import registration from "../views/registration.vue"
+import shelter_registration from '@/views/shelter_registration.vue';
 
 const routes = [
   //jene loginhelp huehfjkgjgsad
@@ -27,6 +28,11 @@ const routes = [
     path: '/registration',
     name: 'registration',
     component: registration
+  },
+  {
+    path: '/shelter_registration',
+    name: 'shelter_registration',
+    component: shelter_registration
   },
   {
     path: '/',

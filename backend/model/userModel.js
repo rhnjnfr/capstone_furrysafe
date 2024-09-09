@@ -1,19 +1,9 @@
 import bcrypt from "bcrypt"
 import supabase from "../config/database.js"
+import { createBuddy } from "./buddyModel.js"
+import { createShelter } from "./shelterModel.js";
 
-export const getUsers = async (req, res) => {
-    const { data, error } = await supabase
-        .from('tbl_user')
-        .select('*');
-
-    if (error) {
-        res.status(500).json({ error: error.message });
-    } else {
-        res.status(200).json(data);
-    }
-};
-
-//check if user exist in DATABASE
+//check if user credentials exist in DATABASE
 export const validateUser = async (req, res) => {
     const { email, password } = req.body
 
@@ -40,17 +30,18 @@ export const validateUser = async (req, res) => {
 };
 //create user in DATABASE
 export const createUser = async (req, res) =>{
-    const { email, password } = req.body 
-    
+    const { email, password, regtype } = req.body 
+    console.log("user model req body data: ", req.body.data)
     //create a salted-hash password 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    //save to DATABASE
+    //save to USER DATABASE
     const {data, error } = await supabase 
     .from('tbl_user')
     .insert([
         {user_email: email, user_password: hashedPassword }
-    ]);
+    ])
+    .select()
 
     if(error){
         if (error.code.match('23505')) { // PostgreSQL error code for unique violation
@@ -59,6 +50,20 @@ export const createUser = async (req, res) =>{
             res.status(401).json({ success: false, message: 'Error Inserting Data' });
         }
     } else {
+        //sample logic
+        const userID = data[0]?.user_id;
+        console.log(userID)
+        if(regtype.match("buddy")){
+            //console.log("buddy")
+            await createBuddy(userID);
+        }
+        else{
+            //console.log("shelter")
+            const { shelter_name } = req.body
+            //console.log("usermodel sheltername: ", shelter_name)
+            await createShelter(userID, shelter_name);
+        }
        res.status(200).json({success: true, message: 'User Successfully added', user: data});
     }
-}
+};
+

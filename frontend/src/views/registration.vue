@@ -83,6 +83,7 @@ export default {
         //registration 
         email: '',
         password: '',
+        reg_type: 'buddy',
         items: [],
         }  
     },
@@ -97,7 +98,9 @@ export default {
                 //add data to email & pass 
                 this.email = userEmail.value;
                 this.password = userPass.value;
+                //this.reg_type = 'buddy';
 
+                //console.log("regtype:" + this.reg_type)
                 //console.log(this.email + ' ' + this.password)
                 await this.setUser();
             }
@@ -111,7 +114,8 @@ export default {
                 const response = await axios.post("http://localhost:5000/registration", 
                 {
                     email: this.email,
-                    password: this.password
+                    password: this.password,
+                    regtype: this.reg_type
                 })
                 this.items = response.data
                 console.log("response: ", response.data); 

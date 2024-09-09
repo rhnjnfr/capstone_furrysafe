@@ -109,7 +109,7 @@ export default {
                 )
                 this.items = response.data
                 if (response.data.success) {
-                    //handles login success 
+                    //handles login success s
                     this.navigateTo('/')
                     //console.log("Success data: " , response.data[1])
                 } else {
