@@ -2,6 +2,7 @@
   <div class="relative">
     <input
       type="text"
+      id="gender"
       placeholder="Select Gender"
       class="w-full p-2 px-5 text-gray-700 border rounded-lg cursor-pointer sm:text-[12px] md:text-[12px] lg:text-[15px]"
       @click="showOptions = !showOptions"

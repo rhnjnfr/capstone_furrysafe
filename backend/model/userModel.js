@@ -102,16 +102,15 @@ export const validateUser = async (req, res) => {
 };
 //create user in DATABASE
 export const createUser = async (req, res) =>{
-    const { email, password, regtype } = req.body 
-    console.log("user model req body data: ", req.body.data)
+    const { user, regtype} = req.body 
     //create a salted-hash password 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(user.password, 10)
 
     //save to USER DATABASE
     const {data, error } = await supabase 
     .from('tbl_user')
     .insert([
-        {user_email: email, user_password: hashedPassword }
+        {user_email: user.email, user_password: hashedPassword }
     ])
     .select()
 
@@ -127,7 +126,10 @@ export const createUser = async (req, res) =>{
         //console.log(userID)
         if(regtype.match("buddy")){
             //console.log("buddy")
-            await createBuddy(userID);
+            //const {firstname, lastname, username, dob, gender} = req.body;
+            
+            //await createBuddy(userID, firstname, lastname, username, dob, gender);
+            await createBuddy(userID, user);
         }
         else{
             //console.log("shelter")

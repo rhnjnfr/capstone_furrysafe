@@ -81,13 +81,15 @@ export default {
         back: require('@/assets/images/Back.png'),
         gender: "",
         //registration 
-        firstname: '', 
-        lastname: '', 
-        username: '', 
-        dob: '',
-        gender: '',
-        email: '',
-        password: '',
+        userdetails: {
+            firstname: '', 
+            lastname: '', 
+            username: '', 
+            dob: '',
+            gender: '',
+            email: '',
+            password: '',
+        },
         reg_type: 'buddy',
         items: [],
         }  
@@ -96,17 +98,32 @@ export default {
         navigateTo(path) {
             this.$router.push(path);
         },
+        //sign up
         async handleSignup(){   
             try{
-                const userEmail = document.getElementById('email');
-                const userPass = document.getElementById('password');
-                //add data to email & pass 
-                this.email = userEmail.value;
-                this.password = userPass.value;
-                //this.reg_type = 'buddy';
+                //retrieves user input
+                this.userdetails = {
+                    email: document.getElementById('email').value,
+                    password:  document.getElementById('password').value,
+                    firstname: document.getElementById('fname').value,
+                    lastname: document.getElementById('lname').value,
+                    username: document.getElementById('username').value,
+                    gender: document.getElementById('gender').value,
+                    dob: document.getElementById('bdate').value
+                }
 
-                //console.log("regtype:" + this.reg_type)
-                //console.log(this.email + ' ' + this.password)
+                //checks if some fields are empty 
+                if (!this.userdetails.firstname || !this.userdetails.lastname || !this.userdetails.email || !this.userdetails.password) {
+                    console.log("Some required fields are empty."); //should have a user interface feedback 
+                    return; 
+                }
+                if(!this.userdetails.gender){
+                    this.userdetails.gender = 'unspecified'
+                }
+
+                console.log(this.userdetails.gender)
+
+                //console.log(this.userdetails)
                 await this.setUser();
             }
             catch(err){
@@ -118,9 +135,11 @@ export default {
             try{
                 const response = await axios.post("http://localhost:5000/registration", 
                 {
-                    email: this.email,
-                    password: this.password,
-                    regtype: this.reg_type
+                    // email: this.email,
+                    // password: this.password,
+                    regtype: this.reg_type,
+                    //details 
+                    user: this.userdetails
                 })
                 this.items = response.data
                 console.log("response: ", response.data); 
