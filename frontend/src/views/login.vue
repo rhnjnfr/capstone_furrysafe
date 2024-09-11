@@ -32,7 +32,7 @@
                             <label for="keep-me-signed-in">Keep me signed in</label>
                         </div>
                         <div>
-                            <a @click="navigateTo('')" class="cursor-pointer">
+                            <a @click="navigateTo('/forgot-password')" class="cursor-pointer">
                                 <u>Forget password</u>
                             </a>
                       </div>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex mt-3 justify-center space-x-2 sm:text-[9px] md:text-[11px] lg:text-[13px]">
                         <span>Don't you have an account? </span>
-                        <a @click="navigateTo('/registrationform')" class="text-blue-500 cursor-pointer">
+                        <a @click="navigateTo('/registration')" class="text-blue-500 cursor-pointer">
                           <u>Sign up</u>
                         </a>
                     </div>

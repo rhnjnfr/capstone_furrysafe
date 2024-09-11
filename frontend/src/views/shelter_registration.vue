@@ -1,3 +1,4 @@
+
 <template>
     <div class="w-full h-screen flex items-center justify-center">
         <div class="border w-screen md:flex md:items-center">
@@ -11,6 +12,10 @@
                             </svg>
                             <span class="text-gray-700 sm:pl-[10px]">Back</span>
                         </router-link>
+                        <!-- TESTING NI GAIS :DDDDDDDDDDDDDDDDD-->
+                       <router-link to="/registration">
+                            register as buddy
+                       </router-link>
                     </div>
                     <div
                         class="field grid font-medium sm:text-[10px] sm:pt-5 sm:space-y-2 md:text-[12px] md:space-y-3 lg:text-[15px]">
@@ -28,8 +33,8 @@
                         <passwordunhide />
                     </div>
                     <div class="mt-[1rem]">
-                        <label for="otherPhotos"
-                            class="font-medium sm:text-[10px] md:text-[12px] lg:text-[15px]">Upload Documents</label>
+                        <label for="otherPhotos" class="font-medium sm:text-[10px] md:text-[12px] lg:text-[15px]">Upload
+                            Documents</label>
                         <div class="px-[1rem] py-[1rem]">
                             <div class="px-4 sm:col-span-2 sm:px-0">
                                 <ul role="list"
@@ -57,7 +62,9 @@
                                     <img width="24" height="24"
                                         src="https://img.icons8.com/fluency/48/stack-of-photos.png"
                                         alt="stack-of-photos" />
-                                    <span class="font-medium text-gray-700 sm:text-[10px] md:text-[12px] lg:text-[15px]">Add more documents</span>
+                                    <span
+                                        class="font-medium text-gray-700 sm:text-[10px] md:text-[12px] lg:text-[15px]">Add
+                                        more documents</span>
                                 </label>
                             </div>
                         </div>
@@ -95,9 +102,11 @@ export default {
             files: [],
             otherPhotos: null,
             //registration 
-            sheltername: '',
-            email: '', 
-            password: '',
+            userdetails: {
+                sheltername: '',
+                email: '', 
+                password: '',   
+            },
             reg_type: 'shelter',
             items: [],
         }
@@ -125,14 +134,13 @@ export default {
         //registration no saving of img for now 
         async handleSignup(){
             try{
-                const userEmail = document.getElementById('email')
-                const userPassword = document.getElementById('password') 
-                const shelterName = document.getElementById('sheltername')
-                //add values to return variables
-                this.email = userEmail.value; 
-                this.password = userPassword.value
-                this.sheltername = shelterName.value
                 
+                this.userdetails = {
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                    sheltername: document.getElementById('sheltername').value
+                }
+
                 await this.setUser();
             }
             catch(err){
@@ -142,12 +150,10 @@ export default {
         //create user to user table 
         async setUser(){
             try{
-                console.log("to post: ", this.email, this.password, this.reg_type, this.sheltername)
+                console.log(this.userdetails)
                 const response = await axios.post("http://localhost:5000/shelter_registration",
                     {
-                        email: this.email,
-                        password: this.password, 
-                        shelter_name: this.sheltername,
+                        user: this.userdetails,
                         regtype: this.reg_type
                     })
                 this.items = response.data
@@ -168,3 +174,4 @@ export default {
     },
 }
 </script>
+

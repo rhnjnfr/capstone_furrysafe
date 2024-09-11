@@ -1,3 +1,4 @@
+<!-- 
 <template>
     <Disclosure as="nav" class="bg-white shadow" v-slot="{ open }">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -30,7 +31,7 @@
                         Sign-Up</RouterLink>
                 </div>
                 <div class="-mr-2 flex items-center sm:hidden">
-                    <!-- Mobile menu button -->
+                    Mobile menu button
                     <DisclosureButton
                         class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                         <span class="absolute -inset-0.5" />
@@ -61,17 +62,26 @@
             </div>
         </DisclosurePanel>
     </Disclosure>
+</template> -->
+
+
+<script>
+export default {
+    components: {
+        navigation
+    },
+    data() {
+        return {
+            //icons
+            home: require('@/assets/images/homepage.png'),
+        }
+    },
+}
+</script>
+
+<template>
+    <div>
+        <img :src="home" alt="animalshelterdog" class="w-full h-full" />
+    </div>
 </template>
 
-<script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
-import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
-const navigation = [
-    { name: 'Home', to: { name: 'landingpage' }, current: true },
-    { name: 'Featured', to: { name: 'shelterDashboard' }, current: false },
-    { name: 'Contacts', to: { name: '' }, current: false },
-    { name: 'About', to: { name: '' }, current: false },
-    { name: 'FAQ', to: { name: '' }, current: false },
-]
-</script>

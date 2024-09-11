@@ -104,9 +104,12 @@ export const validateUser = async (req, res) => {
 export const createUser = async (req, res) =>{
     const { user, regtype} = req.body 
     //create a salted-hash password 
+
+    console.log("create user: ", user.password)
+
     const hashedPassword = await bcrypt.hash(user.password, 10)
 
-    //save to USER DATABASE
+    // //save to USER DATABASE
     const {data, error } = await supabase 
     .from('tbl_user')
     .insert([
@@ -133,9 +136,9 @@ export const createUser = async (req, res) =>{
         }
         else{
             //console.log("shelter")
-            const { shelter_name } = req.body
+            // const { shelter_name } = req.body
             //console.log("usermodel sheltername: ", shelter_name)
-            await createShelter(userID, shelter_name);
+            await createShelter(userID, user);
         }
        res.status(200).json({success: true, message: 'User Successfully added', user: data});
     }

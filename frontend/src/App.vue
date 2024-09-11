@@ -8,17 +8,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.lightgraycolor {
-    background: #F5F5F5;
-}
-
 .graycolor {
     --tw-text-opacity: 1;
     color: #5A5A5A;
-}
-
-.lightgreen {
-    background-color: #40d494;
 }
 
 .hover\:bg-lightgreen:hover {
@@ -38,12 +30,7 @@
 
 .hover\:bg-bgdarkorange:hover {
     --tw-bg-opacity: 1;
-    background-color: #d19132;
-}
-
-.hover\:bg-bgdarkorange:hover {
-    --tw-bg-opacity: 1;
-    background-color: #d19132;
+    background-color: #e8a643;
 }
 
 .hover\:bg-lightorange:hover {
@@ -86,6 +73,108 @@
     background-color: #43abab;
 }
 
+@media (max-width: 1619px) {
+    #rightside {
+       width: 73%;
+    }
+}
+
+@media (max-width: 1585px) {
+    #rightside {
+       width: 71%;
+    }
+    #imgsize{
+        width: 18rem;
+        height: 15rem;
+    }
+}
+@media (max-width: 1499px) {
+    #rightside {
+       width: 70%;
+    }
+}
+
+@media (max-width: 1445px) {
+    #rightside {
+       width: 69%;
+    }
+}
+
+@media (max-width: 1415px) {
+    #rightside {
+       width: 68%;
+    }
+}
+
+@media (max-width: 1389px) {
+    #rightside {
+       width: 67%;
+    }
+}
+
+@media (max-width: 1355px) {
+    #rightside {
+       width: 65%;
+    }
+}
+
+@media (max-width: 1299px) {
+    #rightside {
+       width: 64%;
+    }
+}
+
+@media (max-width: 1267px) {
+    #rightside {
+       width: 61%;
+    }
+}
+
+
+@media (max-width: 1213px) {
+    #leftside {
+       width: 100%;
+    }
+    #rightside {
+       width: 100%;
+    }
+}
+
+@media (max-width: 1023px) {
+    #leftside {
+       width: 25%;
+    }
+    #rightside {
+       width: 65%;
+    }
+}
+
+@media (max-width: 990px) {
+    #rightside {
+       width: 63%;
+    }
+}
+
+@media (max-width: 952px) {
+    #rightside {
+       width: 61%;
+    }
+}
+
+@media (max-width: 900px) {
+    #rightside {
+       width: 59%;
+    }
+}
+
+@media (max-width: 843px) {
+    #leftside {
+       width: 100%;
+    }
+    #rightside {
+       width: 100%;
+    }
+}
 /* media */
 @media (max-width: 1491px) {
     #profile-columns {
@@ -218,7 +307,11 @@
         margin-right: 5rem;
     }
 }
-
+@media (min-width: 632px) and (max-width: 768px) {
+    #logotext {
+       display: flex;
+    }
+}
 @media (max-width: 1023px) {
     #profile-columns {
         grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -23,6 +23,9 @@ importers:
       firebase:
         specifier: ^10.13.1
         version: 10.13.1
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
       vue:
         specifier: ^3.2.13
         version: 3.4.38
@@ -2619,6 +2622,9 @@ packages:
 
   launch-editor@2.8.1:
     resolution: {integrity: sha512-elBx2l/tp9z99X5H/qev8uyDywVh0VXAwEbjk8kJhnc5grOFkGh7aW6q55me9xnYbss261XtnUrysZ+XvGbhQA==}
+
+  leaflet@1.9.4:
+    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
 
   lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
@@ -7085,6 +7091,8 @@ snapshots:
     dependencies:
       picocolors: 1.0.1
       shell-quote: 1.8.1
+
+  leaflet@1.9.4: {}
 
   lilconfig@2.1.0: {}
 

@@ -8,6 +8,10 @@
                             <img :src="back" alt="back icon" class="lg:w-[1rem] sm:w-[10px] md:w-[12px]">
                             <span class="text-gray-700 sm:pl-[10px]">Back</span>
                       </router-link>
+                      <!-- TESTING NI GAIS :DDDDDDDDDDDDDDDDD-->
+                       <router-link to="/shelter_registration">
+                            register as shelter
+                       </router-link>
                     </div>
                     <div class="grid xl:grid-flow-col xl:space-x-4">
                         <div class="field grid sm:text-[10px] sm:pt-5 sm:space-y-2 md:text-[12px] md:space-y-3 lg:text-[15px]">
