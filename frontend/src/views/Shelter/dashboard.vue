@@ -2,10 +2,11 @@
 import textvalue from '@/components/textString.vue'
 import datetoday from '@/components/dateCard.vue'
 import linkfooter from '@/components/footerLink.vue'
+import MapWithPin from '@/components/map.vue';
 
 export default {
     components: {
-        textvalue, datetoday, linkfooter,
+        textvalue, datetoday, linkfooter, MapWithPin
     },
     data() {
         return {
@@ -94,8 +95,9 @@ export default {
                             <span>{{ item.status }}</span>
                         </div>
                     </div>
-                    <div class="flex justify-center items-center">
-                        <img id="mapIMG" :src="map" alt="" class="h-[33.9rem] md:w-[20rem] object-cover" />
+                    <div class="flex justify-center items-center" >
+                        <MapWithPin/>
+                        <!-- <img id="mapIMG" :src="map" alt="" class="h-[33.9rem] md:w-[20rem] object-cover" /> -->
                     </div>
                 </div>
             </div>

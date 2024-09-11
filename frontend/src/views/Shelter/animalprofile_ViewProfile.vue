@@ -11,11 +11,11 @@
             </div>
         </div>
         <div id="margin" class="sm:mx-[1rem] md:mx-[10rem]">
-            <div class="">
+            <div class="border-b mb-6">
                 <div class=" flex justify-between px-4 sm:px-0">
                     <h3 class="text-base font-semibold leading-7 text-gray-900">Pet Information</h3>
                 </div>
-                <div>
+                <div class="pb-[1rem]">
                     <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">This Information related to this Furry
                         Animal will be displayed publicly.</p>
                 </div>
@@ -51,6 +51,14 @@
                         <dt class="text-sm font-medium leading-6 text-gray-900">Given-Name</dt>
                         <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ `${info.name} "${info.nickname}"` }}
                         </dd>
+                    </div>
+                    <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900">Date Re-homed</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.daterehomed }}</dd>
+                    </div>
+                    <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900">Pet Type</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.animaltype }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Age / Gender</dt>
@@ -124,11 +132,13 @@ const info = {
     name: 'Jeneh',
     nickname: 'rhona',
     mixbreed: 'Labrador Retriever',
+    animaltype: "Dog",
     age: '2 yrs old',
     gender: 'Female',
     size: '38 pounds, 59 inches tall',
     fur: 'Short, dark-brown coat with a slight wave',
     EnergyLvl: 'Medium-High',
+    daterehomed: '08-3-24',
     about: 'A Friendly, outgoing, and playful. an be prone to digging if bored, loves to chase squirrels. Good with people of all ages, gets along with other dogs, but can be shy around loud noises and knows "sit" and "stay"'
 }
 
