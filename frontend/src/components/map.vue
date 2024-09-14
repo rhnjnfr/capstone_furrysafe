@@ -6,6 +6,8 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-fullscreen';
+import 'leaflet-fullscreen/dist/leaflet.fullscreen.css';
 
 // Import the custom pin image
 //import customPin from '@/assets/custom-pin.png';
@@ -40,6 +42,9 @@ export default {
       //   iconAnchor: [19, 38], // Anchor point of the icon
       //   popupAnchor: [0, -38], // Position of the popup relative to the icon
       // });
+
+      // Add fullscreen control
+      this.map.addControl(new L.Control.Fullscreen());
 
       // Add a click event to place a marker
       this.map.on('click', this.addMarker);

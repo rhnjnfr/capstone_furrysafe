@@ -1,26 +1,24 @@
 import supabase from "../config/database.js";
 
 //REGISTRATION FUNCTIONS
+
 //create buddy in buddy tbl 
 export const createBuddy = async (userID, user) => {
-    console.log("buddy model")
     try {
-        // Use userID in your buddy creation logic
-        //console.log(userID)
         const { data, error } = await supabase
             .from('tbl_buddy')
             .insert([
                 { user_id: userID } // Insert the userID into the buddy table
             ])
-            .select()
+            .select() //retrieve created row/buddy
 
            
         if (error) {
             console.error("Error creating buddy:", error);
-           // throw error; // Throw error if insertion fails
+            throw error; 
         } else {
             const buddyid = data[0]?.buddy_id
-            createBuddyDetails(buddyid, user)
+            createBuddyDetails(buddyid, user) //create buddy in tbl buddy details 
         }
     } catch (err) {
         console.error("Unexpected error:", err);
@@ -30,7 +28,6 @@ export const createBuddy = async (userID, user) => {
 
 //create buddy in buddy details
 export const createBuddyDetails = async (buddyid, user)=> {
-    console.log("buddy model, buddy details")
     try{
         const {data, error} = await supabase
         .from ('tbl_buddy_details')
@@ -43,14 +40,12 @@ export const createBuddyDetails = async (buddyid, user)=> {
                 gender: user.gender, 
             }
         ])
-        .select()
+        .select() //retrieve created row in buddy details
 
         if (error) {
             console.error("Error creating buddy:", error);
-          //  throw error; // Throw error if insertion fails
+            throw error;
         } 
-
-        console.log("Buddy Details: ", data)
     }
     catch (err){
         console.log("Create buddy details error: ", err)

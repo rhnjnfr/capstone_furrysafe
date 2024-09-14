@@ -39,12 +39,12 @@ const routes = [
     component:login
   },
   {
-    path: '/registration',
+    path: '/buddy-registration',
     name: 'registration',
     component: registration
   },
   {
-    path: '/shelter_registration',
+    path: '/shelter-registration',
     name: 'shelter_registration',
     component: shelter_registration
   },

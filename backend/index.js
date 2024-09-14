@@ -1,42 +1,30 @@
 import path from "path";
-
 import express from "express";
-
-//import cors
 import cors from "cors";
-
-//import routes
 import Router from "./routes/routes.js";
-
+import compression from "compression";
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-//use express json
-app.use(express.json());
+// Use compression middleware for compressing outgoing responses
+app.use(compression());
 
-//use cors
+// Use CORS middleware for cross-origin requests
 app.use(cors());
 
-//use router
+// Set the limit for incoming JSON payloads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Use your routes
 app.use(Router);
 
-// app.get('/login', (req, res) => {
-//   res.send("Server Running")
-// })
-
-
-// app.listen(port, () => {
-//     console.log(`https/localhost:${port}`);
-//   });
-
-
 // Start the server
-try{
+try {
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
   });
-}
-catch (err){
+} catch (err) {
   console.log("Error: " + err);
 }

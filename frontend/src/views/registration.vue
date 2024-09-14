@@ -9,7 +9,7 @@
                             <span class="text-gray-700 sm:pl-[10px]">Back</span>
                       </router-link>
                       <!-- TESTING NI GAIS :DDDDDDDDDDDDDDDDD-->
-                       <router-link to="/shelter_registration">
+                       <router-link to="/shelter-registration">
                             register as shelter
                        </router-link>
                     </div>
@@ -137,7 +137,7 @@ export default {
         //create user
         async setUser(){
             try{
-                const response = await axios.post("http://localhost:5000/registration", 
+                const response = await axios.post("http://localhost:5000/buddy-registration", 
                 {
                     // email: this.email,
                     // password: this.password,

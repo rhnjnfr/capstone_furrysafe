@@ -13,7 +13,7 @@
                             <span class="text-gray-700 sm:pl-[10px]">Back</span>
                         </router-link>
                         <!-- TESTING NI GAIS :DDDDDDDDDDDDDDDDD-->
-                       <router-link to="/registration">
+                       <router-link to="/buddy-registration">
                             register as buddy
                        </router-link>
                     </div>
@@ -35,6 +35,7 @@
                     <div class="mt-[1rem]">
                         <label for="otherPhotos" class="font-medium sm:text-[10px] md:text-[12px] lg:text-[15px]">Upload
                             Documents</label>
+                            <!-- upload button here-->
                         <div class="px-[1rem] py-[1rem]">
                             <div class="px-4 sm:col-span-2 sm:px-0">
                                 <ul role="list"
@@ -57,7 +58,7 @@
                             </div>
                             <div class="mt-3">
                                 <label for="otherPhotos" class="cursor-pointer flex items-center gap-x-2">
-                                    <input type="file" multiple @change="handleMultipleFileChange" id="otherPhotos"
+                                    <input type="file" multiple @change="imagefunction" id="otherPhotos"
                                         ref="otherPhotos" class="hidden" />
                                     <img width="24" height="24"
                                         src="https://img.icons8.com/fluency/48/stack-of-photos.png"
@@ -99,8 +100,12 @@ export default {
             passwordError: false,
             showPassword: false,
             // Multiple Images
-            files: [],
+            files: [], 
             otherPhotos: null,
+            //image upload 
+            //file: null,
+            message: '',
+            messageType: '',
             //registration 
             userdetails: {
                 sheltername: '',
@@ -112,18 +117,58 @@ export default {
         }
     },
     methods: { 
+        //testing
+        imagefunction(event){
+            this.MultipleFileChange(event);
+            this.handleMultipleFileChange(event);
+        },
+        MultipleFileChange(event) {
+            //testing 
+            console.log("jene")
+            const fileArray = event.target.files;
+            this.files = Array.from(fileArray);  // Save all files for later upload
+            },
+        // Send Files to Backend
+        async uploadDocuments() {
+            try {
+                const formData = new FormData();
+                
+                // Append each selected file to the FormData
+                this.files.forEach((file, index) => {
+                    formData.append(`documents`, file);  // Add files with the key 'documents'
+                });
+                
+                // Send the files to the backend
+                const response = await axios.post("http://localhost:5000/upload-documents", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                
+                // Handle the response
+                if (response.data.success) {
+                    console.log("Files uploaded successfully!", response.data);
+                } else {
+                    console.log("File upload failed.", response.data);
+                }
+            } catch (err) {
+                console.error("Error uploading files: ", err);
+            }
+        },
         // navigation na dele mo load
         navigateTo(path) {
             this.$router.push(path);
         },
-        // For Multiple Images
+        // For Multiple Images 
         handleMultipleFileChange(event) {
-            const filesArray = event.target.files
-            for (let i = 0; i < filesArray.length; i++) {
-                const file = filesArray[i]
+            //testing 
+            console.log("joey")
+            const fileArray = event.target.files
+            for (let i = 0; i < fileArray.length; i++) {
+                const file = fileArray[i]
                 const reader = new FileReader()
                 reader.onload = (event) => {
-                    this.files.push({ source: file.name, url: event.target.result })
+                    this.files.push({ source: file.name, url: event.target.result })    
                 }
                 reader.readAsDataURL(file)
             }
@@ -134,7 +179,6 @@ export default {
         //registration no saving of img for now 
         async handleSignup(){
             try{
-                
                 this.userdetails = {
                     email: document.getElementById('email').value,
                     password: document.getElementById('password').value,
@@ -150,16 +194,16 @@ export default {
         //create user to user table 
         async setUser(){
             try{
-                console.log(this.userdetails)
-                const response = await axios.post("http://localhost:5000/shelter_registration",
+                const response = await axios.post("http://localhost:5000/shelter-registration",
                     {
                         user: this.userdetails,
-                        regtype: this.reg_type
+                        regtype: this.reg_type,
                     })
+
                 this.items = response.data
                 console.log("response: ", response.data);
                 if(response.data.success){
-                    this.navigateTo('/shelterDashboard')
+                    // this.navigateTo('/shelterDashboard')
                 }   
                 else{
                     // Handle login failure

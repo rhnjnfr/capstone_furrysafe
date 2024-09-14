@@ -1,9 +1,10 @@
 import { validateUser, createUser  } from "../model/userModel.js";
 
-export const checkUser = (req, res)=>{
+//user models
+export const checkUser = (req, res)=>{ //check if user exists 
     validateUser (req,res);
 }
 
 export const insertUser = (req, res)=>{
-    createUser(req, res);
+    createUser(req, res); //create user 
 }
