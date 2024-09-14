@@ -35,7 +35,6 @@ export const validateUser = async (req, res) => {
                 
             //nothing is returned from shelter
             if (shelterError) {
-                console.log("shelter error:")
                 res.status(500).json({ error: shelterError.message });
                 return;
             }
@@ -86,14 +85,19 @@ export const validateUser = async (req, res) => {
 
 //REGISTRATION | create user in DATABASE
 export const createUser = async (req, res) =>{
-    const { user, regtype, files} = req.body 
-    const hashedPassword = await bcrypt.hash(user.password, 10) //create a salted-hash password 
+    const password = req.body.password
+    const email = req.body.email
+    const regtype = req.body.regtype
+    const sheltername = req.body.sheltername
+    const documents = req.files 
+
+    const hashedPassword = await bcrypt.hash(password, 10) //create a salted-hash password 
 
     // user to user tbl
     const {data, error } = await supabase 
     .from('tbl_user')
     .insert([
-        {user_email: user.email, user_password: hashedPassword }
+        {user_email: email, user_password: hashedPassword }
     ])
     .select() //retrieve created row
 
@@ -110,7 +114,7 @@ export const createUser = async (req, res) =>{
             await createBuddy(userID, user); //user holds all user detials
         }
         else{
-            await createShelter(userID, user, files); //user holds all user detials
+            await createShelter(userID, sheltername, documents); 
         }
        res.status(200).json({success: true, message: 'User Successfully added', user: data});
     }

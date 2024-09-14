@@ -58,7 +58,7 @@
                             </div>
                             <div class="mt-3">
                                 <label for="otherPhotos" class="cursor-pointer flex items-center gap-x-2">
-                                    <input type="file" multiple @change="imagefunction" id="otherPhotos"
+                                    <input type="file" multiple @change="handleMultipleFileChange" id="otherPhotos"
                                         ref="otherPhotos" class="hidden" />
                                     <img width="24" height="24"
                                         src="https://img.icons8.com/fluency/48/stack-of-photos.png"
@@ -107,6 +107,7 @@ export default {
             message: '',
             messageType: '',
             //registration 
+            formData: new FormData(),
             userdetails: {
                 sheltername: '',
                 email: '', 
@@ -117,74 +118,51 @@ export default {
         }
     },
     methods: { 
-        //testing
-        imagefunction(event){
-            this.MultipleFileChange(event);
-            this.handleMultipleFileChange(event);
-        },
-        MultipleFileChange(event) {
-            //testing 
-            console.log("jene")
+        //image uploads
+        handleMultipleFileChange(event) {
             const fileArray = event.target.files;
-            this.files = Array.from(fileArray);  // Save all files for later upload
-            },
-        // Send Files to Backend
-        async uploadDocuments() {
-            try {
-                const formData = new FormData();
-                
-                // Append each selected file to the FormData
-                this.files.forEach((file, index) => {
-                    formData.append(`documents`, file);  // Add files with the key 'documents'
-                });
-                
-                // Send the files to the backend
-                const response = await axios.post("http://localhost:5000/upload-documents", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                
-                // Handle the response
-                if (response.data.success) {
-                    console.log("Files uploaded successfully!", response.data);
-                } else {
-                    console.log("File upload failed.", response.data);
-                }
-            } catch (err) {
-                console.error("Error uploading files: ", err);
-            }
+
+            // Keep existing files and append new ones
+            Array.from(fileArray).forEach(file => {
+                const reader = new FileReader();
+
+                // Set up onload event handler
+                reader.onload = (event) => {
+                    // Push file data into the files array, preserving previous files
+                    this.files.push({ file: file, url: event.target.result });
+                    // console.log("File read:", file.name, event.target.result);
+                };
+
+                // Read the file as a data URL
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
         },
-        // navigation na dele mo load
+        removeImage(index) {
+            //deletion of a single upload 
+            this.files = this.files.filter((_, i) => i !== index);
+        },
         navigateTo(path) {
             this.$router.push(path);
         },
-        // For Multiple Images 
-        handleMultipleFileChange(event) {
-            //testing 
-            console.log("joey")
-            const fileArray = event.target.files
-            for (let i = 0; i < fileArray.length; i++) {
-                const file = fileArray[i]
-                const reader = new FileReader()
-                reader.onload = (event) => {
-                    this.files.push({ source: file.name, url: event.target.result })    
-                }
-                reader.readAsDataURL(file)
-            }
-        },
-        removeImage(index) {
-            this.files.splice(index, 1)
-        },
-        //registration no saving of img for now 
+        //registration
         async handleSignup(){
             try{
-                this.userdetails = {
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value,
-                    sheltername: document.getElementById('sheltername').value
-                }
+                //append user details
+                this.formData.append('sheltername', document.getElementById('sheltername').value);
+                this.formData.append('email', document.getElementById('email').value,);
+                this.formData.append('password', document.getElementById('password').value);
+                this.formData.append('regtype', this.reg_type);
 
+                // Append each selected file to the FormData
+                this.files.forEach((fileobj) => {
+                    this.formData.append(`documents`, fileobj.file);  // Add files with the key 'documents'
+                });
+
+                //for debugging, logging formdata data
+                // for (let pair of this.formData.entries()) {
+                //     console.log(`${pair[0]}: ${pair[1]}`);
+                // }
                 await this.setUser();
             }
             catch(err){
@@ -194,16 +172,16 @@ export default {
         //create user to user table 
         async setUser(){
             try{
-                const response = await axios.post("http://localhost:5000/shelter-registration",
+                const response = await axios.post("http://localhost:5000/shelter-registration", this.formData,
                     {
-                        user: this.userdetails,
-                        regtype: this.reg_type,
+                        'Content-Type': 'multipart/form-data'
                     })
-
+                    console.log("clear the form pls tnx")
+                
                 this.items = response.data
                 console.log("response: ", response.data);
                 if(response.data.success){
-                    // this.navigateTo('/shelterDashboard')
+                     this.navigateTo('/shelterDashboard')
                 }   
                 else{
                     // Handle login failure
@@ -215,7 +193,7 @@ export default {
 
             }
         },
-    },
+    }
 }
 </script>
 

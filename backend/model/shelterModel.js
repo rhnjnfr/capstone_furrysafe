@@ -44,10 +44,7 @@ const uploadDocument = async (req, res)=>{
 //REGISTRATION FUNCTIONS
 
 //create shelter in shelter tbl 
-// files (image) is still testing 
-export const createShelter = async (userID, shelter, files, req, res)=> {
-    console.log("shelter model, create shelter")
-        console.log(files)
+export const createShelter = async (userID, sheltername, documents)=> {
     try{
         const {data, error} = await supabase 
             .from('tbl_shelter')
@@ -61,9 +58,8 @@ export const createShelter = async (userID, shelter, files, req, res)=> {
                 console.error("error creating user:", error)
                 throw error; 
             }else{
-                createShelterDetails(shelterid, shelter.sheltername)
-                console.log("Files to be uploaded:", files); //image testing
-                //saveDocuments(shelterid, files) //image testing
+                createShelterDetails(shelterid, sheltername)
+                saveDocuments(shelterid, documents) //image testing
             }
     }
     catch(err){
@@ -88,31 +84,28 @@ export const createShelterDetails = async (shelterId, shelterName, req, res)=> {
 }
 
 //save documents to documents tbl 
-export const saveDocuments = async (shelterid, files) => { //image testing
+export const saveDocuments = async (shelterid, documents) => { //image testing
     //create shelter details and shelter documents are created at the same time
     try{      
-        if (!files || files.length === 0){
+        if (!documents || documents.length === 0){
             console.log("No files to upload");
             return;
         }
-        
-        for (const file of files) {
 
-            if (!file || !file.name) {
+        const uploadPromises = documents.map(file => {
+            if (!file ) {
                 console.log("Invalid file detected:", file);
-                continue;
+                return null;
             }
-
-            const { data, error } = await supabase.storage
+            return supabase.storage
                 .from('images')
-                .upload(`public/${Date.now()}_${file.name}`, file); // Using the actual File object
+                .upload(`public/${Date.now()}_${file.originalname}`, file.buffer, {
+                    contentType: file.mimetype
+                }); 
+        })
 
-            if (error) {
-                console.log("Image upload failed", error);
-            } else {
-                console.log("Successfully uploaded:", file.name);
-            }
-        }
+        const results = await Promise.all(uploadPromises);
+        console.log("Upload results:", results);
     }
     catch(err){
         console.log("error in saving documents", err)
