@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import supabase from "../config/database.js"
 import { createBuddy } from "./buddyModel.js"
 import { createShelter, verifyShelter } from "./shelterModel.js";
+import { createToken } from "../middleware/jwt.js"
 
 //LOGIN | check if user credentials exist in DATABASE
 export const validateUser = async (req, res) => {
@@ -21,17 +22,20 @@ export const validateUser = async (req, res) => {
         //if something is retrieved from user  table, then will check shelter and buddy table
         if (data && data.length > 0) {
             const user = data[0];
+
                 const passwordMatch = await bcrypt.compare(password, user.user_password); // Compare salted hash password to input
                 if (!passwordMatch) {
                     res.status(401).json({ success: false, message: 'Invalid email or password' });
                     return;
             }
+
             const userID = user.user_id;
+
             const { data: shelterData, error: shelterError } = await supabase
                 .from('tbl_shelter')
                 .select('shelter_id')
-                .eq('user_id', userID);
-            
+                .eq('user_id', userID)
+                .select() //select data retrieved from users table
                 
             //nothing is returned from shelter
             if (shelterError) {
@@ -41,11 +45,19 @@ export const validateUser = async (req, res) => {
         
             //user is shelter 
             if (shelterData && shelterData.length > 0) {
-                const verificationResult = await verifyShelter(userID); 
+                const verificationResult = await verifyShelter(userID); //check if shelter is document verified
 
                 if (verificationResult.success) {
                     // Shelter is verified
-                    res.status(200).json({ success: true, message: 'User validated and shelter verified successfully', userType: 'shelter', user: user });
+                    // res.status(200).json({ success: true, message: 'User validated and shelter verified successfully', userType: 'shelter', user: user });
+                    const token = generateToken({ userID, userType: 'shelter' });
+
+                    res.status(200).json({ 
+                        success: true, 
+                        message: 'User validated and shelter verified successfully', 
+                        userType: 'shelter', 
+                        token 
+                    });
                     return;
                 } else {
                     // Shelter is not verified
@@ -59,6 +71,7 @@ export const validateUser = async (req, res) => {
                 .from('tbl_buddy')
                 .select('buddy_id')
                 .eq('user_id', userID);
+
         
             if (buddyError) {
                 res.status(500).json({ error: buddyError.message });
@@ -67,6 +80,14 @@ export const validateUser = async (req, res) => {
         
             if (buddyData && buddyData.length > 0) {
             // User is a buddy
+                const token = generateToken({ userID, userType: 'buddy' });
+
+                res.status(200).json({ 
+                    success: true, 
+                    message: 'User validated successfully', 
+                    userType: 'buddy', 
+                    token 
+                });
                 res.status(200).json({ success: true, message: 'User validated successfully', userType: 'buddy', user: user });
                 return;
             }
@@ -85,9 +106,20 @@ export const validateUser = async (req, res) => {
 
 //REGISTRATION | create user in DATABASE
 export const createUser = async (req, res) =>{
+
+    const user = {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        gender: req.body.gender,
+        dob: req.body.dob,
+        username: req.body.username
+    }
+
+
     const password = req.body.password
     const email = req.body.email
     const regtype = req.body.regtype
+
     const sheltername = req.body.sheltername
     const documents = req.files 
 
@@ -117,6 +149,5 @@ export const createUser = async (req, res) =>{
             await createShelter(userID, sheltername, documents); 
         }
        res.status(200).json({success: true, message: 'User Successfully added', user: data});
-    }
-};
+    }};
 

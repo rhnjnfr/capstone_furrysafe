@@ -176,8 +176,6 @@ export default {
                     {
                         'Content-Type': 'multipart/form-data'
                     })
-                    console.log("clear the form pls tnx")
-                
                 this.items = response.data
                 console.log("response: ", response.data);
                 if(response.data.success){

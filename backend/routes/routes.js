@@ -17,7 +17,7 @@ const upload = multer ({storage});
 const router = express.Router(); 
 
 router.post("/login", checkUser);
-router.post("/buddy-registration", insertUser)
+router.post("/buddy-registration", upload.any(), insertUser)
 router.post("/shelter-registration", upload.array('documents'), insertUser)
 
 

@@ -69,7 +69,7 @@ export const createShelter = async (userID, sheltername, documents)=> {
 }
 
 //create shelter details 
-export const createShelterDetails = async (shelterId, shelterName, req, res)=> { 
+export const createShelterDetails = async (shelterId, shelterName)=> { 
     //create shelter details and shelter documents are created at the same time
     try{
         const {data, error} = await supabase

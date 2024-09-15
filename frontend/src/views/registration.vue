@@ -85,14 +85,15 @@ export default {
         back: require('@/assets/images/Back.png'),
         gender: "",
         //registration 
+        formData: new FormData(),
         userdetails: {
-            firstname: '', 
-            lastname: '', 
-            username: '', 
-            dob: '',
-            gender: '',
-            email: '',
-            password: '',
+            firstname: 'fname', 
+            lastname: 'lname', 
+            username: 'username', 
+            dob: 'bdate',
+            gender: 'gender',
+            email: 'email',
+            password: 'password',
         },
         reg_type: 'buddy',
         items: [],
@@ -105,6 +106,9 @@ export default {
         //sign up
         async handleSignup(){   
             try{
+
+
+                //me stuped i cant so redundant 
                 //retrieves user input
                 this.userdetails = {
                     email: document.getElementById('email').value,
@@ -116,6 +120,20 @@ export default {
                     dob: document.getElementById('bdate').value
                 }
 
+                this.formData.append('dob', this.userdetails.dob);
+                this.formData.append('email', this.userdetails.email);
+                this.formData.append('password', this.userdetails.password);
+                this.formData.append('firstname', this.userdetails.firstname);
+                this.formData.append('lastname', this.userdetails.lastname);
+                this.formData.append('username', this.userdetails.username,);
+                this.formData.append('gender', this.userdetails.gender);
+                this.formData.append('regtype', this.reg_type);
+
+                // for (const [key, value] of Object.entries(fields)) {
+                //     const elementValue = key === 'regtype' ? value : document.getElementById(key).value;
+                //     this.formData.append(key, elementValue);
+                // }
+
                 //checks if some fields are empty 
                 if (!this.userdetails.firstname || !this.userdetails.lastname || !this.userdetails.email || !this.userdetails.password) {
                     console.log("Some required fields are empty."); //should have a user interface feedback 
@@ -125,9 +143,10 @@ export default {
                     this.userdetails.gender = 'unspecified'
                 }
 
-                console.log(this.userdetails.gender)
+                for (let pair of this.formData.entries()) {
+                    console.log(`${pair[0]}: ${pair[1]}`);
+                }
 
-                //console.log(this.userdetails)
                 await this.setUser();
             }
             catch(err){
@@ -137,14 +156,18 @@ export default {
         //create user
         async setUser(){
             try{
-                const response = await axios.post("http://localhost:5000/buddy-registration", 
-                {
-                    // email: this.email,
-                    // password: this.password,
-                    regtype: this.reg_type,
-                    //details 
-                    user: this.userdetails
-                })
+                const response = await axios.post("http://localhost:5000/buddy-registration", this.formData,
+                    {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                // {
+                //     // email: this.email,
+                //     // password: this.password,
+                //     regtype: this.reg_type,
+                //     //details 
+                //     user: this.userdetails
+                // }
+                )
                 this.items = response.data
                 console.log("response: ", response.data); 
                 if (response.data.success) {
