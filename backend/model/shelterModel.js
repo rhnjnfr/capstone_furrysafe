@@ -83,32 +83,66 @@ export const createShelterDetails = async (shelterId, shelterName, req, res)=> {
     }
 }
 
-//save documents to documents tbl 
+//save documents to supabase storage
 export const saveDocuments = async (shelterid, documents) => { //image testing
     //create shelter details and shelter documents are created at the same time
-    try{      
-        if (!documents || documents.length === 0){
+    try {      
+        if (!documents || documents.length === 0) {
             console.log("No files to upload");
             return;
         }
 
-        const uploadPromises = documents.map(file => {
-            if (!file ) {
+        // Create an array to store the file metadata for bulk insertion into the database
+        const fileMetadataArray = [];
+
+        // Map through each document to handle file uploads
+        const uploadPromises = documents.map(async (file) => {
+            if (!file) {
                 console.log("Invalid file detected:", file);
                 return null;
             }
-            return supabase.storage
-                .from('images')
-                .upload(`public/${Date.now()}_${file.originalname}`, file.buffer, {
-                    contentType: file.mimetype
-                }); 
-        })
 
-        const results = await Promise.all(uploadPromises);
-        console.log("Upload results:", results);
-    }
-    catch(err){
-        console.log("error in saving documents", err)
+            const filePath = `public/${Date.now()}_${file.originalname}`;
+
+            // Upload file to Supabase storage
+            const { data, error } = await supabase.storage
+                .from('images')
+                .upload(filePath, file.buffer, {
+                    contentType: file.mimetype,
+                });
+
+            if (error) {
+                console.error("Upload error:", error);
+                return null;
+            }
+
+            // Store file metadata to insert into the database later
+            fileMetadataArray.push({
+                shelter_id: shelterid,
+                docu_url: filePath,
+                uploaded_at: new Date(),
+            });
+
+            return { uploadData: data };
+        });
+
+        // Wait for all uploads to complete
+        await Promise.all(uploadPromises);
+
+        // After all files are uploaded, insert metadata into the database in bulk
+        if (fileMetadataArray.length > 0) {
+            const { data, error } = await supabase
+                .from('tbl_shelter_documents')
+                .insert(fileMetadataArray); // Insert all rows at once
+
+            if (error) {
+                console.error("Database insert error:", error);
+            } else {
+                console.log("Database insert success");
+            }
+        }
+    } catch (err) {
+        console.log("Error in saving documents", err);
     }
 }
 

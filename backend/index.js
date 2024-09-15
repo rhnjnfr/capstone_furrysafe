@@ -1,8 +1,9 @@
-import path from "path";
+// import function from 'firebase-functions';
 import express from "express";
 import cors from "cors";
 import Router from "./routes/routes.js";
 import compression from "compression";
+import { https } from 'firebase-functions';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -19,6 +20,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Use your routes
 app.use(Router);
+
+
+export const api = https.onRequest(app);
+
 
 // Start the server
 try {
