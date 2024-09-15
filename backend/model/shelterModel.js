@@ -102,7 +102,7 @@ export const saveDocuments = async (shelterid, documents) => { //image testing
                 return null;
             }
 
-            const filePath = `public/${Date.now()}_${file.originalname}`;
+            const filePath = `documents/${Date.now()}_${file.originalname}`;
 
             // Upload file to Supabase storage
             const { data, error } = await supabase.storage
