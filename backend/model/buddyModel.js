@@ -44,12 +44,10 @@ export const createBuddyDetails = async (buddyid, user)=> {
 
         if (error) {
             console.error("Error creating buddy:", error);
-            throw error;
         } 
     }
     catch (err){
         console.log("Create buddy details error: ", err)
-        throw err;
     }
 }
 export default createBuddy;

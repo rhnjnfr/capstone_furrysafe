@@ -97,35 +97,45 @@ export default {
                 console.log(err)
             }
         },
-        async getUser(){
-            //login function
-            try{
-                const response = await axios.post("http://localhost:5000/login", 
-                {
-                    //pass inputs
+        async getUser() {
+            try {
+                const response = await axios.post("http://localhost:5000/login", {
                     email: this.userEmail,
                     password: this.userPassword
-                }
-                )
-                this.items = response.data
-                if (response.data.success) {
-                    //handles login success s
-                    const userType = response.data.userType
-                    
-                    if(userType == 'shelter'){
-                        this.navigateTo('/shelterDashboard')
-                    }
-                    if(userType == 'buddy'){
-                        this.navigateTo('/')
-                    }
+                }, {
+                    withCredentials: true // This allows the request to include cookies
+                });
 
+                this.items = response.data;
+                console.log("login", this.items);
+                
+                localStorage.setItem("access_token", this.items.token)
+                localStorage.setItem("u_type", this.items.userType)
+                localStorage.setItem("u_id", this.items.userID)
+
+                if (response.data.success) {
+                    const userType = response.data.userType;
+                    if (userType === 'shelter') {
+                        this.navigateTo('/shelterDashboard');
+                    } else if (userType === 'buddy') {
+                        this.navigateTo('/buddydashboard'); //need ui
+                    } else if (userType === 'admin') {
+                        this.navigateTo('/admin'); //need ui 
+                    }
                 } else {
-                    // Handle login failure dapat naa ni ui change pag invalid ang credentials 
+                    if (response.status === 403 && response.data.message === 'Shelter is not verified') {
+                        console.log('Shelter is not verified. Please verify your shelter documents.');
+                    }
                     console.log("Invalid login credentials");
                 }
-            }
-            catch (err){
-                console.log("An ERROR occured: " + err);
+
+            } catch (err) {
+                if (err.response) {
+                    console.log("Error Response Data:", err.response.data);
+                    console.log("Status Code:", err.response.status);
+                } else {
+                    console.log("An ERROR occurred:", err.message);
+                }
             }
         },
     },

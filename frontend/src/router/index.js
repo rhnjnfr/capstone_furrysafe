@@ -28,7 +28,7 @@ import login from "../views/login.vue"
 import registration from "../views/registration.vue"
 import shelter_registration from '@/views/shelter_registration.vue';
 import map from "../views/mapview.vue"
-
+import confirm_email from "../views/confirm_Email.vue"
 //import forgot_password from "../views/forgotpassword.vue"
 
 const routes = [
@@ -47,6 +47,11 @@ const routes = [
     path: '/shelter-registration',
     name: 'shelter_registration',
     component: shelter_registration
+  },
+  {
+    path: '/confirming-email',
+    name: 'confirm_Email',
+    component: confirm_email
   },
   {
     path: '/map',
@@ -78,6 +83,7 @@ const routes = [
     name: 'shelterDashboard',
     component: shelterDashboard,
     redirect: '/shelterdashboard',
+    meta: { requiresAuth: true, userType: 'shelter' }, //testing
     children:
       [
         { // dashboard
@@ -142,5 +148,32 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('access_token');
+  const userType = localStorage.getItem('u_type');
+
+  // Prevent navigating to login if the user is already authenticated
+  if (isAuthenticated && to.path === '/login') { //
+    if (userType === 'shelter') {
+      return next('/shelterDashboard'); // Redirect shelter users to their dashboard
+    } else if (userType === 'buddy') {
+      return next('/buddydashboard'); // Redirect buddy users to their dashboard
+    } else if (userType === 'admin') {
+      return next('/admin'); // Redirect admin users to their dashboard
+    }
+  }
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      return next('/login'); // Redirect to login if not authenticated, and after registration
+    } else if (to.meta.userType && to.meta.userType !== userType) {
+      console.log(`Access denied for user type: ${userType}`);
+      return next('/'); // Redirect to home if user type is not allowed
+    }
+  }
+
+  next(); // Proceed if no guards block the navigation
+});
 
 export default router

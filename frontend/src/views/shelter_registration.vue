@@ -148,21 +148,30 @@ export default {
         //registration
         async handleSignup(){
             try{
+
+                if(!document.getElementById('sheltername').value || !document.getElementById('email').value || 
+                    !document.getElementById('password').value){
+                    console.log("Some required fields are empty."); //should have a user interface feedback 
+                    this.formData = new FormData();
+                    return; 
+                }
                 //append user details
                 this.formData.append('sheltername', document.getElementById('sheltername').value);
                 this.formData.append('email', document.getElementById('email').value,);
                 this.formData.append('password', document.getElementById('password').value);
                 this.formData.append('regtype', this.reg_type);
 
-                // Append each selected file to the FormData
+                console.log("checking files...")
+                if (!this.files || this.files.length === 0) {
+                    this.formData = new FormData();
+                    console.log("No files to process or file array is empty.")
+                    return
+                }
+
                 this.files.forEach((fileobj) => {
                     this.formData.append(`documents`, fileobj.file);  // Add files with the key 'documents'
-                });
+                })
 
-                //for debugging, logging formdata data
-                // for (let pair of this.formData.entries()) {
-                //     console.log(`${pair[0]}: ${pair[1]}`);
-                // }
                 await this.setUser();
             }
             catch(err){
@@ -171,24 +180,35 @@ export default {
         },
         //create user to user table 
         async setUser(){
+            console.log("Preparing to send request...");
             try{
                 const response = await axios.post("http://localhost:5000/shelter-registration", this.formData,
                     {
                         'Content-Type': 'multipart/form-data'
                     })
                 this.items = response.data
-                console.log("response: ", response.data);
                 if(response.data.success){
-                     this.navigateTo('/shelterDashboard')
+                    this.formData = new FormData();
+                    this.navigateTo('/shelterDashboard')
                 }   
                 else{
+                    this.formData = new FormData();
                     // Handle login failure
                     //dapat naa ni ui change pag invalid ang credentials 
                     console.log("ERRORRRRRRRRRRRRRRRRRRRRRR");
                 }
             }
             catch(err){
-
+                console.log("error", err)
+            }
+            finally {
+                // Optional: Clear files and user details
+                this.files = [];
+                this.userdetails = {
+                    sheltername: '',
+                    email: '',
+                    password: '',
+                }
             }
         },
     }

@@ -13,7 +13,7 @@
                             <RouterLink to="/"
                                 class="inline-flex items-center border-b-2 border-teal-500 px-1 pt-1 text-sm font-bold text-gray-800 hover:text-lightorange">
                                 FurrySafe</RouterLink>
-                            <RouterLink to="shelterDashboard"
+                            <RouterLink to=""
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 Featured</RouterLink>
                             <RouterLink to=""

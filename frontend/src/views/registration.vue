@@ -106,9 +106,7 @@ export default {
         //sign up
         async handleSignup(){   
             try{
-
-
-                //me stuped i cant so redundant 
+                //me stuped i cant so redundant haha usaba plese tenx ywa man ni oy lord aksjdgajksgdlajsljsagh
                 //retrieves user input
                 this.userdetails = {
                     email: document.getElementById('email').value,
@@ -118,6 +116,17 @@ export default {
                     username: document.getElementById('username').value,
                     gender: document.getElementById('gender').value,
                     dob: document.getElementById('bdate').value
+                }
+
+                //checks if some fields are empty 
+                if (!this.userdetails.firstname || !this.userdetails.lastname || 
+                    !this.userdetails.email || !this.userdetails.password || !this.userdetails.gender) {
+                    console.log("Some required fields are empty."); //should have a user interface feedback 
+                    this.formData = new FormData();
+                    return; 
+                }
+                if(this.userdetails.gender == "  "){
+                    this.userdetails.gender = 'unspecified'
                 }
 
                 this.formData.append('dob', this.userdetails.dob);
@@ -134,18 +143,9 @@ export default {
                 //     this.formData.append(key, elementValue);
                 // }
 
-                //checks if some fields are empty 
-                if (!this.userdetails.firstname || !this.userdetails.lastname || !this.userdetails.email || !this.userdetails.password) {
-                    console.log("Some required fields are empty."); //should have a user interface feedback 
-                    return; 
-                }
-                if(!this.userdetails.gender){
-                    this.userdetails.gender = 'unspecified'
-                }
-
-                for (let pair of this.formData.entries()) {
-                    console.log(`${pair[0]}: ${pair[1]}`);
-                }
+                // for (let pair of this.formData.entries()) {
+                //     console.log(`${pair[0]}: ${pair[1]}`);
+                // }
 
                 await this.setUser();
             }
@@ -155,31 +155,37 @@ export default {
         },
         //create user
         async setUser(){
+            //need to go through login after registration
             try{
                 const response = await axios.post("http://localhost:5000/buddy-registration", this.formData,
                     {
                         'Content-Type': 'multipart/form-data'
                     }
-                // {
-                //     // email: this.email,
-                //     // password: this.password,
-                //     regtype: this.reg_type,
-                //     //details 
-                //     user: this.userdetails
-                // }
                 )
                 this.items = response.data
                 console.log("response: ", response.data); 
                 if (response.data.success) {
+                    this.formData = new FormData();
                     this.navigateTo('/');
                 } else {
+                    this.formData = new FormData();
                     // Handle login failure
                     //dapat naa ni ui change pag invalid ang credentials 
+                    this.formData = new FormData();
                     console.log("ERRORRRRRRRRRRRRRRRRRRRRRR");
                 }
             }
             catch(err){
                 console.log("An ERROR occured: " + err);
+            }
+            finally {
+                // Optional: Clear files and user details
+                this.files = [];
+                this.userdetails = {
+                    sheltername: '',
+                    email: '',
+                    password: '',
+                }
             }
         }
     },

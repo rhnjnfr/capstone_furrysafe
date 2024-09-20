@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer"
 
-import { checkUser, insertUser} from "../controllers/user.js";
+import { checkUser, insertUser, Userlogout} from "../controllers/user.js";
 
 const storage = multer.memoryStorage({
     destination: (req, file, cb) => {
@@ -19,6 +19,6 @@ const router = express.Router();
 router.post("/login", checkUser);
 router.post("/buddy-registration", upload.any(), insertUser)
 router.post("/shelter-registration", upload.array('documents'), insertUser)
-
+router.post("/shelterDashboard", Userlogout)
 
 export default router;
