@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex mt-3 justify-center space-x-2 sm:text-[9px] md:text-[11px] lg:text-[13px]">
                         <span>Don't you have an account? </span>
-                        <a @click="navigateTo('/registration')" class="text-blue-500 cursor-pointer">
+                        <a @click="navigateTo('/buddy-registration')" class="text-blue-500 cursor-pointer">
                           <u>Sign up</u>
                         </a>
                     </div>
@@ -112,6 +112,7 @@ export default {
                 localStorage.setItem("access_token", this.items.token)
                 localStorage.setItem("u_type", this.items.userType)
                 localStorage.setItem("u_id", this.items.userID)
+                localStorage.setItem("c_id", this.items.characterId)
 
                 if (response.data.success) {
                     const userType = response.data.userType;
@@ -120,7 +121,7 @@ export default {
                     } else if (userType === 'buddy') {
                         this.navigateTo('/buddydashboard'); //need ui
                     } else if (userType === 'admin') {
-                        this.navigateTo('/admin'); //need ui 
+                        this.navigateTo('/dashboard'); 
                     }
                 } else {
                     if (response.status === 403 && response.data.message === 'Shelter is not verified') {

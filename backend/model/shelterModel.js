@@ -44,7 +44,7 @@ const uploadDocument = async (req, res)=>{
 //REGISTRATION FUNCTIONS
 
 //create shelter in shelter tbl 
-export const createShelter = async (userID, sheltername, documents)=> {
+export const createShelter = async (userID, sheltername, documents, email)=> {
     try{
         const {data, error} = await supabase 
             .from('tbl_shelter')
@@ -58,7 +58,7 @@ export const createShelter = async (userID, sheltername, documents)=> {
                 console.error("error creating user:", error)
                 throw error; 
             }else{
-                createShelterDetails(shelterid, sheltername)
+                createShelterDetails(shelterid, sheltername, email)
                 saveDocuments(shelterid, documents) //image testing
             }
     }
@@ -69,13 +69,13 @@ export const createShelter = async (userID, sheltername, documents)=> {
 }
 
 //create shelter details 
-export const createShelterDetails = async (shelterId, shelterName)=> { 
+export const createShelterDetails = async (shelterId, shelterName, shelterEmail)=> { 
     //create shelter details and shelter documents are created at the same time
     try{
         const {data, error} = await supabase
         .from('tbl_shelter_details')
         .insert([
-            {shelter_id: shelterId, shelter_name: shelterName}
+            {shelter_id: shelterId, shelter_name: shelterName, shelter_email: shelterEmail}
         ])
     }
     catch(err){

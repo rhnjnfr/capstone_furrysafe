@@ -26,7 +26,7 @@
                         <td
                             :class="[requestIdx === 0 ? '' : 'border-t border-transparent', 'relative py-4 pl-4 pr-3 text-sm sm:pl-6']">
                             <div class="font-medium text-gray-900">
-                                {{ request.name }}
+                                {{ request.sheltername }}
                             </div>
                             <div class="mt-1 flex flex-col text-gray-500 sm:block lg:hidden">
                                 <span>{{ request.email }}</span>
@@ -58,7 +58,8 @@
                                     <MenuItems
                                         class="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md py-2 bg-white shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                                         <MenuItem v-slot="{ active }">
-                                        <RouterLink to="/request_preview"
+                                        <RouterLink 
+                                            :to="{ name: 'request_preview', params: { id: request.id } }"
                                             :class="[active ? 'bg-gray-50' : '', 'block px-6 py-1 text-sm leading-6 text-teal-500']"
                                             class="text-center">
                                             View
@@ -66,12 +67,14 @@
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }">
                                         <button
+                                            @click.prevent = "responseRequest(request.id, 'Approved', 'TRUE')"
                                             :class="[active ? 'bg-gray-50' : '', 'block px-6 py-1 text-sm leading-6 text-green-400 w-full']">
                                             Approve
                                         </button>
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }">
                                         <button
+                                            @click.prevent = "responseRequest(request.id, 'Rejected', 'FALSE')"
                                             :class="[active ? 'bg-gray-50' : '', 'block px-6 py-1 text-sm leading-6 text-red-500 w-full']">
                                             Reject
                                         </button>
@@ -89,70 +92,51 @@
 </template>
 
 <script setup>
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
+    import { onMounted, ref} from 'vue';
+    import axios from 'axios';
+    import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+    import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
 
-const requests = [
-    {
-        id: 1,
-        name: 'Dolends Animal Shelter',
-        email: 'exampleShelter@gmail.com',
-        status: 'Pending',
-    },
-    {
-        id: 2,
-        name: 'Jeneh Animal Shelter',
-        email: 'exampleShelter@gmail.com',
-        status: 'Pending',
-    },
-    // More requests...
-]
-</script>
-<!-- <script>
-import pendinglist from '@/components/admin_pendingList.vue';
-import requestdocu from '@/components/admin_requestDocuments.vue'
+    const requests = ref([]);
 
-export default {
-    components: {
-        pendinglist, requestdocu
-    },
-    data() {
-        return {
-            showDetails: false
+    async function getRequests(){ //displays all the pending
+        try{
+            const response = await axios.post("http://localhost:5000/registration", 
+                {
+                    mode: 'Pending'
+                }
+            );
+            requests.value = response.data;
+            
+            if (!response.data || response.data.length === 0) {
+                console.log("Request not found");
+            }
+            // console.log(response.data)
         }
-    },
-    methods: {
-        handleClick(id) {
-            this.showDetails = true;
-            console.log('Clicked!', id);
-            // Do something with the ID
+        catch(err){
+            console.log("error in getting requests", err)
         }
     }
-};
+    async function responseRequest(id, req_response, req_status){ //reject/approve requests
+        //doesnt update instantly needs to reload, check pls uwu 
+        try{
+            const admin_id = localStorage.getItem('c_id')
+            // console.log("function", id, req_response, req_status, admin_id)
+            const response = await axios.post("http://localhost:5000/response", 
+                {
+                    id: id,
+                    req_status: req_status,
+                    req_response: req_response,
+                    admin_id: admin_id
+                }
+            )
+        }
+        catch(err){
+            console.log("error", err)
+        }
+    }
+    
+    onMounted(() => {
+        getRequests();
+    });
 </script>
-<template>
-    <div class="flex gap-x-6">
-        <div class="w-[30%] border-r-2 rounded-l-lg">
-            <span class="text-gray-700 font-semibold">Pending Request</span>
-            <div class="px-[1rem] py-[1rem]">
-                <pendinglist @click="handleClick($event)" />
-            </div>
-        </div>
-        <div class="w-[70%]">
-            <div class="px-[2rem] py-[1rem]">
-                <h2 class="font-semibold text-gray-600">Shelter's Documents</h2>
-                <div v-if="showDetails">
-                    <requestdocu />
-                    <div class="mt-[1rem] border-t pt-[1rem] flex justify-center gap-5">
-                        <button type="button" class="bg-green-50 py-2 px-[4rem] rounded-md shadow-md">
-                            Approve
-                        </button>
-                        <button type="button" class="bg-red-50 py-2 px-[4rem] rounded-md shadow-md">
-                            Reject
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</template> -->

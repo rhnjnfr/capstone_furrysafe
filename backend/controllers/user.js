@@ -1,4 +1,6 @@
 import { validateUser, createUser, logoutUser} from "../model/userModel.js";
+import { getShelterRequests, getShelterRequestsDetails, getImage,
+    update_reviewFunction, statusDisplay } from "../model/adminModel.js"
 
 //user models
 export const checkUser = (req, res)=>{ //check if user exists 
@@ -11,4 +13,21 @@ export const insertUser = (req, res)=>{
 
 export const Userlogout = (req, res)=>{
     logoutUser(req, res); //logout req for cookies
+}
+
+//admin 
+export const shelterrequests = (req, res) => {
+    getShelterRequests(req, res)
+}
+export const shelterrequestdetails = (req, res) => {
+    getShelterRequestsDetails(req, res)
+}
+export const Image = (req, res) => {
+    getImage (req, res)
+}
+export const reviewFunction = (req, res) =>{
+    update_reviewFunction (req, res)
+}
+export const displayStatus = (req, res) => {
+    statusDisplay (req, res)
 }

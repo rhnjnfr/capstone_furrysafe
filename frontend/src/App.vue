@@ -458,7 +458,7 @@
 }
 </style>
 
-<template>
+<!-- <template>
     <RouterView />
 </template>
 <style>
@@ -917,4 +917,4 @@
         grid-column: 1 / -1;
     }
 }
-</style>
+</style> -->

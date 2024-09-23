@@ -92,12 +92,14 @@
                             </ul>
                         </li>
                         <li class="mt-auto">
-                            <router-link :to="{ name: 'landingpage' }"
+                            <!-- <router-link :to="{ name: 'landingpage' }" -->
+                            <a  @click.prevent = "logout()"
                                 class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-gray-700 hover:text-white">
                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                     aria-hidden="true" />
                                 Logout
-                            </router-link>
+                            </a>
+                            <!-- </router-link> -->
                         </li>
                     </ul>
                 </nav>
@@ -123,28 +125,67 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-// components open source
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-// icons open source
-import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon } from '@heroicons/vue/24/outline'
-import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
+    import { ref, computed } from 'vue'
+    import { RouterLink, useRoute } from 'vue-router'
+    // components open source
+    import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+    // icons open source
+    import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon } from '@heroicons/vue/24/outline'
+    import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
 
 
-import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
+    import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
 
-const route = useRoute()
+    const route = useRoute()
 
-const navigation = [
-    { name: 'Dashboard', to: { name: 'dashboard' }, icon: RectangleGroupIcon, current: false },
-    { name: 'Manage Registration', to: { name: 'registration' }, icon: ClipboardDocumentListIcon, current: false },
-    { name: 'Manage Animal Details', to: { name: 'details' }, icon: CreditCardIcon, current: false },
-]
+    const navigation = [
+        { name: 'Dashboard', to: { name: 'dashboard' }, icon: RectangleGroupIcon, current: false },
+        { name: 'Manage Registration', to: { name: 'registration' }, icon: ClipboardDocumentListIcon, current: false },
+        { name: 'Manage Animal Details', to: { name: 'details' }, icon: CreditCardIcon, current: false },
+    ]
 
-const currentNavigationItem = computed(() => { // to style the currently selected
-    return navigation.find((item) => item.to.name === route.name)
-})
+    const currentNavigationItem = computed(() => { // to style the currently selected
+        return navigation.find((item) => item.to.name === route.name)
+    })
 
-const sidebarOpen = ref(false)
+    const sidebarOpen = ref(false)
+
+    import axios from "axios"
+    import { useRouter } from 'vue-router';
+    const router = useRouter();
+    //logout 
+    function navigateTo(path) {
+        router.push(path);
+    }
+
+    async function logout(){
+        try{
+            //req to clear cookies 
+            const response = await axios.post("http://localhost:5000/logout", {
+                    email: this.userEmail,
+                    password: this.userPassword
+                },
+                {
+                    withCredentials: true // This allows the request to include cookies
+                });
+
+                 console.log(response)
+                // return
+                if (response.status == '200') {
+                    // console.log("Successfully logged out."); 
+                    localStorage.removeItem('u_id')
+                    localStorage.removeItem('u_type')
+                    localStorage.removeItem('c_id')
+                    localStorage.removeItem('access_token')
+                    navigateTo('/')
+                    
+                } else {
+                    console.log("Failed to log out.");
+                }
+        }
+        catch(err){
+            alert("An error occured when logging out")
+            console.log(err)
+        }
+    }
 </script>

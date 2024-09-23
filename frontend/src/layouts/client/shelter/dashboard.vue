@@ -64,12 +64,18 @@
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
-                                            <router-link :to="{ name: '' }"
+                                            <!-- <router-link :to="{ name: '' }"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
                                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                                     aria-hidden="true" />
                                                 Logout
-                                            </router-link>
+                                            </router-link> -->
+                                            <a  @click.prevent = "logout()"
+                                                class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
+                                                <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
+                                                    aria-hidden="true" />
+                                                Logout
+                                            </a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -125,12 +131,18 @@
                             </ul>
                         </li>
                         <li class="mt-auto">
-                            <router-link :to="{ name: 'landingpage' }"
+                            <!-- <router-link :to="{ name: 'landingpage' }"
                                 class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                     aria-hidden="true" />
                                 Logout
-                            </router-link>
+                            </router-link> -->
+                            <a  @click.prevent = "logout()"
+                                class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
+                                <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
+                                aria-hidden="true" />
+                                Logout
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -158,49 +170,89 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-// components open source
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-// icons open source
-import { Bars3Icon, XMarkIcon, IdentificationIcon, HomeModernIcon, ChatBubbleLeftRightIcon, RectangleGroupIcon, DocumentPlusIcon, SparklesIcon } from '@heroicons/vue/24/outline'
-import { PuzzlePieceIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
+    import axios from "axios"
 
-//my components for popup modals
-import popupNewpost from '@/components/shelter_NewPostModal.vue'
-import popupNewEvent from '@/components/shelter_EventPostModal.vue'
+    import { ref, computed } from 'vue'
+    import { RouterLink, useRoute } from 'vue-router'
+    // components open source
+    import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+    // icons open source
+    import { Bars3Icon, XMarkIcon, IdentificationIcon, HomeModernIcon, ChatBubbleLeftRightIcon, RectangleGroupIcon, DocumentPlusIcon, SparklesIcon } from '@heroicons/vue/24/outline'
+    import { PuzzlePieceIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
 
-import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
-import shelterICON from '@/assets/images/Footprint.png' // icon
+    //my components for popup modals
+    import popupNewpost from '@/components/shelter_NewPostModal.vue'
+    import popupNewEvent from '@/components/shelter_EventPostModal.vue'
 
-const route = useRoute()
+    import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
+    import shelterICON from '@/assets/images/Footprint.png' // icon
 
-const navigation = [
-    { name: 'Dashboard', to: { name: 'dashboardContent' }, icon: RectangleGroupIcon, current: false },
-    { name: 'My Shelter', to: { name: 'shelterprofile' }, icon: HomeModernIcon, current: false },
-    { name: 'Animal Profile', to: { name: 'animalprofile' }, icon: IdentificationIcon, current: false },
-    { name: 'Rescue Operation', to: { name: 'rescueoperation' }, icon: ChatBubbleLeftRightIcon, current: false },
-]
-const currentNavigationItem = computed(() => { // to style the currently selected
-    return navigation.find((item) => item.to.name === route.name)
-})
+    const route = useRoute()
 
-const shorcutpopups = [
-    { name: 'New Post', icon: DocumentPlusIcon, current: false },
-    { name: 'New Event', icon: SparklesIcon, current: false },
-]
+    const navigation = [
+        { name: 'Dashboard', to: { name: 'dashboardContent' }, icon: RectangleGroupIcon, current: false },
+        { name: 'My Shelter', to: { name: 'shelterprofile' }, icon: HomeModernIcon, current: false },
+        { name: 'Animal Profile', to: { name: 'animalprofile' }, icon: IdentificationIcon, current: false },
+        { name: 'Rescue Operation', to: { name: 'rescueoperation' }, icon: ChatBubbleLeftRightIcon, current: false },
+    ]
+    const currentNavigationItem = computed(() => { // to style the currently selected
+        return navigation.find((item) => item.to.name === route.name)
+    })
 
-// popup function
-const showModalCreatePost = ref(false)
-const showModalCreateEvent = ref(false)
+    const shorcutpopups = [
+        { name: 'New Post', icon: DocumentPlusIcon, current: false },
+        { name: 'New Event', icon: SparklesIcon, current: false },
+    ]
 
-function toggleModal(activity) {
-    if (activity.name === 'New Post') {
-        showModalCreatePost.value = !showModalCreatePost.value
-    } else if (activity.name === 'New Event') {
-        showModalCreateEvent.value = !showModalCreateEvent.value
+    // popup function
+    const showModalCreatePost = ref(false)
+    const showModalCreateEvent = ref(false)
+
+    function toggleModal(activity) {
+        if (activity.name === 'New Post') {
+            showModalCreatePost.value = !showModalCreatePost.value
+        } else if (activity.name === 'New Event') {
+            showModalCreateEvent.value = !showModalCreateEvent.value
+        }
     }
-}
+
+
+    import { useRouter } from 'vue-router';
+    const router = useRouter();
+    //logout 
+    function navigateTo(path) {
+        router.push(path);
+    }
+    async function logout(){
+        try{
+            //req to clear cookies 
+            const response = await axios.post("http://localhost:5000/logout", {
+                    email: this.userEmail,
+                    password: this.userPassword
+                },
+                {
+                    withCredentials: true // This allows the request to include cookies
+                });
+
+                 console.log(response)
+                // return
+                if (response.status == '200') {
+                    // console.log("Successfully logged out."); 
+                    localStorage.removeItem('u_id')
+                    localStorage.removeItem('u_type')
+                    localStorage.removeItem('c_id')
+                    localStorage.removeItem('access_token')
+                    navigateTo('/')
+                    
+                } else {
+                    console.log("Failed to log out.");
+                }
+        }
+        catch(err){
+            alert("An error occured when logging out")
+            console.log(err)
+        }
+    }
 
 const sidebarOpen = ref(false)
 </script>

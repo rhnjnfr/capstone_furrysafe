@@ -46,6 +46,7 @@ export const validateUser = async (req, res) => {
         
             //IF user is shelter 
             if (shelterData && shelterData.length > 0) {
+                const shelter_id = (shelterData[0].shelter_id)
                 const verificationResult = await verifyShelter(userID); //check if shelter is document verified
 
                 if (verificationResult.success) {
@@ -64,6 +65,7 @@ export const validateUser = async (req, res) => {
                         message: 'User validated and shelter verified successfully',
                         userID: userID, 
                         userType: 'shelter', 
+                        characterId: shelter_id, 
                         token 
                     });
                     return;
@@ -77,7 +79,8 @@ export const validateUser = async (req, res) => {
             const { data: buddyData, error: buddyError } = await supabase //if user doesnt exist in shelter, checks buddy
                 .from('tbl_buddy')
                 .select('buddy_id')
-                .eq('user_id', userID);
+                .eq('user_id', userID)
+                .select()
 
         
             if (buddyError) {
@@ -87,6 +90,8 @@ export const validateUser = async (req, res) => {
         
             //IF User is a buddy
             if (buddyData && buddyData.length > 0) {
+                // console.log(buddyData)
+                const buddy_id = (buddyData[0].buddy_id)
                 const token = createToken({ userID, userType: 'buddy' });
                 const refreshToken = createRefreshToken({userID, userType: 'buddy'})
 
@@ -102,6 +107,7 @@ export const validateUser = async (req, res) => {
                     message: 'User validated successfully', 
                     userID: userID, 
                     userType: 'buddy', 
+                    characterId: buddy_id, 
                     token 
                 });
 
@@ -110,7 +116,8 @@ export const validateUser = async (req, res) => {
             const { data: admindata, error: adminError } = await supabase //if user doesnt exist in shelter, checks buddy
                 .from('tbl_admin')
                 .select('admin_id')
-                .eq('user_id', userID);
+                .eq('user_id', userID)
+                .select();
 
         
             if (adminError) {
@@ -119,6 +126,7 @@ export const validateUser = async (req, res) => {
             }
 
             if (admindata && admindata.length > 0) {
+                const admin_id = (admindata[0].admin_id)
 
                 const token = createToken({ userID, userType: 'admin' });
                 const refreshToken = createRefreshToken({userID, userType: 'admin'})
@@ -135,6 +143,7 @@ export const validateUser = async (req, res) => {
                     message: 'User validated successfully', 
                     userID: userID, 
                     userType: 'admin', 
+                    characterId: admin_id, 
                     token 
                 });
             }
@@ -223,7 +232,7 @@ export const createUser = async (req, res) =>{
                 await createBuddy(userID, user); //user holds all user detials
             }
             else{
-                await createShelter(userID, sheltername, documents); 
+                await createShelter(userID, sheltername, documents, email); 
             }
            res.status(200).json({success: true, message: 'User Successfully added', user: data});
         }

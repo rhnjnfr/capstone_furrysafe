@@ -1,5 +1,3 @@
-</template>
-
 <template>
     <div class="w-full h-screen flex items-center justify-center">
         <div class="border w-screen md:flex md:items-center">
