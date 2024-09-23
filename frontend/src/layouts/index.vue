@@ -13,13 +13,13 @@
                             <RouterLink to="/"
                                 class="inline-flex items-center border-b-2 border-teal-500 px-1 pt-1 text-sm font-bold text-gray-800 hover:text-lightorange">
                                 FurrySafe</RouterLink>
-                            <RouterLink to=""
+                            <RouterLink to="shelterDashboard"
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 Featured</RouterLink>
                             <RouterLink to=""
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 Contact</RouterLink>
-                            <RouterLink to=""
+                            <RouterLink to="/Furrysafe_admin"
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 About Us</RouterLink>
                         </div>
@@ -36,9 +36,9 @@
                         </DisclosureButton>
                     </div>
                     <div class="hidden lg:ml-4 lg:flex lg:items-center gap-4">
-                        <RouterLink to="login" class="hover:text-lightorange">
+                        <RouterLink to="/register" class="hover:text-lightorange">
                             Login</RouterLink>
-                        <RouterLink to="buddy-registration"
+                        <RouterLink to=""
                             class="bgteal text-white p-1.5 px-4 rounded-lg font-medium hover:bg-lightorange">
                             Sign-Up</RouterLink>
                     </div>
@@ -54,13 +54,13 @@
                 </div>
                 <div class="border-t border-gray-200 pb-3 pt-4 space-y-2 text-white">
                     <div class="mx-[1rem]">
-                        <RouterLink to="registration"
+                        <RouterLink to="/register"
                             class="w-full bgteal rounded-lg py-2 flex justify-center hover:bg-bgteal hover:font-medium">
                             Sign-Up
                         </RouterLink>
                     </div>
                     <div class="mx-[1rem]">
-                        <RouterLink to="login"
+                        <RouterLink to=""
                             class="w-full bgorange rounded-lg py-2 flex justify-center hover:bg-lightorange hover:font-medium">
                             Login</RouterLink>
                     </div>
@@ -81,16 +81,16 @@
 </template>
 
 <script setup>
-    import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-    import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-    import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
 
-    import Linkfooter from '../components/footerLink.vue'
-    const navigation = [
-        { name: 'Home', to: { name: 'landingpage' }, current: true },
-        { name: 'Featured', to: { name: 'shelterDashboard' }, current: false },
-        { name: 'Contacts', to: { name: '' }, current: false },
-        { name: 'About', to: { name: '' }, current: false },
-        { name: 'FAQ', to: { name: '' }, current: false },
-    ]
+import Linkfooter from '../components/footerLink.vue'
+const navigation = [
+    { name: 'Home', to: { name: 'landingpage' }, current: true },
+    { name: 'Featured', to: { name: 'shelterDashboard' }, current: false },
+    { name: 'Contacts', to: { name: 'mockup' }, current: false },
+    { name: 'About', to: { name: 'adminDashboard' }, current: false },
+    { name: 'FAQ', to: { name: '' }, current: false },
+]
 </script>

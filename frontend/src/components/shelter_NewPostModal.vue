@@ -62,8 +62,8 @@
               </div>
               <div class="flex justify-center">
                 <button type="button"
-                  class="inline-flex w-full justify-center rounded-md bgteal px-[12.2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal sm:ml-3 sm:w-auto"
-                  @click="open = false">Post</button>
+                  class="inline-flex w-full justify-center rounded-md bgteal px-[12.2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal sm:ml-3 sm:w-auto">
+                  Post</button>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -78,7 +78,7 @@ import PetList from '@/components/dropdown_PetList.vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 export default {
-  components: { PetList, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot },
+  components: { PetList, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, },
   data() {
     return {
       open: true,
@@ -101,7 +101,7 @@ export default {
     },
     removeImage(index) {
       this.imageUrls.splice(index, 1);
-    }
+    },
   }
 }
 </script>
