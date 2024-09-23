@@ -1,31 +1,25 @@
 <script>
-import contents from '@/components/message-content.vue'
-import calendarCard from '@/components/calendar.vue'
+import updatecard from '@/components/admin_updateCard.vue';
+import tablelist from '@/components/admin_updatesTable.vue';
 
 export default {
-  components: {
-    contents,
-    calendarCard
-  },
-  data() {
-    return {
-    //icons
-      pending: require('@/assets/images/Data Pending.png'),
-      users: require('@/assets/images/People.png'),
-      complaints: require('@/assets/images/Strike.png'),
-      calendarICON: require('@/assets/images/Calendar.png'),
-    }
-  },
-}
+    components: {
+        updatecard, tablelist
+    },
+};
 </script>
-
 <template>
-    <div class="flex justify-between">
-        <div class="graycolor">
-            <contents msg="Dashboard"/> <!-- geh try lng nkong components -->
+    <div>
+        <div>
+            <updatecard />
         </div>
         <div>
-            <calendarCard />
+            <div class="my-[1rem] border-y bg-gray-800 py-3 px-[1rem] rounded-lg">
+                <span class="font-semibold text-sm text-white">Request List</span>
+            </div>
+            <div class="overflow-y-auto">
+                <tablelist />
+            </div>
         </div>
     </div>
 </template>

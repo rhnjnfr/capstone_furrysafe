@@ -64,12 +64,18 @@
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
-                                            <router-link :to="{ name: '' }" 
+                                            <!-- <router-link :to="{ name: '' }"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
                                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                                     aria-hidden="true" />
                                                 Logout
-                                            </router-link>
+                                            </router-link> -->
+                                            <a  @click.prevent = "logout()"
+                                                class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
+                                                <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
+                                                    aria-hidden="true" />
+                                                Logout
+                                            </a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -125,12 +131,16 @@
                             </ul>
                         </li>
                         <li class="mt-auto">
-                            <!-- :to="{ name: 'landingpage' }" -->
-                            <!-- gi tanggal nko ang route-link kay maka cause ug error fakyew routlink-->
-                            <a  @click.prevent = "logout()"
+                            <!-- <router-link :to="{ name: 'landingpage' }"
                                 class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                     aria-hidden="true" />
+                                Logout
+                            </router-link> -->
+                            <a  @click.prevent = "logout()"
+                                class="group items-center flex gap-x-3 rounded-md py-2 px-6 text-sm font-semibold leading-6 text-white hover:bg-bgdarkorange hover:text-white">
+                                <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
+                                aria-hidden="true" />
                                 Logout
                             </a>
                         </li>
@@ -152,7 +162,7 @@
         <main class="py-10 lg:pl-72">
             <div class="px-4 sm:px-6 lg:px-8">
                 <RouterView /> <!-- main content page -->
-                <popupNewpost v-if="showModalCreatePost" @close="toggleModal({ name: 'New Post' })" />
+                <popupNewpost v-if="showModalCreatePost" @close="toggleModal({ name: 'New Post' })"/>
                 <popupNewEvent v-if="showModalCreateEvent" @close="toggleModal({ name: 'New Event' })" />
             </div>
         </main>
@@ -160,7 +170,6 @@
 </template>
 
 <script setup>
-    //for logging out
     import axios from "axios"
 
     import { ref, computed } from 'vue'
@@ -177,7 +186,7 @@
 
     import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
     import shelterICON from '@/assets/images/Footprint.png' // icon
-    
+
     const route = useRoute()
 
     const navigation = [
@@ -206,19 +215,18 @@
             showModalCreateEvent.value = !showModalCreateEvent.value
         }
     }
-    //log out function
+
+
     import { useRouter } from 'vue-router';
     const router = useRouter();
-    logout 
+    //logout 
     function navigateTo(path) {
         router.push(path);
     }
     async function logout(){
-        console.log("hi~")
-        console.log("cookie")
         try{
             //req to clear cookies 
-            const response = await axios.post("http://localhost:5000/shelterDashboard", {
+            const response = await axios.post("http://localhost:5000/logout", {
                     email: this.userEmail,
                     password: this.userPassword
                 },
@@ -232,6 +240,7 @@
                     // console.log("Successfully logged out."); 
                     localStorage.removeItem('u_id')
                     localStorage.removeItem('u_type')
+                    localStorage.removeItem('c_id')
                     localStorage.removeItem('access_token')
                     navigateTo('/')
                     
@@ -245,5 +254,5 @@
         }
     }
 
-    const sidebarOpen = ref(false)
+const sidebarOpen = ref(false)
 </script>
