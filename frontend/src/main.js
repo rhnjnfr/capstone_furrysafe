@@ -1,10 +1,17 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router'; // Import your router
+import globalMixin from '@/router/globalMixin'; // Import your global mixin
+import './assets/css/style.css'; // Import your CSS styles
 
-import router from './router' // importing the router created in src if u manually created this...
+// Create the Vue application instance
+const app = createApp(App);
 
-import './assets/css/style.css' // importing the css tailwind directives
+// Apply the global mixin
+app.mixin(globalMixin);
 
-const app = createApp(App)
-app.use(router) // using the router you've imported...
-app.mount('#app')
+// Use the router in your app
+app.use(router);
+
+// Mount the app to the DOM element with id 'app'
+app.mount('#app');

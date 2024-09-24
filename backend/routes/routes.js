@@ -3,7 +3,8 @@ import multer from "multer"
 
 import { checkUser, insertUser, Userlogout, //user
          shelterrequests, shelterrequestdetails, Image, 
-         reviewFunction, displayStatus //admin
+         reviewFunction, displayStatus, displayPetCategory,
+         addBreedCategory, addPetCategory, addVaccineCategory//admin
         } from "../controllers/user.js";
 
 const storage = multer.memoryStorage({
@@ -31,5 +32,9 @@ router.get("/request_preview/:id", shelterrequestdetails)
 router.get("/request_preview/:id/image", Image);
 router.post("/response", reviewFunction);
 router.get("/status", displayStatus)
+router.get("/load-category", displayPetCategory) 
+router.post("/add-breed", addBreedCategory)
+router.post("/add-pet-category", addPetCategory)
+router.post("/add-pet-vaccine", addVaccineCategory)
 
 export default router;

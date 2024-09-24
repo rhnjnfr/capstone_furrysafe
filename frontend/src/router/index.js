@@ -196,20 +196,21 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('access_token');
   const userType = localStorage.getItem('u_type');
 
-  // Prevent navigating to login if the user is already authenticated
-  if (isAuthenticated && to.path === '/login') { //
+  // Prevent navigating to login or landing if the user is already authenticated
+  if (isAuthenticated && (to.path === '/login' || to.path === '/landingcontent')) { // Landing page check
     if (userType === 'shelter') {
       return next('/shelterDashboard'); // Redirect shelter users to their dashboard
     } else if (userType === 'buddy') {
       return next('/buddydashboard'); // Redirect buddy users to their dashboard
     } else if (userType === 'admin') {
-      return next('/admin'); // Redirect admin users to their dashboard
+      return next('/dashboard'); // Redirect admin users to their dashboard
     }
   }
 
+  // Check if the route requires authentication
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      return next('/login'); // Redirect to login if not authenticated, and after registration
+      return next('/login'); // Redirect to login if not authenticated
     } else if (to.meta.userType && to.meta.userType !== userType) {
       console.log(`Access denied for user type: ${userType}`);
       return next('/'); // Redirect to home if user type is not allowed

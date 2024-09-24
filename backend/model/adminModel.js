@@ -28,7 +28,7 @@ export const getShelterRequestsDetails = async (req, res) => {
 
         if (!data || data.length === 0) {
             // If no data found, return 404
-            //return res.status(404).send({ message: 'Request not found' });
+            return res.status(404).send({ message: 'Request not found' });
         }
 
         if (err) {
@@ -71,7 +71,7 @@ export const getImage = async (req, res) => {
 export const update_reviewFunction = async (req, res) => {
     try{
         const {id, req_status, req_response, admin_id } = req.body 
-        
+
         const { data, error } = await supabase
         .rpc('update_shelter_request', { 
             verified_status: req_status, verification: req_response, s_id: id, reviewer_id: admin_id 
@@ -101,4 +101,83 @@ export const statusDisplay = async (req, res)=>{
     catch(err){
         console.log("error", err)
     }
+}
+
+export const addBreed = async (req, res) =>{
+    try{
+        const { category, breed, description } = req.body
+        
+        const { data, error } = await supabase.rpc('insert_breed', {
+            _breedname: breed,
+            _pet_category: category,
+            _pet_description: description
+        });
+    
+        if (error) {
+            console.error("Error inserting data:", error); 
+            return res.status(500).json({ error: "Internal Server Error" });
+            // Log the error details
+            // Handle the error (e.g., show a message to the user)
+        }           
+            res.status(200).json(data);
+    }
+    catch(err){
+        console.log("err", err)
+    }
+}
+
+export const insertPetCategory = async (req, res)=>{
+    try{
+        const { category } = req.body
+        
+        const { data, error } = await supabase.rpc('insert_pet_category', {
+            _pet_category: category,
+        });
+    
+        if (error) {
+            console.error("Error inserting data:", error); 
+            return res.status(500).json({ error: "Internal Server Error" });
+            // Log the error details
+            // Handle the error (e.g., show a message to the user)
+        }           
+            res.status(200).json(data);
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}
+
+export const insertVaccineCategory = async (req, res)=>{
+    try{
+        const { vaccine, category } = req.body
+        const { data, error } = await supabase.rpc('insertvaccinecategory', {
+            _vaccine_name: vaccine, 
+            _pet_category: category,
+        });
+    
+        if (error) {
+            console.error("Error inserting data:", error); 
+            return res.status(500).json({ error: "Internal Server Error" });
+            // Log the error details
+            // Handle the error (e.g., show a message to the user)
+        }           
+        res.status(200).json(data);
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}
+
+export const loadPetCategory = async (req, res) => {
+    try{
+        const {data, error} = await supabase.rpc('retrieve_pet_category')
+        if (error) {
+            console.log("Error:", error);
+        } else {
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("error", err)
+    }    
 }

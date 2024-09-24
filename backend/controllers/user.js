@@ -1,6 +1,7 @@
 import { validateUser, createUser, logoutUser} from "../model/userModel.js";
 import { getShelterRequests, getShelterRequestsDetails, getImage,
-    update_reviewFunction, statusDisplay } from "../model/adminModel.js"
+         update_reviewFunction, statusDisplay, loadPetCategory,
+         addBreed, insertPetCategory, insertVaccineCategory} from "../model/adminModel.js"
 
 //user models
 export const checkUser = (req, res)=>{ //check if user exists 
@@ -30,4 +31,16 @@ export const reviewFunction = (req, res) =>{
 }
 export const displayStatus = (req, res) => {
     statusDisplay (req, res)
+}
+export const displayPetCategory = (req, res) => {
+    loadPetCategory (req, res)
+}
+export const addBreedCategory = (req, res)=>{
+    addBreed (req, res)
+}
+export const addPetCategory = (req, res)=>{
+    insertPetCategory (req, res)
+}
+export const addVaccineCategory = (req, res)=>{
+    insertVaccineCategory (req, res)
 }
