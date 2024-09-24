@@ -69,12 +69,12 @@
         </div>
         <div class="mt-[1rem] border-t py-[2rem] flex justify-end gap-5 text-sm font-medium px-[1rem] text-white">
             <button
-                @click.prevent = "responseRequest(route.params.id, 'Approved', 'TRUE')" 
+                @click.prevent = "responseRequest(route.params.id, 'Approved', 'TRUE');  refreshRoute($router)" 
                 type="button" class=" border-gray-800 bg-gray-600 hover:bg-gray-500 py-2 px-[4rem] rounded-md shadow-md">
                 Approve
             </button>
             <button
-                @click.prevent = "responseRequest(route.params.id, 'Rejected', 'FALSE')" 
+                @click.prevent = "responseRequest(route.params.id, 'Rejected', 'FALSE'),  refreshRoute($router)" 
                 type="button" class="border-gray-800 bg-gray-800 hover:bg-gray-700 py-2 px-[4rem] rounded-md shadow-md">
                 Reject
             </button>

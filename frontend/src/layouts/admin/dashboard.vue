@@ -177,6 +177,7 @@
                     localStorage.removeItem('u_type')
                     localStorage.removeItem('c_id')
                     localStorage.removeItem('access_token')
+                    localStorage.removeItem('currentTab')
                     navigateTo('/')
                     
                 } else {

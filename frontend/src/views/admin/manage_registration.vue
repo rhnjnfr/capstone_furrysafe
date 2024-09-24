@@ -67,14 +67,14 @@
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }">
                                         <button
-                                            @click.prevent = "responseRequest(request.id, 'Approved', 'TRUE')"
+                                            @click.prevent = "responseRequest(request.id, 'Approved', 'TRUE'); refreshRoute($router)"
                                             :class="[active ? 'bg-gray-50' : '', 'block px-6 py-1 text-sm leading-6 text-green-400 w-full']">
                                             Approve
                                         </button>
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }">
                                         <button
-                                            @click.prevent = "responseRequest(request.id, 'Rejected', 'FALSE')"
+                                            @click.prevent = "responseRequest(request.id, 'Rejected', 'FALSE'); refreshRoute($router)"
                                             :class="[active ? 'bg-gray-50' : '', 'block px-6 py-1 text-sm leading-6 text-red-500 w-full']">
                                             Reject
                                         </button>
