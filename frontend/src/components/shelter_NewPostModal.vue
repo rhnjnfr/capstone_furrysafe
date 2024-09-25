@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="relative z-10" @close="open = false">
+    <Dialog as="div" class="relative z-30" @close="open = false">
       <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
         leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
@@ -30,6 +30,26 @@
                   </DialogTitle>
                   <div>
                     <PetList />
+                  </div>
+                  <div class="text-sm mt-1.5">
+                    <div class="flex flex-col">
+                      <label for="petName" class="font-medium leading-6 text-gray-700">
+                        Name</label>
+                      <input type="text" name="petName" id="petName" placeholder="petname"
+                        class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
+                    </div>
+                    <div class="flex flex-col mt-1.5">
+                      <label for="rehomed" class="font-medium leading-6 text-gray-700">
+                        Date Re-homed</label>
+                      <input type="text" name="rehomed" id="rehomed" placeholder="rehomed"
+                        class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
+                    </div>
+                    <div class="flex flex-col mt-1.5">
+                      <label for="petBreed" class="font-medium leading-6 text-gray-700">
+                        Breed / Mix</label>
+                      <input type="text" name="petName" id="petName" placeholder="petbreed"
+                        class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
+                    </div>
                   </div>
                   <div class="mt-2">
                     <textarea v-model="newpost" placeholder="Write a caption or description of this post..."

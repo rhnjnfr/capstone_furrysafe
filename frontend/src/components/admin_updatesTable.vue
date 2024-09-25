@@ -48,25 +48,25 @@ export default {
             ]
         }
     },
-    computed: {
-        categorizedRequests() {
-            const categorized = {
-                Pending: [],
-                Approved: [],
-                Rejected: []
-            };
-            this.requests.forEach(request => {
-                categorized[request.status].push(request);
-            });
-            return categorized;
-        }
-    }
+    // computed: {
+    //     categorizedRequests() {
+    //         const categorized = {
+    //             Pending: [],
+    //             Approved: [],
+    //             Rejected: []
+    //         };
+    //         this.requests.forEach(request => {
+    //             categorized[request.status].push(request);
+    //         });
+    //         return categorized;
+    //     }
+    // }
 };
 </script>
 <template>
     <div>
-        <div v-for="(category, categoryName) in categorizedRequests" :key="categoryName">
-            <h2 class="text-sm font-semibold mb-2 ml-6">{{ categoryName }}</h2>
+        <!-- <div v-for="(category, categoryName) in categorizedRequests" :key="categoryName">
+            <h2 class="text-sm font-semibold mb-2 ml-6">{{ categoryName }}</h2> -->
             <RouterLink v-for="(list, index) in category" :key="index"
                 :to="{ name: 'request_preview', params: { id: list.id } }" custom v-slot="{ navigate }">
                 <div @click="navigate"
@@ -96,7 +96,7 @@ export default {
                 </div>
             </RouterLink>
         </div>
-    </div>
+    <!-- </div> -->
     <!-- <div>
         <RouterLink v-for="(list, index) in requests" :key="index"
             :to="{ name: 'request_preview', params: { id: list.id } }" custom v-slot="{ navigate }">

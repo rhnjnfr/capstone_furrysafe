@@ -98,7 +98,7 @@
                             <ul role="list" class="-mx-2 space-y-1">
                                 <li v-for="item in navigation" :key="item.name">
                                     <RouterLink v-if="!item.children" :to="item.to"
-                                        :class="[item === currentNavigationItem ? 'bgteal text-white text-[15px] items-center pl-[1.5rem]' : 'items-center text-white hover:text-white hover:bg-bgdarkorange pl-[1.5rem]', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
+                                        :class="[item === currentNavigationItem ? 'bgteal hover:bg-bgteal text-white text-[15px] items-center pl-[1.5rem]' : 'items-center text-white hover:text-white hover:bg-bgdarkorange pl-[1.5rem]', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                                         <img v-if="typeof item.icon === 'string'" :src="item.icon"
                                             class="h-5 w-5 shrink-0 text-white" aria-hidden="true" />
                                         <component v-else :is="item.icon" class="h-5 w-5 shrink-0 text-white"
@@ -152,6 +152,8 @@
                 <RouterView /> <!-- main content page -->
                 <popupNewpost v-if="showModalCreatePost" @close="toggleModal({ name: 'New Post' })"/>
                 <popupNewEvent v-if="showModalCreateEvent" @close="toggleModal({ name: 'New Event' })" />
+                <!-- <test v-if="showModalTest" @close="toggleModal({ name: 'Test' })"/> -->
+                <!-- <RouterLink :to="{ name: 'modal' }">Open Modal</RouterLink> -->
             </div>
         </main>
     </div>
@@ -169,6 +171,7 @@ import { PuzzlePieceIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/
 //my components for popup modals
 import popupNewpost from '@/components/shelter_NewPostModal.vue'
 import popupNewEvent from '@/components/shelter_EventPostModal.vue'
+// import test from '@/components/pin_MapModal.vue'
 
 import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
 import shelterICON from '@/assets/images/Footprint.png' // icon
@@ -181,18 +184,32 @@ const navigation = [
     { name: 'Animal Profile', to: { name: 'animalprofile' }, icon: IdentificationIcon, current: false },
     { name: 'Rescue Operation', to: { name: 'rescueoperation' }, icon: ChatBubbleLeftRightIcon, current: false },
 ]
+
 const currentNavigationItem = computed(() => { // to style the currently selected
     return navigation.find((item) => item.to.name === route.name)
 })
 
+// const currentNavigationItem = computed(() => {
+//   const currentPath = route.path;
+//   return navigation.find((item) => {
+//     if (item.to.path) {
+//       return currentPath.startsWith(item.to.path);
+//     } else {
+//       return currentPath.includes(item.to.name);
+//     }
+//   });
+// });
+
 const shorcutpopups = [
     { name: 'New Post', icon: DocumentPlusIcon, current: false },
     { name: 'New Event', icon: SparklesIcon, current: false },
+    // { name: 'Test', icon: SparklesIcon, current: false },
 ]
 
 // popup function
 const showModalCreatePost = ref(false)
 const showModalCreateEvent = ref(false)
+// const showModalTest = ref(false)
 
 function toggleModal(activity) {
     if (activity.name === 'New Post') {
@@ -200,6 +217,9 @@ function toggleModal(activity) {
     } else if (activity.name === 'New Event') {
         showModalCreateEvent.value = !showModalCreateEvent.value
     }
+    //  else if (activity.name === 'Test') {
+    //     showModalTest.value = !showModalTest.value
+    // }
 }
 
 const sidebarOpen = ref(false)
