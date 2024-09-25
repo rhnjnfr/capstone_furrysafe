@@ -181,3 +181,35 @@ export const loadPetCategory = async (req, res) => {
         console.log("error", err)
     }    
 }
+
+export const loadAdminPositions = async (req, res) => {
+    try{
+        // console.log("admin position loading")
+        const {data, error} = await supabase.rpc('retrieve_positions')
+        if (error) {
+            console.log("Error:", error);
+        } else {
+            // console.log(data)
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}
+
+export const registerAdminAccount = async (req, res) => {
+    try{
+        // console.log("admin position loading")
+        // const {data, error} = await supabase.rpc('retrieve_positions')
+        // if (error) {
+        //     console.log("Error:", error);
+        // } else {
+        //     console.log(data)
+        //     return res.status(200).json(data);
+        // }
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}

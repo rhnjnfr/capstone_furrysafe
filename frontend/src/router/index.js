@@ -73,12 +73,6 @@ const routes = [
   // },
   //
   {
-    //add admin
-    path: '/mockup', 
-    name: 'mockup',
-    component: mockup,
-  },
-  {
     path: '/Furrysafe_admin',
     name: 'adminDashboard',
     component: adminDashboard,
@@ -104,6 +98,11 @@ const routes = [
           path: '/details',
           name: 'details',
           component: details
+        },
+        {//add admin
+          path: '/mockup', 
+          name: 'mockup',
+          component: mockup,
         },
       ],
   },
