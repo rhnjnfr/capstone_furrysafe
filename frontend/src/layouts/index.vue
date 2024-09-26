@@ -13,10 +13,10 @@
                             <RouterLink to="/"
                                 class="inline-flex items-center border-b-2 border-teal-500 px-1 pt-1 text-sm font-bold text-gray-800 hover:text-lightorange">
                                 FurrySafe</RouterLink>
-                            <RouterLink to=""
+                            <RouterLink to="/modal"
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 Featured</RouterLink>
-                            <RouterLink to=""
+                            <RouterLink to="/modal"
                                 class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-600 hover:border-teal hover:text-lightorange">
                                 Contact</RouterLink>
                             <RouterLink to="/Furrysafe_admin"
@@ -89,7 +89,7 @@ import Linkfooter from '../components/footerLink.vue'
 const navigation = [
     { name: 'Home', to: { name: 'landingpage' }, current: true },
     { name: 'Featured', to: { name: 'shelterDashboard' }, current: false },
-    { name: 'Contacts', to: { name: 'mockup' }, current: false },
+    { name: 'Contacts', to: { name: 'pinlocation' }, current: false },
     { name: 'About', to: { name: 'adminDashboard' }, current: false },
     { name: 'FAQ', to: { name: '' }, current: false },
 ]

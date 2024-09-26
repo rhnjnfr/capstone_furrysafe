@@ -25,7 +25,8 @@
                                 </div>
                             </TransitionChild>
                             <!-- Sidebar component, swap this element with another sidebar if you like -->
-                            <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-800 pb-2 ring-1 ring-white/10">
+                            <div
+                                class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-800 pb-2 ring-1 ring-white/10">
                                 <div class="flex h-[3.97rem] shrink-0 items-center bg-white pl-[3rem]">
                                     <img :src="logo" alt="Logout Icon" class="w-10" aria-hidden="true" />
                                     <h1 class="pl-3 font-extrabold text-2xl text-gray-600">FurrySafe</h1>
@@ -51,7 +52,7 @@
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-700 hover:text-white">
                                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                                     aria-hidden="true" />
-                                                Logout
+                                                Logouts
                                             </router-link>
                                         </li>
                                     </ul>
@@ -89,8 +90,17 @@
                                         {{ item.name }}
                                     </RouterLink>
                                 </li>
+                                <!-- <li>
+                                    <div class="hover:bg-gray-700 px-2 rounded-md">
+                                        <button type="button" class="flex gap-2 py-2 px-4">
+                                            <DocumentPlusIcon class="h-5 w-5 shrink-0 text-white" />
+                                            <span class="text-sm">Create Admin</span>
+                                        </button>
+                                    </div>
+                                </li> -->
                             </ul>
                         </li>
+
                         <li class="mt-auto">
                             <!-- <router-link :to="{ name: 'landingpage' }" -->
                             <a  @click.prevent = "logout()"
@@ -125,13 +135,13 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
-    import { RouterLink, useRoute } from 'vue-router'
-    // components open source
-    import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-    // icons open source
-    import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon } from '@heroicons/vue/24/outline'
-    import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
+import { ref, computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+// components open source
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+// icons open source
+import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
+import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
 
 
     import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo

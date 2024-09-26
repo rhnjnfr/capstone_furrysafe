@@ -1,6 +1,6 @@
 <template>
     <!-- JENE MAP TESTING :D -->
-    <div id="map"  class="h-screen w-full" ></div>
+    <div id="map"  class=" w-full z-0" ></div>
 </template>
 
 <script>

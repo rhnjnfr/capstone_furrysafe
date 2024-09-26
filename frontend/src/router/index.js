@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { createApp } from 'vue';
 
 // import regis from '../views/shelter_registration.vue'
 import landingpage from '../layouts/index.vue'
@@ -38,6 +39,9 @@ import shelter_registration from '@/views/shelter_registration.vue';
 import map from "../views/mapview.vue"
 import confirm_email from "../views/confirm_Email.vue"
 //import forgot_password from "../views/forgotpassword.vue"
+
+// import map from "../views/shelter/pin_Location.vue"
+import test from '@/components/pin_MapModal.vue'
 
 const routes = [
   //jene loginhelp huehfjkgjgsad
@@ -120,71 +124,114 @@ const routes = [
         }
       ],
   },
+  { // modal
+    path: '/modal',
+    name: 'modal',
+    component: test, // import test from '@/components/pin_MapModal.vue'
+    props: (route) => ({ open: route.query.open }),
+    beforeRouteLeave(to, from, next) {
+      console.log('beforeRouteLeave called');
+      console.log('from.query.open:', from.query.open);
+      if (!from.query.open) {
+        console.log('Navigating to shelterDashboard');
+        next({ name: 'shelterDashboard' });
+      } else {
+        console.log('Not navigating');
+        next();
+      }
+    }
+  },
+  { // modal
+    path: '/modal',
+    name: 'modal',
+    component: test, // import test from '@/components/pin_MapModal.vue'
+    props: (route) => ({ open: route.query.open }),
+    beforeRouteLeave(to, from, next) {
+      console.log('beforeRouteLeave called');
+      console.log('from.query.open:', from.query.open);
+      if (!from.query.open) {
+        console.log('Navigating to shelterDashboard');
+        next({ name: 'shelterDashboard' });
+      } else {
+        console.log('Not navigating');
+        next();
+      }
+    }
+  },
   {
     path: '/FurrySafe',
     name: 'shelterDashboard',
     component: shelterDashboard,
-    redirect: '/shelterdashboard',
+    redirect: '/shelterdashboard', // Redirect to the modal route by default
     meta: { requiresAuth: true, userType: 'shelter' }, //testing
-    children:
-      [
-        { // dashboard
-          path: '/shelterdashboard',
-          name: 'dashboardContent',
-          component: shelterdashboardContent
-        },
-        { // my shelter view
-          path: '/myshelter',
-          name: 'shelterprofile',
-          component: shelterprofile,
-          redirect: '/myshelter_feed', // shelter_NewsfeedCard.vue
-          children:
-            [
-              { // a component shelter_NewsfeedCard.vue
-                path: '/myshelter_feed',
-                name: 'shelterfeed',
-                component: shelterfeed,
-              },
-              { // a component shelter_ViewPostCard.vue
-                path: '/myshelter_viewpost',
-                name: 'shelterviewpost',
-                component: shelterviewpost,
-              },
-            ],
-        },
-        { // my shelter - Edit Profile
-          path: '/edit_shelterprofile',
-          name: 'editshelterprofile',
-          component: editshelterprofile
-        },
-        { // animal profile
-          path: '/animalprofile',
-          name: 'animalprofile',
-          component: shelteranimalprofile
-        },
-        { // animal profile - create animal profile
-          path: '/create_animalprofileform',
-          name: 'createanimalprofile',
-          component: createanimalprofile
-        },
-        { // animal profile - view animal profile
-          path: '/view_animalprofileform',
-          name: 'viewanimalprofile',
-          component: viewanimalprofile
-        },
-        { // animal profile - edit animal profile
-          path: '/edit_animalprofileform',
-          name: 'editanimalprofile',
-          component: editanimalprofile
-        },
-        { // rescue operation
-          path: '/rescueoperation',
-          name: 'rescueoperation',
-          component: rescueoperation
-        },
-      ],
+    children: [
+      { // dashboard
+        path: '/shelterdashboard',
+        name: 'dashboardContent',
+        component: shelterdashboardContent,
+      },
+      { // my shelter view
+        path: '/myshelter',
+        name: 'shelterprofile',
+        component: shelterprofile,
+        redirect: '/myshelter_feed', // shelter_NewsfeedCard.vue
+        children:
+          [
+            { // a component shelter_NewsfeedCard.vue
+              path: '/myshelter_feed',
+              name: 'shelterfeed',
+              component: shelterfeed,
+            },
+            { // a component shelter_ViewPostCard.vue
+              path: '/myshelter_viewpost',
+              name: 'shelterviewpost',
+              component: shelterviewpost,
+            },
+          ],
+      },
+      { // my shelter - Edit Profile
+        path: '/edit_shelterprofile',
+        name: 'editshelterprofile',
+        component: editshelterprofile
+      },
+      { // animal profile
+        path: '/animalprofile',
+        name: 'animalprofile',
+        component: shelteranimalprofile
+      },
+      { // animal profile - create animal profile
+        path: '/create_animalprofileform',
+        name: 'createanimalprofile',
+        component: createanimalprofile
+      },
+      { // animal profile - view animal profile
+        path: '/view_animalprofileform',
+        name: 'viewanimalprofile',
+        component: viewanimalprofile
+      },
+      { // animal profile - edit animal profile
+        path: '/edit_animalprofileform',
+        name: 'editanimalprofile',
+        component: editanimalprofile
+      },
+      { // rescue operation
+        path: '/rescueoperation',
+        name: 'rescueoperation',
+        component: rescueoperation
+      },
+    ],
   },
+  // console.log('shelterDashboard component:', shelterDashboard),
+  // console.log('shelterdashboardContent component:', shelterdashboardContent),
+
+
 ]
+routes.forEach((route, index) => {
+  console.log(`Route ${index}:`, route);
+  if (!route.path) {
+    console.error(`Route ${index} has no path!`);
+  }
+});
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

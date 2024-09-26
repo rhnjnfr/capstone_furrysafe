@@ -1,6 +1,6 @@
 <script>
 import updatecard from '@/components/admin_updateCard.vue';
-import tablelist from '@/components/admin_updatesTable.vue';
+import tablelist from '@/components/admin_pendingList.vue';
 
 export default {
     components: {
