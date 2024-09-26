@@ -3,9 +3,12 @@ import textvalue from '@/components/textString.vue'
 import datetoday from '@/components/dateCard.vue'
 import linkfooter from '@/components/footerLink.vue'
 import updatescard from '@/components/dashboard_Activities.vue';
-import displaymap from '@/components/showMap.vue';
+import displaymap from '@/components/Map.vue';
 
 export default {
+    beforeMount() {
+        this.open = true; // Set the open ref value to true
+    },
     components: {
         textvalue, datetoday, linkfooter, updatescard, displaymap
     },
@@ -31,11 +34,9 @@ export default {
                 <div class="">
                     <div class="grid border">
                         <div class="font-medium graycolor py-[1rem] px-[2rem] border-b-2">Shelters Location</div>
-                        
-                            <div class="flex bg-white">
-                                <displaymap class="h-[40vh]" />
-                            </div>
-                        
+                        <div class="flex bg-white">
+                            <displaymap class="h-[40vh]" />
+                        </div>
                     </div>
                 </div>
             </div>
