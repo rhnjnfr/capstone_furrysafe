@@ -47,12 +47,12 @@
                                             </ul>
                                         </li>
                                         <li class="mt-auto">
-                                            <a  @click.prevent = "logout()"
+                                            <router-link :to="{ name: '' }"
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-700 hover:text-white">
                                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                                     aria-hidden="true" />
                                                 Logout
-                                            </a>
+                                            </router-link>
                                         </li>
                                     </ul>
                                 </nav>
@@ -142,7 +142,6 @@
         { name: 'Dashboard', to: { name: 'dashboard' }, icon: RectangleGroupIcon, current: false },
         { name: 'Manage Registration', to: { name: 'registration' }, icon: ClipboardDocumentListIcon, current: false },
         { name: 'Manage Animal Details', to: { name: 'details' }, icon: CreditCardIcon, current: false },
-        { name: 'Create Admin Account', to: { name: 'mockup' }, icon: CreditCardIcon, current: false },
     ]
 
     const currentNavigationItem = computed(() => { // to style the currently selected
