@@ -1,4 +1,5 @@
 import supabase from "../config/database.js"
+import bcrypt from "bcrypt"
 
 export const getShelterRequests = async(req, res)=>{
     try{
@@ -200,14 +201,27 @@ export const loadAdminPositions = async (req, res) => {
 
 export const registerAdminAccount = async (req, res) => {
     try{
-        // console.log("admin position loading")
-        // const {data, error} = await supabase.rpc('retrieve_positions')
-        // if (error) {
-        //     console.log("Error:", error);
-        // } else {
-        //     console.log(data)
-        //     return res.status(200).json(data);
-        // }
+        console.log("admin position loading")
+
+        const { firstname, lastname, username, password, email, position } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const { data, error } = await supabase.rpc('insert_user_and_admin', {
+            _user_email: email,               
+            _user_password: hashedPassword,          
+            _admin_username: username,   
+            _admin_position_id: position,          
+            _admin_firstname: firstname,       
+            _admin_lastname: lastname,        
+        });
+
+        if (error) {
+            console.log("Error:", error);
+        } else {
+            // console.log
+            return res.status(200).json({
+                "success": true
+              });
+        }
     }
     catch(err){
         console.log("error", err)

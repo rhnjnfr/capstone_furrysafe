@@ -59,7 +59,7 @@
                             <option value="" selected disabled hidden>Select Pet Type</option>
                             <option v-for="(item, index) in category" :key="index" :value="item.id">{{ item.pet_category }}</option>
                         </select>
-                    </div>
+                    </div>  
                     <div>
                         <label for="animalvaccine" class="font-semibold">Vaccine</label>
                         <input type="text" name="animalvaccine" id="animalvaccine" placeholder="Enter Pet Vaccine"
@@ -156,7 +156,7 @@
     async function addVaccine(){
         const vaccinename = document.getElementById('animalvaccine').value
 
-        console.log*(vaccinename, this.selectedCategory)
+        // console.log*(vaccinename, this.selectedCategory)
         try{
             if(!vaccinename || !this.selectedCategory){ 
                 alert("Some fields are missing")
