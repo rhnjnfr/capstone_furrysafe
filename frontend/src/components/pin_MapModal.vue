@@ -15,6 +15,7 @@
                         leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                         <DialogPanel
                             class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-[90vw] sm:p-6">
+                            <div>search bar huie</div>
                             <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                                 <button type="button"
                                     class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400  focus:ring-offset-2"
@@ -28,7 +29,8 @@
                             </div>
                             <div class="mt-4 sm:flex sm:items-start justify-center">
                                 <div class="border rounded-lg drop-shadow-sm">
-                                    <displayMap class="h-[75vh] w-[87vw]" />
+                                    <displayMap  /> 
+                                    <!-- class="h-[75vh] w-[87vw]" -->
                                 </div>
                             </div>
                             <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
@@ -48,13 +50,13 @@
 </template>
 
 <script setup>
-import { ref, useRouter } from 'vue'
+import { ref } from 'vue'
+import { router } from 'vue-router'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 import displayMap from '@/components/Map.vue'
 
-const router = useRouter()
 const open = ref(true)
 
 function handleClose() {

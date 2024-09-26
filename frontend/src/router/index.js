@@ -38,6 +38,7 @@ import buddy_registration from "../views/registration.vue"
 import shelter_registration from '@/views/shelter_registration.vue';
 import map from "../views/mapview.vue"
 import confirm_email from "../views/confirm_Email.vue"
+import location from "@/components/location_prompt.vue"
 //import forgot_password from "../views/forgotpassword.vue"
 
 // import map from "../views/shelter/pin_Location.vue"
@@ -141,22 +142,10 @@ const routes = [
       }
     }
   },
-  { // modal
-    path: '/modal',
-    name: 'modal',
-    component: test, // import test from '@/components/pin_MapModal.vue'
-    props: (route) => ({ open: route.query.open }),
-    beforeRouteLeave(to, from, next) {
-      console.log('beforeRouteLeave called');
-      console.log('from.query.open:', from.query.open);
-      if (!from.query.open) {
-        console.log('Navigating to shelterDashboard');
-        next({ name: 'shelterDashboard' });
-      } else {
-        console.log('Not navigating');
-        next();
-      }
-    }
+  { // LOCATION RETRIEVAL TESTING
+    path: '/location',
+    name: 'location',
+    component: location, // import test from '@/components/pin_MapModal.vue'
   },
   {
     path: '/FurrySafe',
