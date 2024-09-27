@@ -49,9 +49,13 @@ export const validateUser = async (req, res) => {
                 const shelter_id = (shelterData[0].shelter_id)
                 const verificationResult = await verifyShelter(userID); //check if shelter is document verified
 
+                // console.log(verificationResult)
+                // return
                 if (verificationResult.success) {
                     const token = createToken({ userID, userType: 'shelter' });
                     const refreshToken = createRefreshToken({ userID, userType: 'shelter' });
+
+                    const addressExists = verificationResult.address
                     
                     res.cookie('refreshToken', refreshToken, {
                         httpOnly: true,
@@ -66,6 +70,7 @@ export const validateUser = async (req, res) => {
                         userID: userID, 
                         userType: 'shelter', 
                         characterId: shelter_id, 
+                        address_exists: addressExists,
                         token 
                     });
                     return;

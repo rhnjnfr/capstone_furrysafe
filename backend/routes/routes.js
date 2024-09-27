@@ -7,6 +7,8 @@ import { checkUser, insertUser, Userlogout, //user
          addBreedCategory, addPetCategory, addVaccineCategory, //admin
          getAdminPosition, insertAdminAccount} from "../controllers/user.js";
 
+import { insertShelterAddress } from "../controllers/shelter_functions.js"
+
 const storage = multer.memoryStorage({
     destination: (req, file, cb) => {
         cb(null, 'images/documents'); 
@@ -39,5 +41,7 @@ router.post("/add-pet-vaccine", addVaccineCategory)
 router.get("/get-position", getAdminPosition)
 router.post("/add-admin-account", insertAdminAccount)
  
+//shelter functions 
+router.post("/update-shelter-details", insertShelterAddress)
 
 export default router;

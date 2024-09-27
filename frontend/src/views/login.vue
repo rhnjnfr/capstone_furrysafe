@@ -107,12 +107,13 @@ export default {
                 });
 
                 this.items = response.data;
-                console.log("login", this.items);
+                console.log("login", response.data);
                 
                 localStorage.setItem("access_token", this.items.token)
                 localStorage.setItem("u_type", this.items.userType)
                 localStorage.setItem("u_id", this.items.userID)
                 localStorage.setItem("c_id", this.items.characterId)
+                localStorage.setItem("address_exists", this.items.address_exists);
 
                 if (response.data.success) {
                     const userType = response.data.userType;

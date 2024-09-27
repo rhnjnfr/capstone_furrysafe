@@ -1,8 +1,11 @@
 import { validateUser, createUser, logoutUser} from "../model/userModel.js";
+
 import { getShelterRequests, getShelterRequestsDetails, getImage,
          update_reviewFunction, statusDisplay, loadPetCategory,
          addBreed, insertPetCategory, insertVaccineCategory, 
-         loadAdminPositions, registerAdminAccount} from "../model/adminModel.js"
+         loadAdminPositions, registerAdminAccount } from "../model/adminModel.js" 
+
+// import { insertShelterAddress } from "../model/shelterFunctionsModel.js"
 
 //user models
 export const checkUser = (req, res)=>{ //check if user exists 
@@ -51,3 +54,8 @@ export const getAdminPosition = (req, res) => {
 export const insertAdminAccount = (req, res) => {
     registerAdminAccount (req,res)
 }
+
+// //shelter functions 
+// export const addshelteraddress = (req, res) => {
+//     insertShelterAddress (req, res)
+// }

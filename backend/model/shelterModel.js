@@ -14,35 +14,34 @@ const storage = multer.diskStorage({
 })
 const upload = multer ({storage}); 
 
-const uploadDocument = async (req, res)=>{
-    const files = req.files;
-    try{
-        const uploadResults = [];
-        for (const file of files){
-            const filePath = path.join(__dirname, '../images/documents', file.filename);
-            const fileContent = fs.readFileSync (filePath);
+// const uploadDocument = async (req, res)=>{
+//     const files = req.files;
+//     try{
+//         const uploadResults = [];
+//         for (const file of files){
+//             const filePath = path.join(__dirname, '../images/documents', file.filename);
+//             const fileContent = fs.readFileSync (filePath);
 
-            const {data, error} = await supabase.storage 
-            .fromt('images')
-            .upload(file.filename, fileContent,{
-                constentType: file.mimetype
-            })
+//             const {data, error} = await supabase.storage 
+//             .fromt('images')
+//             .upload(file.filename, fileContent,{
+//                 constentType: file.mimetype
+//             })
 
-            if (error) throw error;
+//             if (error) throw error;
 
-            uploadResults.push(data);
+//             uploadResults.push(data);
       
-            // Clean up the file from the server
-            fs.unlinkSync(filePath);
-        }
-    }
-    catch(err){
-        res.status(500).json({ error: err.message });
-    }
-}
+//             // Clean up the file from the server
+//             fs.unlinkSync(filePath);
+//         }
+//     }
+//     catch(err){
+//         res.status(500).json({ error: err.message });
+//     }
+// }
 
 //REGISTRATION FUNCTIONS
-
 //create shelter in shelter tbl 
 export const createShelter = async (userID, sheltername, documents, email)=> {
     try{
@@ -67,7 +66,6 @@ export const createShelter = async (userID, sheltername, documents, email)=> {
         throw err;
     }
 }
-
 //create shelter details 
 export const createShelterDetails = async (shelterId, shelterName, shelterEmail)=> { 
     //create shelter details and shelter documents are created at the same time
@@ -82,7 +80,6 @@ export const createShelterDetails = async (shelterId, shelterName, shelterEmail)
         console.log("error in shelter model, creating shelter details: ", err)
     }
 }
-
 //save documents to supabase storage
 export const saveDocuments = async (shelterid, documents) => { //image testing
     //create shelter details and shelter documents are created at the same time
@@ -147,24 +144,61 @@ export const saveDocuments = async (shelterid, documents) => { //image testing
 }
 
 //LOGIN FUNCTIONS 
-export const verifyShelter = async (userID, req, res)=>{ //verify if shelter is verified 
-    try{
-        const {data, error} = await supabase  
-        .from('tbl_shelter')
-        .select('verified')
-        .eq('user_id', userID)
+export const verifyShelter = async (userID, req, res) => { 
+    // verify if shelter is verified
+    try {
+        const { data, error } = await supabase  
+            .from('tbl_shelter')
+            .select('verified, shelter_id')
+            .eq('user_id', userID);
+        
+        const shelter_id = data[0]?.shelter_id;
+        const shelter_status = data[0]?.verified;
 
-        const shelter_status = data[0]?.verified
-        if(shelter_status == true){
-            return { success: true };
-        }
-        else{
+        if (shelter_status) {
+            // Call checkShelterAddress and pass the shelter_id
+            const addressExists = await checkShelterAddress(shelter_id, req, res);
+            if(addressExists == true){
+                console.log("retrieve current data")
+                return { success: true,  address: true};
+            }
+            else{
+                console.log("show map prompt")
+                return {success: true , address: false}
+            }
+        } else {
             return { success: false };
         }
-    }
-    catch(err){
-        console.log("error in verifying shelter: ", err);
-        throw err; 
+    } catch (err) {
+        console.log("Error in verifying shelter: ", err);
+        throw err;
     }
 }
+
+export const checkShelterAddress = async (shelterID, req, res) => {
+    console.log("Shelter ID:", shelterID);
+
+    try {
+        const { data, error } = await supabase
+            .from('tbl_shelter_details')
+            .select('shelter_id, address, latitude, longitude')
+            .eq('shelter_id', shelterID);
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data[0]?.address){
+            return false;
+        }
+        else{
+            return true;
+        }
+    } catch (err) {
+        console.log("Error in checking shelter address: ", err);
+        throw err;
+    }
+}
+
+
 export default createShelter;    
