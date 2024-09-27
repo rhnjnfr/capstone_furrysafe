@@ -52,7 +52,7 @@
                                                 class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-700 hover:text-white">
                                                 <ArrowRightStartOnRectangleIcon class="h-5 w-5 shrink-0 text-white"
                                                     aria-hidden="true" />
-                                                Logouts
+                                                Logout
                                             </router-link>
                                         </li>
                                     </ul>
@@ -135,14 +135,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-// components open source
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-// icons open source
-import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
-import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
-
+    import { ref, computed } from 'vue'
+    import { RouterLink, useRoute } from 'vue-router'
+    // components open source
+    import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+    // icons open source
+    import { Bars3Icon, XMarkIcon, CreditCardIcon, ClipboardDocumentListIcon, RectangleGroupIcon, DocumentPlusIcon } from '@heroicons/vue/24/outline'
+    import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid'
 
     import logo from '@/assets/images/frrysfLOGO.png' // FurrySafe Logo
 
@@ -163,6 +162,8 @@ import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/soli
     import axios from "axios"
     import { useRouter } from 'vue-router';
     const router = useRouter();
+
+
     //logout 
     function navigateTo(path) {
         router.push(path);
@@ -188,6 +189,7 @@ import { CubeIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/soli
                     localStorage.removeItem('c_id')
                     localStorage.removeItem('access_token')
                     localStorage.removeItem('currentTab')
+                    localStorage.removeItem('address_exists')
                     navigateTo('/')
                     
                 } else {

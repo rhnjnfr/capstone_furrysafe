@@ -4,23 +4,44 @@ import datetoday from '@/components/dateCard.vue'
 import linkfooter from '@/components/footerLink.vue'
 import updatescard from '@/components/dashboard_Activities.vue';
 import displaymap from '@/components/Map.vue';
+import mapoverlay from '@/components/pin_MapModal.vue'
 
 export default {
     beforeMount() {
+        // this.address_exists = localStorage.getItem("address_exists")
+        const address_exist = localStorage.getItem('address_exists')
+        console.log("here")
+        console.log(address_exist)
+
+        if(address_exist.startsWith(false)){
+            this.toggleModal()
+        }
+
         this.open = true; // Set the open ref value to true
     },
     components: {
-        textvalue, datetoday, linkfooter, updatescard, displaymap
+        textvalue, datetoday, linkfooter, updatescard, displaymap, mapoverlay
     },
     data() {
         return {
-
+            modalVisible: false,
         }
-    }
+    },
+    methods: {
+    toggleModal() {
+        console.log("Toggling modal");
+        this.modalVisible = true; // Show the modal
+        },
+  },
 };
+
+    // function toggleModal() {
+    //     console.log("D:")
+    // }
 </script>
 <template>
     <div class="h-screen flex flex-col">
+        <mapoverlay v-if="modalVisible" @close="modalVisible = false" />
         <header class="flex justify-between items-center">
             <div class="graycolor">
                 <textvalue msg="Dashboard" />
