@@ -12,10 +12,16 @@ const port = process.env.PORT || 5000;
 app.use(compression());
 
 // Use CORS middleware for cross-origin requests
-app.use(cors(
-  {origin: 'http://localhost:8080',
-    credentials: true}
-));
+// app.use(cors(
+//   {origin: 'http://localhost:8080',
+//     credentials: true}
+// ));
+app.use(cors({
+  origin: function (origin, callback) {
+    callback(null, true); // Allows all origins
+  },
+  credentials: true
+}));
 
 // Set the limit for incoming JSON payloads
 app.use(express.json({ limit: '10mb' }));

@@ -6,7 +6,9 @@ export const getShelterRequests = async(req, res)=>{
         const {mode} = req.body
         
         const {data, err} = 
-        await supabase.rpc('get_shelter_requests', {p_status: mode})
+        await supabase.rpc('get_shelter_requests', {
+            p_status: mode
+        })
 
         if (err) {
             console.log("an error occurred when getting shelter requests", err);

@@ -4,7 +4,7 @@
     <div id="card" class="container sm:max-w-full lg:max-w-[25rem]">
       <div class="mb-[1rem]">
         <span class="text-gray-600 font-semibold text-[14px]">About Shelter</span>
-        <ul v-for="item in sentence" :key="item.id">
+        <ul v-for="item in bio" :key="item.id">
           <span class="break-words">{{ item.info }}</span>
         </ul>
       </div>
@@ -26,15 +26,24 @@
 </template>
 
 <script setup>
-const sentence = [
-  {
-    info: 'dsadhsi udosdhcxzxzc xcxcxcsdsx zcdfdfds faaaaaaaaaaa asdsdsdsdsdasdssdsxzcxzc xcxzsdsadsa sgiudhsudagdsd hdusidgsaiodhisdhsaidsdgshs ushdiashdusdiushdsa dsahdsadsja'
-  },
-]
-
+import { onMounted, ref } from 'vue';
+import axios from "axios"; 
 import { PhoneIcon, LinkIcon, EnvelopeIcon, MapPinIcon } from "@heroicons/vue/20/solid";
 
-const details = [
+
+const bio = ref([
+  {
+    info: 'test'
+  }
+])
+
+const sociallink = ref([
+  {
+    link: 'http://dolendshelter@idkwhatisthis.com',
+  },
+])
+
+const details = ref([
   {
     icon: MapPinIcon,
     label: '#506 Lim Building J.P. Laurel Avenue, Corner Acacia, Davao City, Philippines',
@@ -47,11 +56,59 @@ const details = [
     icon: EnvelopeIcon,
     label: 'dolendshelter@idkwhatisthis.com',
   },
-]
+])
 
-const sociallink = [
-  {
-    link: 'http://dolendshelter@idkwhatisthis.com',
-  },
-]
+async function loadProfileDetails() {
+  const id = localStorage.getItem('c_id');
+  
+  try {
+    const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
+      shelterid: id
+    });
+
+    // Assuming response.data is an array and you need the first item
+    const data = response.data[0];
+    console.log(data);
+
+    // Update bio
+    bio.value = [
+      {
+        info: data.bio || 'No bio available.'
+      }
+    ];
+
+    // Update social links
+    sociallink.value = [
+      {
+        link: data.link || 'No social link available.'
+      },
+    ];
+
+    // Update details
+    details.value = [
+      {
+        icon: MapPinIcon,
+        label: data.address || 'No address available.',
+      },
+      {
+        icon: PhoneIcon,
+        label: data.contact ? data.contact.toString() : 'No contact available.',
+      },
+      {
+        icon: EnvelopeIcon,
+        label: data.email || 'No email available.',
+      },
+    ];
+
+  } catch (err) {
+    console.error("Error loading profile details:", err);
+    // Optionally, you can set default or error messages in your reactive variables here
+  }
+}
+
+
+onMounted(() => {
+  loadProfileDetails();
+});
+
 </script>

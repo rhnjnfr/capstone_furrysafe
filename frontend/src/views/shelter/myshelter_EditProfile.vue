@@ -50,8 +50,9 @@
                         <label for="about" class="block text-sm font-medium leading-6 text-gray-900">About
                             Shelter</label>
                         <div class="mt-2">
-                            <textarea v-model="about" id="about" name="about" rows="3"
-                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                            <textarea v-model="about" id="about" name="about" rows="3" placeholder="Describe what the shelter is about"
+                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" >
+                            </textarea>
                         </div>
                     </div>
                     <div class="col-span-full">
@@ -62,6 +63,7 @@
                             <input type="text" v-model="shelterAddress" name="shelterAddress" id="shelterAddress"
                                 autocomplete="street-address"
                                 class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                            <div>Open Map</div>
                         </div>
                     </div>
                     <div class="sm:col-span-full md:col-span-3">
@@ -69,7 +71,7 @@
                             Number</label>
                         <div class="mt-2 flex gap-x-3 items-center">
                             <PhoneIcon alt="Logout Icon" class="w-6 h-6 text-gray-500" aria-hidden="true" />
-                            <input type="text" v-model="Phone" name="Phone" id="Phone" autocomplete="Phone"
+                            <input type="text" v-model="Phone" name="Phone" id="Phone" autocomplete="Phone" placeholder="Contact Number"
                                 class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                         </div>
                     </div>
@@ -89,7 +91,7 @@
                         <div>
                             <div v-for="(link, index) in links" :key="index" class="mt-2 flex gap-x-3 items-center">
                                 <LinkIcon alt="Link Icon" class="w-6 h-6 text-gray-500" aria-hidden="true" />
-                                <input v-model="link.value" type="text" autocomplete="link"
+                                <input v-model="link.value" type="text" autocomplete="link" placeholder="Social Link"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 <!-- Add an x button to remove the link -->
                                 <button type="button" @click="removeLink(index)"
@@ -118,7 +120,8 @@
             </div>
             <div class="mt-6 flex items-center justify-end gap-x-6">
                 <router-link to="/myshelter" class="text-sm font-semibold leading-6 text-gray-900">Cancel</router-link>
-                <button type="button"  @click="showPrompt"
+                <!-- @click="showPrompt" //gitanggal nko ang prompt -->
+                <button type="button" @click.prevent="saveProfile()"
                     class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     Save Changes</button>
             </div>
@@ -128,52 +131,384 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid'
-import prompt from '@/components/prompt_savechange.vue'
+import axios from "axios"; 
+import { ref, onMounted } from 'vue';
+import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid';
+import prompt from '@/components/prompt_savechange.vue';
+import { useRouter } from 'vue-router';
 
-const isModalpromptOpen = ref(false)
+const router = useRouter();
 
-// Toggle the modal's visibility
+const isModalpromptOpen = ref(false);
+
+const id = localStorage.getItem('c_id');
+const lat = ref('');
+const lng = ref('');
+const shelterName = ref('');
+const about = ref('');
+const shelterAddress = ref('');
+const Phone = ref('');
+const email = ref('');
+const links = ref([{ value: '' }]);
+const url = ref('');
+
+const fileInput = ref(null); 
+const selectedImage = ref(null); 
+let fileToUpload = null;
+
+// Navigation function
+function navigateTo(path) {
+    router.push(path);
+}
+
+// Toggle modal visibility
 function showPrompt() {
-  isModalpromptOpen.value = true
+    isModalpromptOpen.value = true;
 }
 
 function handleSaveClick() {
-  console.log('Save button clicked!')
-  // Perform actions when the Save button is clicked
+    console.log('Save button clicked!');
+    // Perform actions when the Save button is clicked
 }
-const fileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element.
-const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
-const links = ref([{ value: '' }]);
 
 function handleFileChange(event) {
-    const file = event.target.files[0]; // gets the first file selected by the user 
-    const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
-    reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
-        // When the file reading is complete, the onload event is triggered, and the callback function is executed:
-        selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
+    const file = event.target.files[0]; 
+    fileToUpload = file; 
+
+    const reader = new FileReader(); 
+    reader.onload = (event) => { 
+        selectedImage.value = event.target.result; 
     };
-    reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
+    reader.readAsDataURL(file); 
 }
 
 function clearImage() {
-    selectedImage.value = null; // sets the selectedImage reference to null, effectively removing the image
-    if (fileInput.value) { // if the file input element exists, sets its value to an empty string, effectively clearing the file selection
+    selectedImage.value = null; 
+    fileToUpload = null;
+    
+    if (fileInput.value) { 
         fileInput.value.value = '';
     }
 }
 
-// temp display links
 function addLink() {
     console.log('Add link button clicked');
-    links.value.push({ value: '' }); //the one that adds a new input tag to the template.
+    links.value.push({ value: '' }); 
     console.log('Links array:', links.value);
 }
 
-// This function takes the index of the link to be removed as an argument, and uses the splice method to remove that element from the links array.
-// the splice method will remove the element at index for example, if we have an array links = [{ value: 'link1' }, { value: 'link2' }, { value: 'link3' }] and we call removeLink(1), the splice method will remove the element at index 1 ({ value: 'link2' }) and the resulting array will be links = [{ value: 'link1' }, { value: 'link3' }].
 function removeLink(index) {
     links.value.splice(index, 1);
 }
+
+// Retrieve data from the backend based on localStorage c_id 
+async function get_Shelter_Details(){
+    try{
+        const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
+                shelterid: id
+            });
+
+        console.log(response.data[0])
+        if (response.data) {
+            populateForm(response.data[0]);
+        }
+    }
+    catch(err){
+        console.log("An error occurred getting shelter details", err);
+    }
+}
+
+// Populate the interface with the retrieved data 
+async function populateForm(data) {
+    shelterName.value = data.shelter || '';
+    about.value = data.bio || '';
+    shelterAddress.value = data.address || '';
+    Phone.value = data.contact || '';
+    email.value = data.email || '';
+    lat.value = data.latitude || '';
+    lng.value = data.longitude || '';
+    url.value = data.profile || '';
+    // Handle links based on their format
+
+    console.log("url, value", url.value)
+
+    if (data.link) {
+        let parsedLinks = [];
+        try {
+            // Attempt to parse as JSON
+            parsedLinks = JSON.parse(data.link);
+            if (!Array.isArray(parsedLinks)) {
+                throw new Error('Parsed links is not an array');
+            }
+        } catch (error) {
+            console.warn('Links are not in JSON format. Attempting to split by comma.');
+            // Fallback: split by comma
+            parsedLinks = data.link.split(',').map(link => link.trim()).filter(link => link);
+        }
+        links.value = parsedLinks.map(link => ({ value: link }));
+    } else {
+        links.value = [{ value: '' }];
+    }
+
+    // Handle profile image if available
+    if (data.profile) {
+        try{
+            const response = await axios.post("http://localhost:5000/image", 
+            {
+                profileUrl: data.profile
+            })
+            // console.log("response", response.data.data)
+            selectedImage.value = response.data.data
+
+        }
+        catch(err){
+            console.log(err)
+        }
+
+        // selectedImage.value = data.profile; // Assuming 'profile' contains the image URL or base64
+    }
+}
+
+async function saveProfile(){
+    console.log
+    
+    if (!fileToUpload) {
+        console.log("saving... url", url.value)
+        fileToUpload = url.value;
+    }
+
+    console.log("file to upload", fileToUpload)
+    
+    const transformedLinks = links.value.map(linkObj => linkObj.value);
+    const id = localStorage.getItem('c_id')
+
+    const formData = new FormData();
+    formData.append('image', fileToUpload); 
+    formData.append('shelterid', id); 
+    formData.append('links', JSON.stringify(transformedLinks)); // Serialize if backend expects JSON
+    formData.append('sheltername', shelterName.value); 
+    formData.append('shelteraddress', shelterAddress.value); 
+    formData.append('contact', Phone.value); 
+    formData.append('email', email.value); 
+    formData.append('latitude', lat.value); 
+    formData.append('longitude', lng.value); 
+    formData.append('bio', about.value); 
+
+    // Log FormData entries for debugging
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+    try{
+        const response = await axios.post("http://localhost:5000/save_shelterprofile",
+            formData, 
+            {
+                headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
+            }
+        );
+
+            console.log("response", response)
+
+        if(response.data.success){
+            navigateTo("/myshelter"); // Uncomment to enable navigation
+        } else {
+            console.error('Failed to save profile:', response.data.message);
+            alert(`Error: ${response.data.message}`);
+        }
+    }
+    catch(err){
+        // Enhanced error handling
+        if (err.response) {
+            // Server responded with a status other than 2xx
+            console.error("Backend error:", err.response.data);
+            alert(`Error: ${err.response.data.message}`);
+        } else if (err.request) {
+            // Request was made but no response received
+            console.error("No response from server:", err.request);
+            alert('No response from server. Please try again later.');
+        } else {
+            // Something else caused the error
+            console.error("Error:", err.message);
+            alert(`Error: ${err.message}`);
+        }
+    }
+}
+
+onMounted(() => {
+    get_Shelter_Details();
+});
 </script>
+
+<!-- <script setup>
+    import axios from "axios" 
+    import { ref, onMounted } from 'vue';
+    import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid'
+    import prompt from '@/components/prompt_savechange.vue'
+    import { useRouter } from 'vue-router';
+    const router = useRouter();
+
+    const isModalpromptOpen = ref(false)
+
+    const id = localStorage.getItem('c_id')
+    const lat = ref('')
+    const lng = ref ('')
+    const shelterName = ref('');
+    const about = ref('');
+    const shelterAddress = ref('');
+    const Phone = ref('');
+    const email = ref('');
+    const links = ref([{ value: '' }]);
+
+    const test = []
+
+    //for close after save :D
+    function navigateTo(path) {
+        router.push(path);
+    }
+
+    // Toggle the modal's visibility
+    function showPrompt() {
+        isModalpromptOpen.value = true
+    }
+
+    function handleSaveClick() {
+    console.log('Save button clicked!')
+    // Perform actions when the Save button is clicked
+    }
+    const fileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element.
+    const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
+    let fileToUpload = null;
+
+    function handleFileChange(event) {
+        const file = event.target.files[0]; // gets the first file selected by the user 
+        fileToUpload = file; 
+
+        const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
+        reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
+            // When the file reading is complete, the onload event is triggered, and the callback function is executed:
+            selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
+        };
+        reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
+    }
+
+    function clearImage() {
+        selectedImage.value = null; // sets the selectedImage reference to null, effectively removing the image
+        fileToUpload = null;
+        
+        if (fileInput.value) { // if the file input element exists, sets its value to an empty string, effectively clearing the file selection
+            fileInput.value.value = '';
+        }
+    }
+
+    // temp display links
+    function addLink() {
+        console.log('Add link button clicked');
+        links.value.push({ value: '' }); //the one that adds a new input tag to the template.
+        console.log('Links array:', links.value);
+    }
+    // This function takes the index of the link to be removed as an argument, and uses the splice method to remove that element from the links array.
+    // the splice method will remove the element at index for example, if we have an array links = [{ value: 'link1' }, { value: 'link2' }, { value: 'link3' }] and we call removeLink(1), the splice method will remove the element at index 1 ({ value: 'link2' }) and the resulting array will be links = [{ value: 'link1' }, { value: 'link3' }].
+    function removeLink(index) {
+        links.value.splice(index, 1);
+    }
+
+    //retrieves data from database based on the localstorage c_id 
+    async function get_Shelter_Details(){
+        try{
+            const response =  await axios.post("http://localhost:5000/edit_shelterprofile", {
+                    shelterid: id
+                })
+            if (response.data) {
+                populateForm(response.data[0]);
+            }
+        }
+        catch(err){
+            console.log("an error occured getting shelter details", err)
+        }
+    }
+
+    //populate the interface with the retieved data 
+    function populateForm(data) {
+        shelterName.value = data.shelter || '';
+        about.value = data.bio || '';
+        shelterAddress.value = data.address || '';
+        Phone.value = data.contact || '';
+        email.value = data.email || '';
+        lat.value = data.latitude || '';
+        lng.value = data.longitude || '';
+
+        // Handle links: Assuming links are separated by commas or newlines
+        if (data.link) {
+            try {
+                const parsedLinks = JSON.parse(data.link);
+                links.value = parsedLinks.map(link => ({ value: link }));
+            } catch (error) {
+                console.error('Error parsing links:', error);
+                links.value = [{ value: '' }]; // Fallback in case of error
+            }
+        } else {
+            links.value = [{ value: '' }];
+        }
+
+        // Handle profile image if available
+        if (data.profile) {
+            selectedImage.value = data.profile; // Assuming 'profile' contains the image URL or base64
+        }
+    }
+
+    async function saveProfile(){
+        if (!fileToUpload) {
+            alert('Please select an image first.');
+            return;
+        }
+        const transformedLinks = links.value.map(linkObj => linkObj.value);
+        
+        const formData = new FormData();
+        formData.append('image', fileToUpload); 
+        formData.append('links', JSON.stringify(transformedLinks)); 
+        formData.append('sheltername', shelterName.value); 
+        formData.append('shelteraddress', shelterAddress.value); 
+        formData.append('contact', Phone.value); 
+        formData.append('email', email.value); 
+        formData.append('latitude', lat.value); 
+        formData.append('longitude', lng.value); 
+        formData.append('bio', about.value); 
+
+        // Log FormData entries
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+        
+        try{
+            const response = await axios.post("http://localhost:5000/save_shelterprofile",
+                formData, 
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' } 
+                }
+            );
+
+            if(response.data.success){
+                navigateTo("/myshelter");
+            } else {
+                console.error('Failed to save profile:', response.data.message);
+            }
+        }
+        catch(err){
+            // Enhanced error handling
+            if (err.response) {
+                console.error("Backend error:", err.response.data);
+                alert(`Error: ${err.response.data.message}`);
+            } else if (err.request) {
+                console.error("No response from server:", err.request);
+                alert('No response from server. Please try again later.');
+            } else {
+                console.error("Error:", err.message);
+                alert(`Error: ${err.message}`);
+            }
+        }
+    }
+
+    onMounted(() => {
+        get_Shelter_Details();
+    });
+</script> -->

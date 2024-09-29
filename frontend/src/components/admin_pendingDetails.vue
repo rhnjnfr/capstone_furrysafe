@@ -2,26 +2,7 @@
 export default {
     data() {
         return {
-            toApproved: [
-                {
-                    id: 1,
-                    name: 'Dolends Animal Shelter',
-                    createdAt: 'Sept 30',
-                    email: 'exampleShelter@gmail.com',
-                },
-                {
-                    id: 2,
-                    name: 'Jeneh Animal Shelter',
-                    createdAt: 'Sept 30',
-                    email: 'exampleShelter@gmail.com',
-                },
-                {
-                    id: 3,
-                    name: 'Monai Animal Shelter',
-                    createdAt: 'Sept 30',
-                    email: 'exampleShelter@gmail.com',
-                },
-            ]
+            toApproved: [  ]
         }
     }
 };

@@ -130,6 +130,7 @@ export default {
                     // Push file data into the files array, preserving previous files
                     this.files.push({ file: file, url: event.target.result });
                     // console.log("File read:", file.name, event.target.result);
+                    console.log(this.files)
                 };
 
                 // Read the file as a data URL
