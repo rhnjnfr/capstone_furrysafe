@@ -1,3 +1,432 @@
+<script setup>
+import axios from "axios"; 
+import { ref, watch, computed, onMounted, toRaw } from 'vue';
+import { PhotoIcon } from '@heroicons/vue/24/solid'
+import linkfooter from '@/components/footerLink.vue'
+import prompt from '@/components/prompt_savecreatedacc.vue'
+
+const isModalpromptOpen = ref(false)
+
+// Toggle the modal's visibility
+function showPrompt() {
+    // const vaccineid = ref()
+//   isModalpromptOpen.value = true
+
+//     _owner_id INT,   local storage
+//     _pet_type INT,	db id
+//     _breed_id INT,	db id
+//     _other_breed TEXT,	textbox input
+//     _status_id INT,	db id
+//     _pet_name TEXT,	textbox input
+//     _pet_nickname TEXT, textbox input
+//     _date_rehomed DATE, date input
+//     _gender CHAR(1), 	selection (f/m)
+//     _age INT, 		textbox input
+//     _size_weight TEXT,	textbox input
+//     _energy_level TEXT,	selection value string
+//     _coat_fur TEXT,	textbox input
+//     _about_pet TEXT,	textbox input
+
+//     _pet_profile_url TEXT,	need function (single/pfp)
+    //     _pet_qr_url TEXT,		IN CREATION THIS IS NULL
+//     _sterilization_id INT,	db id
+//     _medical_condition TEXT, 	textbox input
+//     _special_needs TEXT,	textbox input
+//     _photo_url TEXT,		need function (multiple) [array]
+//     _vaccine_id INT,		db id [array]
+//     _other_vaccine TEXT,	textbox input [array]
+//     _vaccinated BOOLEAN,	if check true; else. [array]
+//note: if other animal is selected put codition to retrieve the user input from the textbox'
+    console.log("DATA TO PASS TO BACKEND")
+    console.log(
+        "id:", localStorage.getItem('u_id'), "\n",
+        "gender:", selectedGender.value, " | ", genderchar.value, "\n",
+        "pet category id:", selectedAnimalType.value, "\n",
+        "other pet category:", animaltype.value, "\n",
+        "breed id:", selectedAnimalBreed.value, "\n",
+        "other breed:", animalbreed.value, "\n",
+        "status: ", selectedstatus.value, "\n",
+        "name:", name.value, "\n",
+        "nickname:", nickname.value, "\n",
+        "daterehomed:", daterehomed.value, "\n",
+        "age:", age.value, "\n",
+        "sizeweight: ", sizeweight.value, "\n",
+        "coat: ", coat.value, "\n",
+        "about: ", about.value, "\n",
+        "special  needs:", specialneed.value, "\n",
+        "med condition: ", medicalcondition.value, "\n",
+        "\n",
+        "vaccines:", getSelectedVaccineIds(), "\n",
+        "other vaccines:", otherVaccines.value,  "\n",
+        "\n",
+        "sterilization:", selectedSterilization.value, "|",  getSelectedSterilization(), "|", selectedValue.value
+    )
+}
+
+function handleYesClick() {
+  console.log('Yes button clicked!')
+  // Perform actions when the Save button is clicked
+}
+//user details
+const userid = localStorage.getItem('u_id')
+
+//pet details
+const name = ref('')
+const nickname = ref('')
+const daterehomed = ref('')
+const genderchar = ref('')
+const age = ref('')
+const sizeweight = ref('')
+const energylevel = ref('')
+const coat = ref('')
+const about  = ref('')
+const specialneed = ref('')
+const medicalcondition = ref('')
+const selectedGender = ref ('')
+const selectedSterilization = ref('')
+
+const profileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element. (profile photo)
+const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
+
+function handleFileChange(event) {
+    const file = event.target.files[0]; // gets the first file selected by the user 
+    const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
+    reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
+        // When the file reading is complete, the onload event is triggered, and the callback function is executed:
+        selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
+    };
+    reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
+}
+
+function clearImage() {
+    selectedImage.value = null; // sets the selectedImage reference to null, effectively removing the image
+    if (profileInput.value) { // if the file input element exists, sets its value to an empty string, effectively clearing the file selection
+        profileInput.value.value = '';
+    }
+}
+
+// For select animal type and auto change the value option on animalbreed depending on what's the animal type selected.
+const animaltype = ref(''); //others option
+const animalbreed = ref('');
+const selectedAnimalType = ref(''); //selected from the options, retrieves the ID based on the database
+const selectedAnimalBreed = ref('');
+const selectedAnimalTypeString = ref('') //retrieves the string exactly from the option e.g.: dog, cat, horse, bird
+const selectedBreedString = ref('')
+
+//for dropbox/options
+const animalCategory = ref([])
+const breedCategory = ref ([])
+const status = ref ([])
+
+watch(selectedAnimalType, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        selectedAnimalBreed.value = ''; // reset selectedAnimalBreed when selectedAnimalType changes
+        Vaccines.value = []; // reset the selected vaccines when animal type changes
+        // otherVaccines.value = ''; // reset the other vaccines when animal type changes
+    }
+});
+
+const clearAnimalTypeInput = () => {
+    animaltype.value = '';
+    selectedAnimalType.value = ''; // reset the selected animal type
+};
+const clearAnimalTypeBreed = () => {
+    animalbreed.value = '';
+    selectedAnimalBreed.value = ''; // reset the selected animal breed
+};
+
+// For Vaccines options
+const vaccines = ref({ });
+const other_vaccine = ({
+    "Other": [
+            "Rabies",
+            "Distemper",
+            "Influenza",
+            "Tetanus",
+            "Bovine viral diarrhea (BVD)"
+        ]
+})
+
+//VACCINES
+const displayVaccines = computed(() => {
+    // console.log(selectedAnimalType.value)
+    if (selectedAnimalType.value == 'Other') {
+        // return other_vaccine.Other; // Return the array directly
+    } else if (Vaccines.value && Array.isArray(Vaccines.value)) {
+        return Vaccines.value; // Ensure vaccines is an array
+    }
+    return [];
+});
+
+const selectedstatus = ref('')
+
+const Vaccines = ref([]); 
+const selectedVaccines = ref([]) // initialize an empty array to store the selected vaccines
+const otherVaccines = ref(''); // initialize an empty string to store the other vaccines
+
+const allVaccines = computed(() => {
+    const selectedVaccineNames = selectedVaccines.value.map(vaccine => vaccine); // Extract the vaccine names
+    return [...selectedVaccineNames, ...otherVaccines.value.split(',').filter(Boolean)];
+});
+
+// spayed or neutered
+const sterilization = ref([ ])
+const nonSurgical = ref([]);
+const surgical = ref([]);
+const spayNeuterOptions = ref([ //"other" option value
+    {
+        id: 'intact',
+        name: 'Intact',
+        label: 'No - Intact',
+        description: 'This animal has not been spayed or neutered.'
+    },
+    {
+        id: 'NA',
+        name: 'Not Applicable',
+        label: 'Not Applicable',
+        description: 'This animal is too young or not eligible for spaying/neutering.'
+    },
+    {
+        id: 'unknown',
+        name: 'Unknown',
+        label: 'Unknown',
+        description: 'This animal\'s spay/neuter status is unknown.'
+    }
+])
+
+const selectedValue = ref('')
+const categories = ref({
+  "non-surgical": [],
+  "surgical": [],
+  "others": []
+})
+
+const categoriesRaw = computed(() => toRaw(categories.value)); 
+
+// multiple images
+const files = ref([])
+const otherPhotos = ref(null)
+
+//image handling
+const handleMultipleFileChange = (event) => {
+    const filesArray = event.target.files
+    for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i]
+        const reader = new FileReader()
+        reader.onload = (event) => {
+            files.value.push({ source: file.name, url: event.target.result })
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+async function loadPetCategory(){ //type from db dog cats //pet type/category rendering
+    try{
+        const response = await axios.get("http://localhost:5000/load-category")
+        console.log(response)
+        if(response.data){
+            animalCategory.value = response.data
+        }
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}
+async function loadPetBreed(){ //breed from db //load pet breed when pet type (animalCategory) is selected
+    try{
+        const response = await axios.post("http://localhost:5000/pet_breed",
+            {
+                _category_id: selectedAnimalType.value
+            }
+        )
+        if(response.data){
+            breedCategory.value = response.data
+        }
+    }
+    catch(err){
+        console.log("error", err)
+    }
+}
+//load vaccines when pet type (animalCategory) is selected
+async function loadVaccineOptions(){ //ovi nmn ;-; load vaccine
+    try{
+        const response = await axios.post("http://localhost:5000/vaccine", 
+            {
+                _category_id: selectedAnimalType.value
+            }
+        )
+        if(response){
+            Vaccines.value = response.data
+        }
+    }
+    catch(err){
+        console.log("error in loading vaccines", err)
+    }
+}
+//load sterilization base on gender selectedGender
+async function loadSterilization(){ //kwaon tung sa db tas e load ;-; ovi
+    try{
+        console.log(selectedGender.value)
+        const response = await axios.post("http://localhost:5000/sterilization", 
+            {
+                _gender: selectedGender.value
+            }
+        )
+        if(response){
+            sterilization.value = response.data
+            categorizedSterilization() // Categorize after loading
+            //
+            categories.value = {
+            "non-surgical": [...categories.value["non-surgical"]],
+            "surgical": [...categories.value["surgical"]],
+            "others": [...categories.value["others"], ...spayNeuterOptions.value]
+            }
+        }
+    }
+    catch(err){
+        console.log("error in loading sterilization", err)
+    }
+}
+function categorizedSterilization(){ //categorize sterilization from load sterilization (e.g. surgical, non surgical)
+    try{
+        const keys = Object.keys(categories.value);
+
+        if (!Array.isArray(sterilization.value)) {
+            console.error("sterilization.value is not an array:", sterilization.value);
+            return;
+        }
+
+        sterilization.value.forEach(request => {
+            if (categories.value[request.type]) {
+                categories.value[request.type].push(request);
+            }
+            else {
+                console.warn(`Unknown type '${request.type}' encountered.`);
+                // If type doesn't match 'non-surgical' or 'surgical', add to 'others'
+                categories.value["others"].push({
+                    id: request.id || 'unknown',
+                    value: request.type || 'Unknown',
+                    label: request.label || 'Unknown',
+                    description: request.description || 'No description available'
+                });
+            }
+        });
+
+        // console.log("Categories", categories.value);
+        console.log("category", categories.value)
+
+        // Assign categorized data to separate refs
+        nonSurgical.value = categories.value["non-surgical"];
+        surgical.value = categories.value["surgical"];
+        
+    }
+    catch(err){
+        console.log("error in categorizing sterilization", err)
+    }
+}
+async function loadPetStatus(){ // load pet status... tf do u want 
+    try{
+        const response = await axios.get("http://localhost:5000/pet_status")
+        if(response){
+            status.value = response.data
+        }
+    }
+    catch(err){
+        console.log("error in loading sterilization", err)
+    }
+}
+
+//SMALL FUNCTIONS
+const removeImage = (index) => {
+    files.value.splice(index, 1)
+}
+function getSelectedOption(event) { //for energy level
+    const selectedOption = event.target.options[event.target.selectedIndex].text;
+    energylevel.value = selectedOption
+}
+function getSelectedVaccineIds() {
+    const selectedVaccineIds = selectedVaccines.value.map(selectedName => {
+        const matchingVaccine = Vaccines.value.find(vaccine => vaccine.name === selectedName);
+        return matchingVaccine ? matchingVaccine.id : null; // return null if no match found
+    });
+    return selectedVaccineIds;
+}
+function getSelectedSterilization() {
+    console.log(sterilization.value)
+  const selectedSterilizationId = sterilization.value.find(sterilization => sterilization.name === selectedValue.value)?.id ?? null;
+  return selectedSterilizationId;
+}
+
+//watcher
+watch(selectedGender, (value) => {//watch for breed
+    if(value=='male'){
+        genderchar.value = 'm'
+    }
+    else{
+        genderchar.value = 'f'
+    }
+});
+watch(selectedAnimalType, (newValue) => { //watch for breed
+  if (newValue === 'Other') {
+    selectedAnimalTypeString.value = newValue;
+    breedCategory.value = ''
+  } 
+  else {
+    // Ensure animalCategory is an array and defined before using find
+    if (Array.isArray(animalCategory.value)) {
+      const selected = animalCategory.value.find(item => item.id === newValue);
+      selectedAnimalTypeString.value = selected ? selected.pet_category : '';
+      loadPetBreed()
+      loadVaccineOptions()
+        // console.log("string", selectedAnimalTypeString.value)
+    } else {
+      console.error("animalCategory is not an array or is undefined");
+      selectedAnimalTypeString.value = '';
+    }
+  }
+});
+watch(selectedAnimalBreed, (newValue) => { //watch for breed 
+  if (newValue === 'Other') {
+    selectedBreedString.value = newValue;
+  } 
+  else {
+    // Ensure animalCategory is an array and defined before using find
+    if (Array.isArray(breedCategory.value)) {
+        const selected = breedCategory.value.find(
+            item => item.id === newValue
+        );
+        selectedBreedString.value = selected ? selected.name : '';
+    } else {
+        console.error("breedCategory is not an array or is undefined");
+        selectedBreedString.value = '';
+    }
+  }
+});
+watch(selectedGender, (newValue) => { //watch for sterilization
+  if (newValue) {
+    selectedGender.value = newValue;
+    categories.value = {
+      "non-surgical": [],
+      "surgical": [],
+      "others": []
+    };
+    loadSterilization();
+  }
+});
+const categoriesLoaded = ref(false);
+watch(() => categories.value, (newVal) => {//i forgot where dis used basta ayaw tanggala 
+  if (newVal && Object.keys(newVal).length > 0) {
+    categoriesLoaded.value = true;
+  }
+})
+
+onMounted(() => { //pag load sa page mag load ni =)
+    //data rendering :'D
+    loadPetCategory()
+    loadPetStatus()
+})
+</script>
+
 <template>
     <div>
         <div id="marginright" class="pb-[1rem] lg:mx-[3rem] flex justify-between items-center">
@@ -17,14 +446,6 @@
                     <p class="mt-1 text-sm leading-6 text-gray-600">Create a comprehensive profile for this animal,
                         including its breed, age, size, behavior, and medical history.</p>
                     <div class="mt-10 border-t pt-[2rem] grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                        <div class="md:col-span-3 sm:col-span-full">
-                            <label for="idNum" class="block text-sm font-medium leading-6 text-gray-900">
-                                ID Number</label>
-                            <div class="mt-2">
-                                <input type="text" v-model="idNum" name="idNum" id="idNum"
-                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
-                            </div>
-                        </div>
                         <div class="md:col-span-3 sm:col-span-full">
                             <label for="profile-photo" class="block text-sm font-medium leading-6 text-gray-900">
                                 Profile photo</label>
@@ -61,7 +482,7 @@
                             <label for="given-name"
                                 class="block text-sm font-medium leading-6 text-gray-900">Name</label>
                             <div class="mt-2">
-                                <input type="text" name="given-name" id="given-name" autocomplete="given-name"
+                                <input  v-model="name" type="text" name="given-name" id="given-name" autocomplete="given-name"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -69,7 +490,7 @@
                             <label for="alias"
                                 class="block text-sm font-medium leading-6 text-gray-900">Nickname</label>
                             <div class="mt-2">
-                                <input type="text" name="alias" id="alias"
+                                <input  v-model="nickname" type="text" name="alias" id="alias"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -77,82 +498,67 @@
                             <label for="rehome" class="block text-sm font-medium leading-6 text-gray-900">
                                 Date Re-homed</label>
                             <div class="mt-2">
-                                <input type="date" name="rehome" id="rehome"
+                                <input v-model="daterehomed" type="date" name="rehome" id="rehome"
                                     class="border p-1 rounded-lg px-[1rem] w-full">
                             </div>
                         </div>
                         <div id="anitype" class="lg:col-span-2 sm:col-span-full">
-                            <label for="animaltype" class="block text-sm font-medium leading-6 text-gray-900">
-                                Pet Type</label>
-                            <div class="mt-2">
-                                <select v-if="selectedAnimalType !== 'Other type of animal'" id="animaltype"
-                                    name="animaltype" v-model="selectedAnimalType"
-                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                    <option value="" selected disabled hidden>Select Animal Type</option>
-                                    <option>Dog</option>
-                                    <option>Cat</option>
-                                    <option>Other type of animal</option>
-                                </select>
-                                <div v-else class="flex gap-2 items-center">
-                                    <input type="text" v-model="animaltype" name="animaltype" id="animaltype"
-                                        placeholder="Type of Furry Animal"
-                                        class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
-                                    <button @click="clearAnimalTypeInput" class="w-4 h-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                            <label for="animaltype" class="block text-sm font-medium leading-6 text-gray-900">Pet Type</label>
+                                <div class="mt-2">
+                                    <select v-if="selectedAnimalType !== 'Other'" id="animaltype"
+                                        name="animaltype" v-model="selectedAnimalType"
+                                        class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                        <option value="" selected disabled hidden>Select Animal Type</option>
+                                        <option v-for="(item, index) in animalCategory" :key="index" :value="item.id">{{ item.pet_category }}</option>
+                                        <option value="Other">Other</option> <!-- Make sure this value matches the check -->
+                                    </select>
+                                    <div v-else class="flex gap-2 items-center">
+                                        <input type="text" v-model="animaltype" name="animaltype" id="animaltype"
+                                            placeholder="Type of Furry Animal"
+                                            class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
+                                        <button @click="clearAnimalTypeInput" class="w-4 h-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
                         </div>
                         <div id="breed" class="lg:col-span-2 sm:col-span-full">
                             <label for="animalbreed" class="block text-sm font-medium leading-6 text-gray-900">
                                 Breed / Mix</label>
                             <div class="mt-2">
-                                <select v-if="selectedAnimalType === 'Dog' && selectedAnimalBreed !== 'Mixed breed'"
+                                <!-- Display the dropdown when selectedAnimalTypeString is not 'Other' -->
+                                <select v-if="selectedAnimalTypeString && selectedBreedString !== 'Other'"
                                     id="animalbreed" name="animalbreed" v-model="selectedAnimalBreed"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                    <option value="" selected disabled hidden>Select Dog Breed/Mix</option>
-                                    <option v-for="(breed, index) in dogBreeds" :key="index" :value="breed">{{ breed }}
-                                    </option>
-                                </select>
-                                <select
-                                    v-else-if="selectedAnimalType === 'Cat' && selectedAnimalBreed !== 'Mixed breed'"
-                                    id="animalbreed" name="animalbreed" v-model="selectedAnimalBreed"
-                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                    <option value="" selected disabled hidden>Select Cat Breed/Mix</option>
-                                    <option v-for="(breed, index) in catBreeds" :key="index" :value="breed">{{ breed }}
-                                    </option>
+                                    <option value="" selected disabled hidden>Select {{selectedAnimalTypeString}} Breed/Mix</option>
+                                    <option v-for="(breed, index) in breedCategory" :key="index" :value="breed.id">{{ breed.name }}</option>
+                                    <option value="Other">Other</option>
                                 </select>
 
+                                <!-- Display the text input when selectedAnimalTypeString is 'Other' -->
                                 <div v-else class="flex gap-2 items-center">
                                     <input type="text" v-model="animalbreed" name="animalbreed" id="animalbreed"
-                                        :placeholder="selectedAnimalType === 'Dog' ? 'Type of Mixed Dog Breed' : selectedAnimalType === 'Cat' ? 'Type of Mixed Cat Breed' : 'Type of Furry Animal Breed/Mix'"
+                                        :placeholder="selectedBreedString === 'Other' ? 'Type of Furry Animal Breed/Mix' : `Type of ${selectedAnimalTypeString} Breed/Mix`"
                                         class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
-                                    <button
-                                        v-if="(selectedAnimalType === 'Dog' || selectedAnimalType === 'Cat') && selectedAnimalBreed === 'Mixed breed'"
-                                        @click.prevent="clearAnimalTypeBreed" class="w-4 h-4 lg:mr-[1rem]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M6 18L18 6M6 6l12 12" />
+                                    <button v-if="selectedBreedString === 'Other'" @click.prevent="clearAnimalTypeBreed" class="w-4 h-4 lg:mr-[1rem]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
                                 </div>
-
                             </div>
                         </div>
                         <div id="gender" class="lg:col-span-1 sm:col-span-full">
                             <label for="animalGender"
                                 class="block text-sm font-medium leading-6 text-gray-900">Gender</label>
                             <div class="mt-2">
-                                <select id="animalGender" name="animalGender"
+                                <select v-model= "selectedGender" id="animalGender" name="animalGender"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                     <option value="" selected disabled hidden>Select Gender</option>
-                                    <option>Male</option>
-                                    <option>Female</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
                                 </select>
                             </div>
                         </div>
@@ -160,14 +566,14 @@
                             <label for="coatfur" class="block text-sm font-medium leading-6 text-gray-900">
                                 Coat / Fur</label>
                             <div class="mt-2">
-                                <input type="text" name="coatfur" id="coatfur" placeholder="ex. Short, dark-brown coat with a slight wave"
+                                <input v-model="coat" type="text" name="coatfur" id="coatfur" placeholder="ex. Short, dark-brown coat with a slight wave"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
                         <div id="age" class="md:col-span-2 sm:col-span-full">
                             <label for="animalAge" class="block text-sm font-medium leading-6 text-gray-900">Age</label>
                             <div class="mt-2">
-                                <input type="text" name="animalAge" id="animalAge" placeholder="Ex. 2 yrs old"
+                                <input v-model="age" type="text" name="animalAge" id="animalAge" placeholder="Ex. 2 yrs old"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -175,7 +581,7 @@
                             <label for="animalSize"
                                 class="block text-sm font-medium leading-6 text-gray-900">Size</label>
                             <div class="mt-2">
-                                <input type="text" name="animalSize" id="animalSize"
+                                <input v-model="sizeweight" type="text" name="animalSize" id="animalSize"
                                     placeholder="ex. 38 pounds, 59 inches tall"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
@@ -183,8 +589,8 @@
                         <div id="lvl" class="md:col-span-2 sm:col-span-full">
                             <label for="energyLvl" class="block text-sm font-medium leading-6 text-gray-900">Energy
                                 Level</label>
-                            <div class="mt-2">
-                                <select id="energyLvl" name="energyLvl"
+                            <div class="mt-2"> 
+                                <select id="energyLvl" name="energyLvl" @change="getSelectedOption($event)"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                     <option value="" selected disabled hidden>Select Energy Level Status</option>
                                     <option>Low</option>
@@ -192,6 +598,16 @@
                                     <option>Medium-High</option>
                                     <option>High</option>
                                     <option>Very High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="lvl" class="md:col-span-2 sm:col-span-full">
+                            <label for="status" class="block text-sm font-medium leading-6 text-gray-900">Status</label>
+                            <div class="mt-2">
+                                <select id="status" name="status" v-model="selectedstatus"
+                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                    <option value="" selected disabled hidden>Select Pet Status</option>
+                                    <option v-for="(status, index) in status" :key="index" :value="status.id">{{ status.name }} </option>
                                 </select>
                             </div>
                         </div>
@@ -210,30 +626,26 @@
                                 <p class="font-normal text-[13px] text-gray-500">( Please select one or more of the
                                     following vaccination options this animal has received. )</p>
                             </div>
-                            <div
-                                class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-1 gap-y-2 text-sm leading-6">
-                                <div v-for="(option, index) in displayVaccines" :key="index"
-                                    class="flex items-center mx-6">
+                            <div class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-1 gap-y-2 text-sm leading-6">
+                                <div v-for="(option, index) in displayVaccines" :key="index" class="flex items-center mx-6">
                                     <div>
-                                        <input type="checkbox" :id="`checkbox${index + 1}`" v-model="Vaccines"
-                                            :value="option"
+                                        <input type="checkbox" 
+                                            :id="'checkbox' + (index + 1)" 
+                                            v-model="selectedVaccines" 
+                                            :value="option.name"  
                                             class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600">
                                     </div>
                                     <div>
-                                        <label :for="`checkbox${index + 1}`"
-                                            class="font-medium text-gray-600 pl-[.50rem]">{{ option }}</label>
+                                        <label :for="'checkbox' + (index + 1)" class="font-medium text-gray-600 pl-[.50rem]">{{ option.name }}</label>
                                     </div>
                                 </div>
                                 <div class="col-span-full">
-                                    <label for="" class="block text-sm font-medium leading-6 text-gray-900">
-                                        Other Vaccines
-                                    </label>
+                                    <label for="" class="block text-sm font-medium leading-6 text-gray-900">Other Vaccines</label>
                                     <div class="mt-2 flex gap-x-3">
-                                        <textarea type="text" v-model="otherVaccines" name="" id=""
-                                            class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
+                                        <textarea v-model="otherVaccines" 
+                                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"></textarea>
                                     </div>
                                 </div>
-                                <p class="text-[13px]">Selected Vaccines: {{ allVaccines.join(', ') }}</p>
                             </div>
                         </div>
                         <div class="col-span-full">
@@ -241,7 +653,7 @@
                                 Medical Conditions
                             </label>
                             <div class="mt-2 flex gap-x-3">
-                                <textarea type="text" v-model="MedConditions" name="MedConditions" id="MedConditions"
+                                <textarea type="text" v-model="medicalcondition" name="MedConditions" id="MedConditions"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -250,37 +662,39 @@
                                 Special Needs
                             </label>
                             <div class="mt-2 flex gap-x-3">
-                                <textarea type="text" v-model="specialNeeds" name="specialNeeds" id="specialNeeds"
+                                <textarea type="text" v-model="specialneed" name="specialNeeds" id="specialNeeds"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
-                        <div class="sm:col-span-full">
-                            <h4 class="font-medium text-gray-900">
-                                Has this animal been spayed/neutered?
-                            </h4>
-                            <div class="mt-2 ml-[2rem] gap-x-5">
-                                <div class="mt-4 space-y-2">
-                                    <div v-for="(option, index) in spayNeuterOptions" :key="index"
-                                        class="relative flex gap-x-3">
+                            <div v-if="categoriesLoaded" class="sm:col-span-full">
+                                <h4 class="font-medium text-gray-900">
+                                    Has this animal been sterilized?
+                                </h4>
+                                <div v-for="[categoryname, options] in Object.entries(categoriesRaw)" :key="categoryname" class="mt-4 space-y-2">
+                                    <span v-if="categoryname !== 'None'" class="font-medium text-sm text-gray-900">
+                                            {{ categoryname }}
+                                    </span>
+                                    <div v-if="options.length > 0" v-for="(option, index) in options" :key="index" class="relative flex gap-x-3">
                                         <div class="flex h-6 items-center">
-                                            <input :id="option.id" name="spayNeuterStatus" type="radio"
-                                                :value="option.value"
-                                                class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600"
-                                                @input="selectedValue = $event.target.value" />
+                                            <input 
+                                            :id="option.id" 
+                                            name="spayNeuterStatus" 
+                                            type="radio"
+                                            :value="option.name" 
+                                            v-model="selectedSterilization" 
+                                            class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" 
+                                            @input="selectedValue = $event.target.value" 
+                                            />
                                         </div>
-                                        <div class="lg:flex text-sm leading-6">
+                                    <div class="lg:flex text-sm leading-6">
                                             <label :for="option.id" class="font-medium text-gray-700 pr-[1rem]">
-                                                {{ option.label }}
+                                            {{ option.name }}
                                             </label>
                                             <p class="text-gray-600">{{ option.description }}</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span class="text-[13px]">Selected value: {{ selectedValue }}</span>
+                                        </div> 
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         <div class="col-span-full border-t border-gray-900/10">
                             <div class="border-b border-gray-900/10 py-5">
                                 <h2 class="text-base font-semibold leading-7 text-gray-900">Other Information
@@ -358,180 +772,3 @@
         </footer>
     </div>
 </template>
-
-<script setup>
-import { ref, watch, computed } from 'vue';
-import { PhotoIcon } from '@heroicons/vue/24/solid'
-import linkfooter from '@/components/footerLink.vue'
-import prompt from '@/components/prompt_savecreatedacc.vue'
-
-const isModalpromptOpen = ref(false)
-
-// Toggle the modal's visibility
-function showPrompt() {
-  isModalpromptOpen.value = true
-}
-
-function handleYesClick() {
-  console.log('Yes button clicked!')
-  // Perform actions when the Save button is clicked
-}
-
-const idNum = ref('') //idnumber
-
-const profileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element. (profile photo)
-const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
-
-function handleFileChange(event) {
-    const file = event.target.files[0]; // gets the first file selected by the user 
-    const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
-    reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
-        // When the file reading is complete, the onload event is triggered, and the callback function is executed:
-        selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
-    };
-    reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
-}
-
-function clearImage() {
-    selectedImage.value = null; // sets the selectedImage reference to null, effectively removing the image
-    if (profileInput.value) { // if the file input element exists, sets its value to an empty string, effectively clearing the file selection
-        profileInput.value.value = '';
-    }
-}
-
-// For select animal type and auto change the value option on animalbreed depending on what's the animal type selected.
-const animaltype = ref('');
-const animalbreed = ref('');
-const selectedAnimalType = ref('');
-const selectedAnimalBreed = ref('');
-
-const dogBreeds = ['Labrador Retriever', 'Golden Retriever', 'Bulldog', 'German Shepherd', 'Pit bull', 'Beagle', 'Rottweiler', 'Boxer', 'Dachshund', 'Yorkshire Terrier', 'Maltese', 'Chihuahua', 'Poodle', 'German Shepherd', 'Shih Tzu', 'Mixed breed'];
-const catBreeds = ['Siamese', 'Persian', 'Maine Coon', 'British Shorthair', 'Domestic Shorthair', 'American Shorthair', 'Domestic Longhair', 'Domestic Medium Hair', 'Bengal', 'Ragdoll', 'Mixed breed'];
-
-
-watch(selectedAnimalType, (newVal, oldVal) => {
-    if (newVal !== oldVal) {
-        selectedAnimalBreed.value = ''; // reset selectedAnimalBreed when selectedAnimalType changes
-        Vaccines.value = []; // reset the selected vaccines when animal type changes
-        // otherVaccines.value = ''; // reset the other vaccines when animal type changes
-    }
-});
-
-const clearAnimalTypeInput = () => {
-    animaltype.value = '';
-    selectedAnimalType.value = ''; // reset the selected animal type
-};
-const clearAnimalTypeBreed = () => {
-    animalbreed.value = '';
-    selectedAnimalBreed.value = ''; // reset the selected animal breed
-};
-
-// For Vaccines options
-const vaccines = ref({
-    "Dogs": [
-        "Rabies",
-        "Distemper",
-        "Hepatitis",
-        "Parvovirus (Parvo)",
-        "Adenovirus (CAV-2)",
-        "Parainfluenza",
-        "Bordetella (Kennel Cough)",
-        "Lyme disease",
-        "Leptospirosis",
-        "Canine influenza",
-        "Coronavirus",
-        "Rotavirus",
-        "Norovirus"
-    ],
-    "Cats": [
-        "Rabies",
-        "Feline viral rhinotracheitis (FVR)",
-        "Feline calicivirus (FCV)",
-        "Feline leukemia virus (FeLV)",
-        "Panleukopenia (FPV)",
-        "Feline immunodeficiency virus (FIV)",
-        "Feline infectious peritonitis (FIP)"
-    ],
-    "Other": [
-        "Rabies",
-        "Distemper",
-        "Influenza",
-        "Tetanus",
-        "Bovine viral diarrhea (BVD)"
-    ]
-});
-
-const displayVaccines = computed(() => {
-    if (selectedAnimalType.value === 'Dog') {
-        return vaccines.value["Dogs"];
-    } else if (selectedAnimalType.value === 'Cat') {
-        return vaccines.value["Cats"];
-    } else if (selectedAnimalType.value === 'Other type of animal') {
-        return vaccines.value["Other"];
-    } else {
-        return [];
-    }
-});
-
-const Vaccines = ref([]); // initialize an empty array to store the selected vaccines
-const otherVaccines = ref(''); // initialize an empty string to store the other vaccines
-
-const allVaccines = computed(() => {
-    return [...Vaccines.value, ...otherVaccines.value.split(',').filter(Boolean)]; // to get all vaccines selected options and type
-});
-
-// spayed or neutered
-const spayNeuterOptions = ref([
-    {
-        id: 'spayed',
-        value: 'Spayed',
-        label: 'Yes - Spayed',
-        description: 'This animal is a female that has been spayed.'
-    },
-    {
-        id: 'neutered',
-        value: 'Neutered',
-        label: 'Yes - Neutered',
-        description: 'This animal is a male that has been neutered.'
-    },
-    {
-        id: 'intact',
-        value: 'Intact',
-        label: 'No - Intact',
-        description: 'This animal has not been spayed or neutered.'
-    },
-    {
-        id: 'notApplicable',
-        value: 'Not Applicable',
-        label: 'Not Applicable',
-        description: 'This animal is too young or not eligible for spaying/neutering.'
-    },
-    {
-        id: 'unknown',
-        value: 'Unknown',
-        label: 'Unknown',
-        description: 'This animal\'s spay/neuter status is unknown.'
-    }
-])
-const selectedValue = ref('')
-
-// multiple images
-const files = ref([])
-const otherPhotos = ref(null)
-
-const handleMultipleFileChange = (event) => {
-    const filesArray = event.target.files
-    for (let i = 0; i < filesArray.length; i++) {
-        const file = filesArray[i]
-        const reader = new FileReader()
-        reader.onload = (event) => {
-            files.value.push({ source: file.name, url: event.target.result })
-        }
-        reader.readAsDataURL(file)
-    }
-}
-
-const removeImage = (index) => {
-    files.value.splice(index, 1)
-}
-</script>

@@ -2,6 +2,7 @@ import supabase from "../config/database.js";
 import bcrypt from "bcrypt";
 import multer from "multer"
 
+//cloud storage used for saving images 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'images/'); 
@@ -11,6 +12,7 @@ const storage = multer.diskStorage({
     }
 })
 
+//newly logged in after shelter verificaion (adds a new address to the shelter)
 export const addShelterAddress = async (req, res) => {
     try {
         const { address, latitude, longitude, id} = req.body
@@ -35,7 +37,7 @@ export const addShelterAddress = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
+//retrieves shelter profile details (tbl_shelter, tbl_shelter_details, tbl_shelter_link)
 export const retrieveShelterDetails = async (req, res) => {
     try{
         const { shelterid } = req.body
@@ -53,13 +55,14 @@ export const retrieveShelterDetails = async (req, res) => {
         console.log("an error occured retrieving shelter details", err)
     }
 }
+//retrieves profile picture from cloud storage (bucket (images))
 export const retrieveProfile = async (req, res) => {
     try{
         const { profileUrl } = req.body
         
         const { data: imageData, error } = supabase
             .storage
-            .from('images') // Replace with your bucket name
+            .from('images')
             .getPublicUrl(profileUrl);
 
         if (error) {
@@ -72,8 +75,7 @@ export const retrieveProfile = async (req, res) => {
         
     }
 }
-
-
+//save modified shelter details and links
 export const saveShelter_and_Link = async (req, res) => {
     try {
         const { shelterid, sheltername, shelteraddress, image,
@@ -163,8 +165,91 @@ export const saveShelter_and_Link = async (req, res) => {
         res.status(500).send({ message: "Internal server error" });
     }
 };
-export const saveProfile = async (req, res) => {
-    // const 
-}
+//retrieve pet details and EVERYTHING KATUNG FOCKING 14??? TABLE QUERY
+export const retrievePetProfile = async (req, res) => {
+    const { _userid, _petid } = req.body
 
+    try{
+        const { data, error } = await supabase.rpc('retrieve_pet_profiles', {
+            _user_id: _userid,
+            _pet_id: _petid
+        })
+        if (error) {
+            console.log("Error:", error);
+        } else {
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("Error occured when retrieving pet profiles")
+    }
+}
+//retrieve pet breed
+export const retrievePetBreed = async (req, res) => {
+    const {_category_id} = req.body
+    try{
+        const {data, err} = await supabase.rpc('retrieve_pet_breed', {
+            _pet_type: _category_id
+        })
+        if (err) {
+            console.log("Error:", err);
+        } else {
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("error retrieving pet breed", err)
+    }
+}
+//retrieve vaccine category
+export const retrieveVaccineCategory = async (req, res) => {
+    const {_category_id} = req.body
+    try{
+        const {data, err} = await supabase.rpc('retrieve_pet_vaccine', {
+            _pet_type: _category_id
+        })
+        if (err) {
+            console.log("Error:", err);
+        } else {
+            console.table(data)
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("error in retrieving vaccine", err)
+    }
+}
+//retrieve sterilization
+export const retrieveSterilization = async (req, res) =>{
+    const { _gender } = req.body
+    try{
+        const {data, err} = await supabase.rpc('retrieve_sterilization', {
+            _gender: _gender
+        })
+        if (err) {
+            console.log("Error:", err);
+        } else {
+            console.table(data)
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+//retrieve pet status
+export const retrievePetStatus = async (req, res) =>{
+    try{
+        const {data, err} = await supabase.rpc('retrieve_pet_status')
+        if (err) {
+            console.log("Error:", err);
+        } else {
+            console.table(data)
+            return res.status(200).json(data);
+        }
+    }
+    catch(err){
+        console.log("error retrieving pet status", err)
+    }
+}
 export default addShelterAddress;

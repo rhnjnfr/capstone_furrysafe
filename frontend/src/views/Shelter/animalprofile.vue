@@ -1,71 +1,47 @@
-<script>
-import { FolderPlusIcon } from '@heroicons/vue/20/solid'
-import textvalue from '@/components/textString.vue'
-import datetoday from '@/components/dateCard.vue'
-import linkfooter from '@/components/footerLink.vue'
+<script setup>
+import axios from "axios"; 
+import { ref, onMounted } from 'vue';
 
-export default {
-    components: {
-        textvalue,
-        datetoday,
-        linkfooter,
-        FolderPlusIcon,
-    },
-    data() {
-        return {
-            profiles: [
-                {
-                    name: 'Eric',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'Bals',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'Chellsey',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'Cyril',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'Jeneh',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'blink-blink',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'heinz',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-                {
-                    name: 'Jeneh',
-                    petType: 'Bulldog',
-                    imageUrl:
-                        require('@/assets/images/animalshelterdog.png'),
-                },
-            ]
+import { FolderPlusIcon } from '@heroicons/vue/20/solid';
+import textvalue from '@/components/textString.vue';
+import datetoday from '@/components/dateCard.vue';
+import linkfooter from '@/components/footerLink.vue';
+
+// Register components (no need for export default)
+const profiles = ref([ ]);
+
+const id = localStorage.getItem('u_id');
+const petid = null
+
+async function loadPetProfiles(){
+    try{
+        const response = await axios.post("http://localhost:5000/profile", {
+            _userid: id,
+            _petid: petid
+        });
+        
+        if (response.data && response.data.length > 0) {
+            response.data.forEach(profile => {
+                const _name_nickname = profile.name_nickname
+                const [name, nickname] = _name_nickname.split('/')
+                profiles.value.push({
+                    petid: profile.id, 
+                    name: name, 
+                    petType: profile.breed,
+                    imageUrl: profile.profileurl
+                })
+            });
         }
-    },
+    }
+    catch(err){
+        console.log("error: ", err)
+    }
 }
+
+onMounted(() => {
+    loadPetProfiles();
+});
+
 </script>
 <template>
     <div class="h-screen flex flex-col">

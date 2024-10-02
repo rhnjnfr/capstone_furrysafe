@@ -8,7 +8,8 @@ import { checkUser, insertUser, Userlogout, //user
          getAdminPosition, insertAdminAccount} from "../controllers/user.js";
 
 import { insertShelterAddress, getShelterDetails, insertShelterLink,
-         getProfile
+         getProfile, getPetProfile, getPetBreed, getVaccineCategory,
+         getSterilization, getPetStatus
 } from "../controllers/shelter_functions.js"
 
 const storage = multer.memoryStorage({
@@ -19,8 +20,8 @@ const storage = multer.memoryStorage({
         const filename = Date.now() + '-' + file.originalname
         cb(null, filename);
     }
-})
-const upload = multer ({storage}); 
+}) //storage path
+const upload = multer ({storage}); //storage path for upload/retrieve
 
 const router = express.Router(); 
 
@@ -43,11 +44,20 @@ router.post("/add-pet-vaccine", addVaccineCategory)
 router.get("/get-position", getAdminPosition)
 router.post("/add-admin-account", insertAdminAccount)
  
-//shelter functions 
+//shelter redering and function paths
+//shelter functions || used in my shelter
 router.post("/update-shelter-details", insertShelterAddress)
 router.post("/edit_shelterprofile", getShelterDetails)
 router.post("/save_shelterprofile", upload.single('image'), insertShelterLink)
 router.post("/image", getProfile)
+
+//shelter functions || used in animal profile
+router.post("/profile", getPetProfile)
+router.post("/pet_breed", getPetBreed)
+router.post("/vaccine", getVaccineCategory)
+router.post("/sterilization", getSterilization)
+router.get("/pet_status", getPetStatus)
+
 
 
 export default router;
