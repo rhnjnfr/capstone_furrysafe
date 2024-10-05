@@ -22,7 +22,7 @@
             </div>
             <div class="flex mt-[1rem] place-content-center space-x-10">
                 <div class="w-[13rem] border rounded-lg p-[1rem]">
-                    <img :src="petprofile.profile" alt="Pet Profile">
+                    <img :src="petDetails.imageUrl" alt="Pet Profile">
                 </div>
                 <div class="grid grid-flow-col items-center space-x-8">
                     <button id="switch1"
@@ -49,41 +49,46 @@
                 <dl class="grid grid-cols-1 sm:grid-cols-2">
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Given-Name</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ `${info.name} "${info.nickname}"` }}
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.name}}
                         </dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Date Re-homed</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.daterehomed }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.date_rehomed }}</dd>
+                    </div>
+                    <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
+                        <dt class="text-sm font-medium leading-6 text-gray-900">Owner Name</dt>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.owner }}
+                        </dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Pet Type</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.animaltype }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.petCategory}}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Age / Gender</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ `${info.age}, ${info.gender}` }}
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{  petDetails.age}}
                         </dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Breed / Mix</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.mixbreed }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.petBreed }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Size</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.size }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.size }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0 mr-[2rem]">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Coat / Fur</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.fur }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{  petDetails.coat }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-1 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">Energy Level</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.EnergyLvl }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.energyLevel }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-2 sm:px-0">
                         <dt class="text-sm font-medium leading-6 text-gray-900">About</dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ info.about }}</dd>
+                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">{{ petDetails.about }}</dd>
                     </div>
                     <div class="border-t border-gray-100 px-4 py-6 sm:col-span-2 sm:px-0">
                         <span class="text-sm font-semibold leading-6 text-gray-900">Health and Medical</span>
@@ -91,7 +96,7 @@
                             v-for="(item, index) in healthAndMedical" :key="index">
                             <dt class="text-sm font-normal  leading-6 text-gray-900 mr-[2rem]">{{ item.label }}</dt>
                             <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ item.status }} {{
-                                item.details ? `(${item.details})` : '' }}</dd>
+                                item.details ? `${item.details}` : '' }}</dd>
                         </div>
                     </div>
                     <div class="border-t border-gray-100 px-4 pt-6 sm:col-span-2 sm:px-0">
@@ -100,7 +105,7 @@
                     <div class="px-4 py-6 sm:col-span-2 sm:px-0">
                         <ul role="list"
                             class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                            <li v-for="image in photos" :key="image.source" class="relative">
+                            <li v-for="image in extraphotos" :key="image.source" class="relative">
                                 <div
                                     class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
                                     <img :src="image.source" alt="" class="pointer-events-none object-cover" />
@@ -116,60 +121,104 @@
                 <linkfooter />
             </div>
         </footer>
+        <Toast ref="toastRef" @closed="refreshRoute($router)" />
     </div>
 </template>
 
 <script setup>
 import { PencilIcon } from '@heroicons/vue/20/solid'
 import linkfooter from '@/components/footerLink.vue'
+import axios from "axios"; 
+import { ref, watch, computed, onMounted, toRaw, reactive } from 'vue';
+import { useRoute } from 'vue-router';
+import Toast from '@/components/toast.vue';  // Ensure correct case for the file name
 
-const petprofile = {
-    profile: new URL('@/assets/images/animalshelterdog.png', import.meta.url).href
-}
+const toastRef = ref(null);  // Create a ref for the Toast component
 
-const info = {
-    avatar: require('@/assets/images/animalshelterdog.png'),
-    name: 'Jeneh',
-    nickname: 'rhona',
-    mixbreed: 'Labrador Retriever',
-    animaltype: "Dog",
-    age: '2 yrs old',
-    gender: 'Female',
-    size: '38 pounds, 59 inches tall',
-    fur: 'Short, dark-brown coat with a slight wave',
-    EnergyLvl: 'Medium-High',
-    daterehomed: '08-3-24',
-    about: 'A Friendly, outgoing, and playful. an be prone to digging if bored, loves to chase squirrels. Good with people of all ages, gets along with other dogs, but can be shy around loud noises and knows "sit" and "stay"'
-}
+const route = useRoute();
+const petid = route.params.petid;
+const id = localStorage.getItem('u_id')
 
-import { reactive } from 'vue'
+const petprofile = ref('')
+let extraphotos = ref([ ])
 
-const healthAndMedical = reactive([
-    {
-        label: 'Vaccinations Status',
-        status: "Up-to-date",
-        details: "including rabies and FVRCP"
-    },
-    {
-        label: 'Spay / Neuter',
-        status: "Spayed"
-    },
-    {
-        label: 'Medical Conditions',
-        status: "None known",
-        details: "but has a slight dental issue that requires regular cleaning"
-    },
-    {
-        label: 'Special Needs',
-        status: "None"
+const healthAndMedical = reactive([ ])
+const info = ref([])
+
+const petDetails = ref({})
+
+async function loadPetProfiles(){
+    try{
+        const response = await axios.post("http://localhost:5000/profile", {
+            _userid: id,
+            _petid: petid
+        });
+        
+        if (response.data && response.data.length > 0) {
+            response.data.forEach(profile => {
+                const _name_nickname = profile.name_nickname;
+                const [name, nickname] = _name_nickname.split('/');
+                
+                // Handle extra photos check
+                // let extraphotosArray = [];
+                if (profile.additionalphotos && profile.additionalphotos != "No additional photos") {
+                    extraphotos = profile.additionalphotos.split(',').map(url => ({
+                        source: url.trim()
+                    }));
+                }
+
+                petDetails.value = {
+                    petid: profile.id,
+                    name: name,
+                    nickname: nickname,
+                    petBreed: profile.breed,
+                    petCategory: profile.pet_category, // Corrected typo from 'petCatergory'
+                    coat: profile.coat,
+                    date_rehomed: profile.date_rehomed,
+                    size: profile.size,
+                    energyLevel: profile.energylevel || "Unspecified", // Corrected to camelCase
+                    age: profile.age,
+                    about: profile.about,
+                    status: profile.status,
+                    owner: profile.owner,
+                    qrphoto: profile.qr,
+                    extraphotos: extraphotos, // Use transformed extraphotos array
+                    imageUrl: profile.profileurl
+                };
+
+                healthAndMedical.length = 0;
+                healthAndMedical.push(
+                    {
+                        label: 'Vaccinations Status',
+                        details: profile.vaccinename || "Not vaccinated"
+                    },
+                    {
+                        label: 'Spay / Neuter',
+                        status: profile.sterilization || "Unknown"
+                    },
+                    {
+                        label: 'Medical Conditions',
+                        status: profile.condition || "None known"
+                    },
+                    {
+                        label: 'Special Needs',
+                        status: profile.need || "None"
+                    }
+                );
+
+                petprofile.value = profile.profileurl;
+            });
+        }
+    } catch (err) {
+        if (toastRef.value) {
+            toastRef.value.showToast(err);
+        }
     }
-])
+}
 
-const photos = [
-    {
-        source: require('@/assets/images/animalshelterdog.png'),
-    },
-    // More files...
-]
+onMounted(() => {
+    loadPetProfiles()
+})
+
 
 </script>

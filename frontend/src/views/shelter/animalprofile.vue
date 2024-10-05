@@ -69,15 +69,16 @@ onMounted(() => {
                     class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center border drop-shadow-md">
                     <div class="flex flex-1 flex-col p-7">
                         <img class="mx-auto w-52 h-52 flex-shrink-0" :src="pets.imageUrl" alt="" />
-                        <h3 class="mt-6 text-sm font-medium text-gray-900">{{ pets.name }}</h3>
+                        <h3 class="mt-6 text-sm font-medium text-gray-900">{{ pets.name }} </h3>
                         <dl class="mt-1 flex flex-grow flex-col justify-between">
-                            <dt class="sr-only">Aninal Type</dt>
+                            <dt class="sr-only">Animal Type</dt>
                             <dd class="text-sm text-gray-500">{{ pets.petType }}</dd>
                         </dl>
                     </div>
                     <div>
                         <div class="text-[14px] bg-slate-50 p-[1rem] hover:bg-bgteal hover:text-white rounded-b-lg">
-                            <RouterLink to="/view_animalprofileform">
+                            <!-- to="/view_animalprofileform" -->
+                            <RouterLink :to="{ name: 'viewanimalprofile', params: { petid: pets.petid }}" >
                                 <span class="px-[5rem] py-[1rem]">View Profile</span>
                             </RouterLink>
                         </div>
