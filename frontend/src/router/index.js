@@ -194,9 +194,10 @@ const routes = [
         component: createanimalprofile
       },
       { // animal profile - view animal profile
-        path: '/view_animalprofileform',
+        path: '/view_animalprofileform/:petid',
         name: 'viewanimalprofile',
-        component: viewanimalprofile
+        component: viewanimalprofile,
+        props: true
       },
       { // animal profile - edit animal profile
         path: '/edit_animalprofileform',

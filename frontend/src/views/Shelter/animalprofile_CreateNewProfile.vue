@@ -4,63 +4,14 @@ import { ref, watch, computed, onMounted, toRaw } from 'vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid'
 import linkfooter from '@/components/footerLink.vue'
 import prompt from '@/components/prompt_savecreatedacc.vue'
+import Toast from '@/components/toast.vue';  // Ensure correct case for the file name
 
+const toastRef = ref(null);  // Create a ref for the Toast component
 const isModalpromptOpen = ref(false)
 
 // Toggle the modal's visibility
 function showPrompt() {
-    // const vaccineid = ref()
-//   isModalpromptOpen.value = true
-
-//     _owner_id INT,   local storage
-//     _pet_type INT,	db id
-//     _breed_id INT,	db id
-//     _other_breed TEXT,	textbox input
-//     _status_id INT,	db id
-//     _pet_name TEXT,	textbox input
-//     _pet_nickname TEXT, textbox input
-//     _date_rehomed DATE, date input
-//     _gender CHAR(1), 	selection (f/m)
-//     _age INT, 		textbox input
-//     _size_weight TEXT,	textbox input
-//     _energy_level TEXT,	selection value string
-//     _coat_fur TEXT,	textbox input
-//     _about_pet TEXT,	textbox input
-
-//     _pet_profile_url TEXT,	need function (single/pfp)
-    //     _pet_qr_url TEXT,		IN CREATION THIS IS NULL
-//     _sterilization_id INT,	db id
-//     _medical_condition TEXT, 	textbox input
-//     _special_needs TEXT,	textbox input
-//     _photo_url TEXT,		need function (multiple) [array]
-//     _vaccine_id INT,		db id [array]
-//     _other_vaccine TEXT,	textbox input [array]
-//     _vaccinated BOOLEAN,	if check true; else. [array]
-//note: if other animal is selected put codition to retrieve the user input from the textbox'
-    console.log("DATA TO PASS TO BACKEND")
-    console.log(
-        "id:", localStorage.getItem('u_id'), "\n",
-        "gender:", selectedGender.value, " | ", genderchar.value, "\n",
-        "pet category id:", selectedAnimalType.value, "\n",
-        "other pet category:", animaltype.value, "\n",
-        "breed id:", selectedAnimalBreed.value, "\n",
-        "other breed:", animalbreed.value, "\n",
-        "status: ", selectedstatus.value, "\n",
-        "name:", name.value, "\n",
-        "nickname:", nickname.value, "\n",
-        "daterehomed:", daterehomed.value, "\n",
-        "age:", age.value, "\n",
-        "sizeweight: ", sizeweight.value, "\n",
-        "coat: ", coat.value, "\n",
-        "about: ", about.value, "\n",
-        "special  needs:", specialneed.value, "\n",
-        "med condition: ", medicalcondition.value, "\n",
-        "\n",
-        "vaccines:", getSelectedVaccineIds(), "\n",
-        "other vaccines:", otherVaccines.value,  "\n",
-        "\n",
-        "sterilization:", selectedSterilization.value, "|",  getSelectedSterilization(), "|", selectedValue.value
-    )
+    retrieveData()
 }
 
 function handleYesClick() {
@@ -70,6 +21,8 @@ function handleYesClick() {
 //user details
 const userid = localStorage.getItem('u_id')
 
+// const formData = new FormData()
+const dataEntries = ref([])
 //pet details
 const name = ref('')
 const nickname = ref('')
@@ -87,16 +40,13 @@ const selectedSterilization = ref('')
 
 const profileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element. (profile photo)
 const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
+const profileToUpload =ref(null)
+const fileToUploadArray =ref(null) //holds the file in handlefilechanges event function
+ //holds the file in handlefilechanges event function
 
-function handleFileChange(event) {
-    const file = event.target.files[0]; // gets the first file selected by the user 
-    const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
-    reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
-        // When the file reading is complete, the onload event is triggered, and the callback function is executed:
-        selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
-    };
-    reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
-}
+// multiple images
+const files = ref([])
+const otherPhotos = ref(null)
 
 function clearImage() {
     selectedImage.value = null; // sets the selectedImage reference to null, effectively removing the image
@@ -203,21 +153,33 @@ const categories = ref({
 
 const categoriesRaw = computed(() => toRaw(categories.value)); 
 
-// multiple images
-const files = ref([])
-const otherPhotos = ref(null)
-
 //image handling
 const handleMultipleFileChange = (event) => {
     const filesArray = event.target.files
+
     for (let i = 0; i < filesArray.length; i++) {
         const file = filesArray[i]
         const reader = new FileReader()
         reader.onload = (event) => {
-            files.value.push({ source: file.name, url: event.target.result })
+            // files.value.push({ source: file.name, url: event.target.result })
+            files.value.push({ file: file, url: event.target.result });
         }
         reader.readAsDataURL(file)
     }
+}
+function handleFileChange(event) {
+    const file = event.target.files[0]; // gets the first file selected by the user 
+    profileToUpload.value = file; 
+
+    // console.log(file)
+    console.log(profileToUpload.value)
+
+    const reader = new FileReader(); // creates a new FileReader object, which is used to read the contents of the file
+    reader.onload = (event) => { // sets up an event listener for when the file reading is complete.
+        // When the file reading is complete, the onload event is triggered, and the callback function is executed:
+        selectedImage.value = event.target.result; // sets the selectedImage reference to the result of the file reading (the data URL string)
+    };
+    reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
 }
 
 async function loadPetCategory(){ //type from db dog cats //pet type/category rendering
@@ -335,6 +297,96 @@ async function loadPetStatus(){ // load pet status... tf do u want
         console.log("error in loading sterilization", err)
     }
 }
+async function retrieveData(){
+    const formData = new FormData();
+    dataEntries.value = [];
+    const vaccineArray = getSelectedVaccineIds(); 
+
+    dataEntries.value = [
+    ['id', localStorage.getItem('u_id')],
+    ['gender', `${genderchar.value}`],
+    ['pet_category_id', selectedAnimalType.value],
+    ['other_pet_category', animaltype.value],
+    ['breed_id', selectedAnimalBreed.value],
+    ['other_breed', animalbreed.value],
+    ['status', selectedstatus.value],
+    ['name', name.value],
+    ['nickname', nickname.value],
+    ['daterehomed', daterehomed.value],
+    ['energylevel', energylevel.value],
+    ['age', age.value],
+    ['sizeweight', sizeweight.value],
+    ['coat', coat.value],
+    ['about', about.value],
+    ['special_needs', specialneed.value],
+    ['med_condition', medicalcondition.value],
+    // ['vaccines', vaccineArray],
+    ['other_vaccines', otherVaccines.value],
+    ['other_sterilization', `${selectedSterilization.value}`],
+    ['sterilization_id', `${getSelectedSterilization()}`]
+    ];
+
+    vaccineArray.forEach((vaccineId, index) => {
+        formData.append(`vaccines`, vaccineId);
+    });
+    if (!profileToUpload.value) {
+        profileToUpload.value = url.value;
+    }
+    formData.append('profile', profileToUpload.value)
+
+    files.value.forEach((fileobj) => {
+        formData.append(`extra_photo`, fileobj.file);  
+    })
+    // if (!this.files || this.files.length === 0) {
+    //     formData = new FormData();
+    // }
+
+    // console.log("profile picture to save", profileToUpload.value)
+    // console.log("extra photos", files.value)
+    // const extraPhotos = formData.getAll('extra_photo');
+    // extraPhotos.forEach((file, index) => {
+        // console.log(`Extra Photo ${index + 1}:`, file);
+    // })
+    //return
+
+    dataEntries.value.forEach(([key, value]) => formData.append(key, value));
+    const name_ = formData.get('name');
+    const gender_ = formData.get('gender');
+    const pet_ = formData.get('pet_category_id');
+    const pet2_ = formData.get('other_pet_category');
+    const status_ = formData.get('status');
+    const steril_ = formData.get('other_sterilization');
+    const steril2_ = formData.get('sterilization_id');
+
+    if(name_ && gender_ && status_ && (pet_ || pet2_) && (steril_ || steril2_)){
+        savePetProfile(formData)
+    }
+    else{
+        if (toastRef.value) {
+            toastRef.value.showToast('Error: Missing inputs');
+        }
+        // console.log("empty isa heee", name_, gender_, status_, pet_, pet2_, steril_,steril2_)
+    }
+}
+async function savePetProfile(formData){ //Save pet profile, pet profile photo, and additional images
+    console.log("profile picture to save", profileToUpload.value)
+    console.log("extra photos", files.value)
+
+    try{
+        const response = await axios.post("http://localhost:5000/save_pet_profile",
+            formData, 
+            {
+                headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
+            }
+        );
+    }
+    catch(err){
+        if (toastRef.value) {
+            toastRef.value.showToast(err);
+        }
+        console.log("error", err)
+    }
+}
 
 //SMALL FUNCTIONS
 const removeImage = (index) => {
@@ -345,11 +397,12 @@ function getSelectedOption(event) { //for energy level
     energylevel.value = selectedOption
 }
 function getSelectedVaccineIds() {
-    const selectedVaccineIds = selectedVaccines.value.map(selectedName => {
-        const matchingVaccine = Vaccines.value.find(vaccine => vaccine.name === selectedName);
-        return matchingVaccine ? matchingVaccine.id : null; // return null if no match found
-    });
-    return selectedVaccineIds;
+    return selectedVaccines.value
+        .map(selectedName => {
+            const matchingVaccine = Vaccines.value.find(vaccine => vaccine.name === selectedName);
+            return matchingVaccine ? matchingVaccine.id : null; // Handle unmatched names
+        })
+        .filter(id => id !== null); 
 }
 function getSelectedSterilization() {
     console.log(sterilization.value)
@@ -770,5 +823,7 @@ onMounted(() => { //pag load sa page mag load ni =)
                 <linkfooter />
             </div>
         </footer>
+
+        <Toast ref="toastRef" @closed="refreshRoute($router)" />
     </div>
 </template>

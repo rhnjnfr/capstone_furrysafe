@@ -1,6 +1,6 @@
 import { addShelterAddress, retrieveShelterDetails, saveShelter_and_Link, 
          retrieveProfile, retrievePetProfile, retrievePetBreed, retrieveVaccineCategory,
-         retrieveSterilization, retrievePetStatus
+         retrieveSterilization, retrievePetStatus, savepetprofie
 } from "../model/shelterFunctionsModel.js";
 
 export const insertShelterAddress = (req, res) => {
@@ -29,4 +29,7 @@ export const getSterilization = (req, res) => {
 }
 export const getPetStatus = (req, res) => {
     retrievePetStatus(req, res)
+}
+export const insertPetProfile = (req, res) => {
+    savepetprofie(req, res)
 }

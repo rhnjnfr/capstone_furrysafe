@@ -85,11 +85,11 @@ export const saveShelter_and_Link = async (req, res) => {
 
         // Check if the file is uploaded
         if (file) {
-            filePath = `user_images/${Date.now()}_${file.originalname}`;
+            filePath = `pet/${Date.now()}_${file.originalname}`;
 
             // Upload file to Supabase storage
             const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('images')
+                .from('pets_images')
                 .upload(filePath, file.buffer, {
                     contentType: file.mimetype,
                 });
@@ -252,4 +252,131 @@ export const retrievePetStatus = async (req, res) =>{
         console.log("error retrieving pet status", err)
     }
 }
+//--------------------------------------------
+export const savepetprofie = async (req, res) => {
+    try {
+        console.log(req.body);
+        console.log(req.files);
+        
+        let { 
+            id, gender, pet_category_id, other_pet_category, breed_id, other_breed,
+            status, name, nickname, daterehomed, age, sizeweight, coat, about, special_needs,
+            med_condition, vaccines, other_vaccines, other_sterilization, sterilization_id, energylevel
+        } = req.body;
+
+        // Parse necessary fields to integers
+        const owner_id = parseInt(id, 10);
+        const pet_type = parseInt(pet_category_id, 10);
+        const breed_id_int = parseInt(breed_id, 10);
+        const status_id = parseInt(status, 10);
+        const age_int = parseInt(age, 10);
+        const sterilization_id_int = parseInt(sterilization_id, 10);
+        const vaccine_ids = vaccines.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+
+        const files = req.files;
+
+        // Upload Profile Photo
+        const profileFile = files.find(file => file.fieldname === 'profile');
+        const extraPhotos = files.filter(file => file.fieldname === 'extra_photo');
+
+        if(sterilization_id == 'null'){
+            sterilization_id = null
+        }
+
+        let profileUrl = null;
+        const extraPhotoUrls = [];
+
+        if (profileFile) {
+            const profileFilePath = `pets_profiles/${Date.now()}_${profileFile.originalname}`;
+            const { data: profileUploadData, error: profileUploadError } = await supabase.storage
+                .from('pets_images') // Ensure this is your correct bucket name
+                .upload(profileFilePath, profileFile.buffer, {
+                    contentType: profileFile.mimetype,
+                });
+
+            if (!profileUploadError) {
+                const { data: profileUrlData } = supabase.storage
+                    .from('pets_images')
+                    .getPublicUrl(profileFilePath);
+                profileUrl = profileUrlData.publicUrl;  // Profile photo URL
+            } else {
+                console.error('Profile upload error:', profileUploadError);
+                return res.status(500).send({ message: "Failed to upload profile image." });
+            }
+        }
+
+        // Upload Extra Photos
+        for (const photo of extraPhotos) {
+            const photoPath = `pets_photos/${Date.now()}_${photo.originalname}`;
+            const { data: photoUploadData, error: photoUploadError } = await supabase.storage
+                .from('pets_images') // Ensure this is your correct bucket name
+                .upload(photoPath, photo.buffer, {
+                    contentType: photo.mimetype,
+                });
+
+            if (!photoUploadError) {
+                const { data: photoUrlData } = supabase.storage
+                    .from('pets_images')
+                    .getPublicUrl(photoPath);
+                extraPhotoUrls.push(photoUrlData.publicUrl);  // Collecting extra photo URLs
+            } else {
+                console.error('Extra photo upload error:', photoUploadError);
+                return res.status(500).send({ message: "Failed to upload extra photos." });
+            }
+        }
+
+        // Ensure all required fields are present
+        if (
+            name && gender && status_id && 
+            (pet_type || other_pet_category) && 
+            (other_sterilization || sterilization_id_int)
+        ) {
+            const { data, error } = await supabase.rpc('insert_pet_data',{
+                _about_pet: about,
+                _age: age,
+                _breed_id: breed_id,
+                _coat_fur: coat,
+                _date_rehomed: daterehomed,
+                _energy_level: energylevel,
+                _gender: gender,
+                _medical_condition: med_condition,
+                _other_breed: other_breed,
+                _other_pet_type: other_pet_category,
+                _other_sterilization: other_sterilization,
+                _other_vaccine: other_vaccines,
+                _owner_id: id,
+                _pet_extra_photos: extraPhotoUrls,
+                _pet_name: name,
+                _pet_nickname: nickname,
+                _pet_profile_url: profileUrl,
+                _pet_type: pet_category_id,
+                _size_weight: sizeweight,
+                _special_needs: special_needs,
+                _status_id: status,
+                _sterilization_id: sterilization_id,
+                _vaccine_id: vaccines
+              })
+
+            if (error) {
+                console.error("Database insert error:", error);
+                return res.status(500).send({ message: "Failed to save image URLs to the database." });
+            }
+            else{
+                console.log("saved successfully check db")
+            }
+
+            // Success response
+            res.status(200).send({ message: "Pet profile and images saved successfully." });
+        } else {
+            if (toastRef.value) {
+                toastRef.value.showToast('Error: Missing inputs');
+            }
+            return res.status(400).send({ message: "Error: Missing inputs." });
+        }
+
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        res.status(500).send({ message: "An unexpected error occurred." });
+    }
+};
 export default addShelterAddress;

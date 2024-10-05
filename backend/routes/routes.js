@@ -9,7 +9,7 @@ import { checkUser, insertUser, Userlogout, //user
 
 import { insertShelterAddress, getShelterDetails, insertShelterLink,
          getProfile, getPetProfile, getPetBreed, getVaccineCategory,
-         getSterilization, getPetStatus
+         getSterilization, getPetStatus, insertPetProfile
 } from "../controllers/shelter_functions.js"
 
 const storage = multer.memoryStorage({
@@ -22,6 +22,9 @@ const storage = multer.memoryStorage({
     }
 }) //storage path
 const upload = multer ({storage}); //storage path for upload/retrieve
+
+const storage2 = multer.memoryStorage(); // Use memory storage
+const upload2 = multer({ storage: storage2 }); 
 
 const router = express.Router(); 
 
@@ -57,6 +60,8 @@ router.post("/pet_breed", getPetBreed)
 router.post("/vaccine", getVaccineCategory)
 router.post("/sterilization", getSterilization)
 router.get("/pet_status", getPetStatus)
+router.post("/save_pet_profile", upload2.any(), insertPetProfile)
+
 
 
 
