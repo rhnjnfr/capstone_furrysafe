@@ -191,7 +191,7 @@ const routes = [
       { // animal profile - create animal profile
         path: '/create_animalprofileform',
         name: 'createanimalprofile',
-        component: createanimalprofile
+        component: createanimalprofile,
       },
       { // animal profile - view animal profile
         path: '/view_animalprofileform/:petid',
@@ -200,9 +200,10 @@ const routes = [
         props: true
       },
       { // animal profile - edit animal profile
-        path: '/edit_animalprofileform',
+        path: '/edit_animalprofileform/:petid',
         name: 'editanimalprofile',
-        component: editanimalprofile
+        component: editanimalprofile,
+        props: true
       },
       { // rescue operation
         path: '/rescueoperation',

@@ -156,6 +156,7 @@ const categoriesRaw = computed(() => toRaw(categories.value));
 //image handling
 const handleMultipleFileChange = (event) => {
     const filesArray = event.target.files
+    console.log("handle multiple file change", filesArray)
 
     for (let i = 0; i < filesArray.length; i++) {
         const file = filesArray[i]
@@ -337,17 +338,6 @@ async function retrieveData(){
     files.value.forEach((fileobj) => {
         formData.append(`extra_photo`, fileobj.file);  
     })
-    // if (!this.files || this.files.length === 0) {
-    //     formData = new FormData();
-    // }
-
-    // console.log("profile picture to save", profileToUpload.value)
-    // console.log("extra photos", files.value)
-    // const extraPhotos = formData.getAll('extra_photo');
-    // extraPhotos.forEach((file, index) => {
-        // console.log(`Extra Photo ${index + 1}:`, file);
-    // })
-    //return
 
     dataEntries.value.forEach(([key, value]) => formData.append(key, value));
     const name_ = formData.get('name');

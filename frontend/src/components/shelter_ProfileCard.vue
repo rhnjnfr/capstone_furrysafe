@@ -4,7 +4,7 @@
             class="flex items-center space-x-5 sm:justify-center">
             <div class="flex-shrink-0">
                 <div class="relative">
-                    <img class="h-32 w-32 rounded-full" :src="profileUrl" alt="profile image" />
+                    <img class="h-32 w-32 rounded-full object-cover" :src="profileUrl" alt="profile image " />
                     <span class="absolute inset-0 rounded-full shadow-inner" aria-hidden="true"></span>
                 </div>
             </div>
@@ -36,7 +36,6 @@ const profileUrl = ref(null); // Holds the image URL
 
 async function loadProfileCard() {
     try {
-        console.log("Loading profile data...");
         const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
             shelterid: id
         });
@@ -73,62 +72,3 @@ onMounted(() => {
     loadProfileCard();
 });
 </script>
-
-<!-- <script setup>
-import { onMounted, ref } from 'vue';
-import axios from "axios"; 
-import { PencilIcon } from '@heroicons/vue/20/solid'
-
-const id = localStorage.getItem('c_id')
-const profileUrl = ref(null); 
-const profiles = ref ([
-    // {
-    //     shelter: 'FurrySafe Shelter',
-    //     profile: require('@/assets/images/homepage.png'),
-    //     email: 'furrySafe2024@gmail.com'
-    // },
-
-])
-
-async function loadProfileCard(){
-    try{
-        console.log("load profile vue")
-        const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
-                shelterid: id
-            });
-
-        if (response.data) {
-            response.data.forEach(item => {
-                profiles.value.push({
-                    shelter: item.shelter,
-                    email: item.email,
-                });
-            });
-            
-            if(profiles){
-                try{
-                    const response = await axios.post("http://localhost:5000/image", 
-                    {
-                        profileUrl: profiles.profile
-                    })
-                    profileUrl.value = response.data.data
-                }
-                catch(err){
-                    console.log(err)
-                }
-            }
-        }
-        else{
-            console.log("an error occured", response)
-        }
-        
-    }
-    catch(err){
-        console.log("An error occurred getting shelter details", err);
-    }
-}
-
-onMounted(() => {
-    loadProfileCard();
-});
-</script> -->
