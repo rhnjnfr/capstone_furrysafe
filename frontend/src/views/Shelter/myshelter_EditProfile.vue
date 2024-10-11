@@ -1,3 +1,219 @@
+<script setup>
+import axios from "axios";
+import { ref, onMounted } from 'vue';
+import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid';
+import prompt from '@/components/prompt_savechange.vue';
+import { useRouter, useRoute } from 'vue-router';
+
+import Toast from '@/components/toast.vue';  // Ensure correct case for the file name
+import mapoverlay from '@/components/pin_MapModal.vue'
+
+const showMapModal = ref(false)
+const route = useRoute();
+const router = useRouter();
+const toastRef = ref(null);  // Create a ref for the Toast component
+const isModalpromptOpen = ref(false);
+
+const id = localStorage.getItem('c_id');
+const lat = ref('');
+const lng = ref('');
+const shelterName = ref('');
+const about = ref('');
+const shelterAddress = ref('');
+const Phone = ref('');
+const email = ref('');
+const links = ref([{ value: '' }]);
+const url = ref('');
+
+const fileInput = ref(null);
+const selectedImage = ref(null);
+let fileToUpload = null;
+
+// Navigation function
+function navigateTo(path) {
+    router.push(path);
+}
+
+// Toggle modal visibility
+function showPrompt() {
+    isModalpromptOpen.value = true;
+}
+
+function handleSaveClick() { //click ni sa prompt
+    console.log('Save button clicked!');
+    // Perform actions when the Save button is clicked
+}
+
+function handleFileChange(event) {
+    const file = event.target.files[0];
+    fileToUpload = file;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        selectedImage.value = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearImage() {
+    selectedImage.value = null;
+    fileToUpload = null;
+
+    if (fileInput.value) {
+        fileInput.value.value = '';
+    }
+}
+
+function addLink() {
+    console.log('Add link button clicked');
+    links.value.push({ value: '' });
+    console.log('Links array:', links.value);
+}
+
+function removeLink(index) {
+    links.value.splice(index, 1);
+}
+
+// Retrieve data from the backend based on localStorage c_id 
+async function get_Shelter_Details() {
+    try {
+        const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
+            shelterid: id
+        });
+
+        console.log(response.data[0])
+        if (response.data) {
+            populateForm(response.data[0]);
+        }
+    }
+    catch (err) {
+        console.log("An error occurred getting shelter details", err);
+    }
+}
+
+// Populate the interface with the retrieved data 
+async function populateForm(data) {
+    shelterName.value = data.shelter || '';
+    about.value = data.bio || '';
+    shelterAddress.value = data.address || '';
+    Phone.value = data.contact || '';
+    email.value = data.email || '';
+    lat.value = data.latitude || '';
+    lng.value = data.longitude || '';
+    url.value = data.profile || '';
+    // Handle links based on their format
+
+    console.log("lat lang to pass", lat.value, lng.value)
+
+    if (data.link) {
+        let parsedLinks = [];
+        try {
+            // Attempt to parse as JSON
+            parsedLinks = JSON.parse(data.link);
+            if (!Array.isArray(parsedLinks)) {
+                throw new Error('Parsed links is not an array');
+            }
+        } catch (error) {
+            console.warn('Links are not in JSON format. Attempting to split by comma.');
+            // Fallback: split by comma
+            parsedLinks = data.link.split(',').map(link => link.trim()).filter(link => link);
+        }
+        links.value = parsedLinks.map(link => ({ value: link }));
+    } else {
+        links.value = [{ value: '' }];
+    }
+
+    // Handle profile image if available
+    if (data.profile) {
+        try {
+            const response = await axios.post("http://localhost:5000/image",
+                {
+                    profileUrl: data.profile
+                })
+            // console.log("response", response.data.data)
+            selectedImage.value = response.data.data
+
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+        // selectedImage.value = data.profile; // Assuming 'profile' contains the image URL or base64
+    }
+}
+
+async function saveProfile() {
+    if (!fileToUpload) {
+        console.log("saving... url", url.value)
+        fileToUpload = url.value;
+    }
+
+    console.log("file to upload", fileToUpload)
+
+    const transformedLinks = links.value.map(linkObj => linkObj.value);
+    const id = localStorage.getItem('c_id')
+
+    const formData = new FormData();
+    formData.append('image', fileToUpload);
+    formData.append('shelterid', id);
+    formData.append('links', JSON.stringify(transformedLinks)); // Serialize if backend expects JSON
+    formData.append('sheltername', shelterName.value);
+    formData.append('shelteraddress', shelterAddress.value);
+    formData.append('contact', Phone.value);
+    formData.append('email', email.value);
+    formData.append('latitude', lat.value);
+    formData.append('longitude', lng.value);
+    formData.append('bio', about.value);
+
+    // Log FormData entries for debugging
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+    try {
+        const response = await axios.post("http://localhost:5000/save_shelterprofile",
+            formData,
+            {
+                headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
+            }
+        );
+
+        console.log("response :D", response)
+
+        if (response.data.success) {
+            // navigateTo("/myshelter", { query: { showToast: true, message: 'Saved Successfully', from: 'edit' } });
+            navigateTo({
+                path: "/myshelter",
+                query: { showToast: true, message: 'Saved Successfully'}
+            });
+        } else {
+            console.error('Failed to save profile:', response.data.message);
+            alert(`Error: ${response.data.message}`);
+        }
+    }
+    catch (err) {
+        // Enhanced error handling
+        if (err.response) {
+            // Server responded with a status other than 2xx
+            console.error("Backend error:", err.response.data);
+            alert(`Error: ${err.response.data.message}`);
+        } else if (err.request) {
+            // Request was made but no response received
+            console.error("No response from server:", err.request);
+            alert('No response from server. Please try again later.');
+        } else {
+            // Something else caused the error
+            console.error("Error:", err.message);
+            alert(`Error: ${err.message}`);
+        }
+    }
+}
+onMounted(() => {
+    get_Shelter_Details();
+});
+</script>
+
+
 <template>
     <form>
         <div id="shelterform" class="space-y-12 sm:mx-[1rem] md:mx-[2rem] lg:mx-[10rem] my-[2.5rem]">
@@ -50,8 +266,9 @@
                         <label for="about" class="block text-sm font-medium leading-6 text-gray-900">About
                             Shelter</label>
                         <div class="mt-2">
-                            <textarea v-model="about" id="about" name="about" rows="3" placeholder="Describe what the shelter is about"
-                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" >
+                            <textarea v-model="about" id="about" name="about" rows="3"
+                                placeholder="Describe what the shelter is about"
+                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                             </textarea>
                         </div>
                     </div>
@@ -63,7 +280,11 @@
                             <input type="text" v-model="shelterAddress" name="shelterAddress" id="shelterAddress"
                                 autocomplete="street-address"
                                 class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                            <div>Open Map</div>
+                            <div @click.prevent="showMapModal = true">
+                                <img width="30" height="30"
+                                    src="https://img.icons8.com/fluency-systems-regular/50/map-editing.png"
+                                    alt="map-editing" />
+                            </div>
                         </div>
                     </div>
                     <div class="sm:col-span-full md:col-span-3">
@@ -71,7 +292,8 @@
                             Number</label>
                         <div class="mt-2 flex gap-x-3 items-center">
                             <PhoneIcon alt="Logout Icon" class="w-6 h-6 text-gray-500" aria-hidden="true" />
-                            <input type="text" v-model="Phone" name="Phone" id="Phone" autocomplete="Phone" placeholder="Contact Number"
+                            <input type="text" v-model="Phone" name="Phone" id="Phone" autocomplete="Phone"
+                                placeholder="Contact Number"
                                 class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                         </div>
                     </div>
@@ -106,14 +328,6 @@
                             <!-- function that adds more input tags and display or duplicate the social link input -->
                             <button type="button" @click="addLink"
                                 class="mt-2 ml-[3rem] text-gray-500 text-[14px] font-medium">Add more links</button>
-                            <!-- temp displays container -->
-                            <div class="mt-[1rem] bg-white rounded-lg border border-dashed p-[1rem] text-[13px]">
-                                <h2>Collected links:</h2>
-                                <!-- function to display while typing the links -->
-                                <ul class="pl-[1rem]">
-                                    <li v-for="(link, index) in links" :key="index">{{ link.value }}</li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,214 +339,11 @@
                     class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     Save Changes</button>
             </div>
-            <prompt v-model:isOpen="isModalpromptOpen" @save-clicked="handleSaveClick"/>
+            <prompt v-model:isOpen="isModalpromptOpen" @save-clicked="handleSaveClick" />
+            <mapoverlay :shelterlatitude="lat" :shelterlongitude="lng" v-if="showMapModal"
+                @close="showMapModal = false" />
+            <Toast ref="toastRef" @closed="refreshRoute($router)" />
+            <!-- @closed="refreshRoute($router); navigateAfterToast() -->
         </div>
     </form>
 </template>
-
-<script setup>
-import axios from "axios"; 
-import { ref, onMounted } from 'vue';
-import { PhotoIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, LinkIcon } from '@heroicons/vue/24/solid';
-import prompt from '@/components/prompt_savechange.vue';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const isModalpromptOpen = ref(false);
-
-const id = localStorage.getItem('c_id');
-const lat = ref('');
-const lng = ref('');
-const shelterName = ref('');
-const about = ref('');
-const shelterAddress = ref('');
-const Phone = ref('');
-const email = ref('');
-const links = ref([{ value: '' }]);
-const url = ref('');
-
-const fileInput = ref(null); 
-const selectedImage = ref(null); 
-let fileToUpload = null;
-
-// Navigation function
-function navigateTo(path) {
-    router.push(path);
-}
-
-// Toggle modal visibility
-function showPrompt() {
-    isModalpromptOpen.value = true;
-}
-
-function handleSaveClick() { //click ni sa prompt
-    console.log('Save button clicked!');
-    // Perform actions when the Save button is clicked
-}
-
-function handleFileChange(event) {
-    const file = event.target.files[0]; 
-    fileToUpload = file; 
-
-    const reader = new FileReader(); 
-    reader.onload = (event) => { 
-        selectedImage.value = event.target.result; 
-    };
-    reader.readAsDataURL(file); 
-}
-
-function clearImage() {
-    selectedImage.value = null; 
-    fileToUpload = null;
-    
-    if (fileInput.value) { 
-        fileInput.value.value = '';
-    }
-}
-
-function addLink() {
-    console.log('Add link button clicked');
-    links.value.push({ value: '' }); 
-    console.log('Links array:', links.value);
-}
-
-function removeLink(index) {
-    links.value.splice(index, 1);
-}
-
-// Retrieve data from the backend based on localStorage c_id 
-async function get_Shelter_Details(){
-    try{
-        const response = await axios.post("http://localhost:5000/edit_shelterprofile", {
-                shelterid: id
-            });
-
-        console.log(response.data[0])
-        if (response.data) {
-            populateForm(response.data[0]);
-        }
-    }
-    catch(err){
-        console.log("An error occurred getting shelter details", err);
-    }
-}
-
-// Populate the interface with the retrieved data 
-async function populateForm(data) {
-    shelterName.value = data.shelter || '';
-    about.value = data.bio || '';
-    shelterAddress.value = data.address || '';
-    Phone.value = data.contact || '';
-    email.value = data.email || '';
-    lat.value = data.latitude || '';
-    lng.value = data.longitude || '';
-    url.value = data.profile || '';
-    // Handle links based on their format
-
-    console.log("url, value", url.value)
-
-    if (data.link) {
-        let parsedLinks = [];
-        try {
-            // Attempt to parse as JSON
-            parsedLinks = JSON.parse(data.link);
-            if (!Array.isArray(parsedLinks)) {
-                throw new Error('Parsed links is not an array');
-            }
-        } catch (error) {
-            console.warn('Links are not in JSON format. Attempting to split by comma.');
-            // Fallback: split by comma
-            parsedLinks = data.link.split(',').map(link => link.trim()).filter(link => link);
-        }
-        links.value = parsedLinks.map(link => ({ value: link }));
-    } else {
-        links.value = [{ value: '' }];
-    }
-
-    // Handle profile image if available
-    if (data.profile) {
-        try{
-            const response = await axios.post("http://localhost:5000/image", 
-            {
-                profileUrl: data.profile
-            })
-            // console.log("response", response.data.data)
-            selectedImage.value = response.data.data
-
-        }
-        catch(err){
-            console.log(err)
-        }
-
-        // selectedImage.value = data.profile; // Assuming 'profile' contains the image URL or base64
-    }
-}
-
-async function saveProfile(){
-    if (!fileToUpload) {
-        console.log("saving... url", url.value)
-        fileToUpload = url.value;
-    }
-
-    console.log("file to upload", fileToUpload)
-    
-    const transformedLinks = links.value.map(linkObj => linkObj.value);
-    const id = localStorage.getItem('c_id')
-
-    const formData = new FormData();
-    formData.append('image', fileToUpload); 
-    formData.append('shelterid', id); 
-    formData.append('links', JSON.stringify(transformedLinks)); // Serialize if backend expects JSON
-    formData.append('sheltername', shelterName.value); 
-    formData.append('shelteraddress', shelterAddress.value); 
-    formData.append('contact', Phone.value); 
-    formData.append('email', email.value); 
-    formData.append('latitude', lat.value); 
-    formData.append('longitude', lng.value); 
-    formData.append('bio', about.value); 
-
-    // Log FormData entries for debugging
-    for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
-
-    try{
-        const response = await axios.post("http://localhost:5000/save_shelterprofile",
-            formData, 
-            {
-                headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
-            }
-        );
-
-            console.log("response", response)
-
-        if(response.data.success){
-            navigateTo("/myshelter"); // Uncomment to enable navigation
-        } else {
-            console.error('Failed to save profile:', response.data.message);
-            alert(`Error: ${response.data.message}`);
-        }
-    }
-    catch(err){
-        // Enhanced error handling
-        if (err.response) {
-            // Server responded with a status other than 2xx
-            console.error("Backend error:", err.response.data);
-            alert(`Error: ${err.response.data.message}`);
-        } else if (err.request) {
-            // Request was made but no response received
-            console.error("No response from server:", err.request);
-            alert('No response from server. Please try again later.');
-        } else {
-            // Something else caused the error
-            console.error("Error:", err.message);
-            alert(`Error: ${err.message}`);
-        }
-    }
-}
-
-onMounted(() => {
-    get_Shelter_Details();
-});
-</script>

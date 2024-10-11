@@ -4,7 +4,6 @@
       class="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity"
       :class="{'opacity-100': visible, 'opacity-0': !visible}"
       role="alert"
-      @click="hideToast"
     >
         {{ message }}
     </div>

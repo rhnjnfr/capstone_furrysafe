@@ -1,40 +1,44 @@
-<script>
-import textvalue from '@/components/textString.vue'
-import datetoday from '@/components/dateCard.vue'
-import profileCard from '@/components/shelter_ProfileCard.vue'
-import detailCard from '@/components/shelter_DetailsCard.vue'
-import linkfooter from '@/components/footerLink.vue'
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import textvalue from '@/components/textString.vue';
+import datetoday from '@/components/dateCard.vue';
+import profileCard from '@/components/shelter_ProfileCard.vue';
+import detailCard from '@/components/shelter_DetailsCard.vue';
+import linkfooter from '@/components/footerLink.vue';
+import Toast from '@/components/toast.vue';  // Ensure correct case for the file name
+import popupNewpost from '@/components/shelter_NewPostModal.vue';
+import popupNewEvent from '@/components/shelter_EventPostModal.vue';
+import eventsCard from '@/components/shelter_EventFeaturedCard.vue';
 
-// pop-up modals
-import popupNewpost from '@/components/shelter_NewPostModal.vue'
-import popupNewEvent from '@/components/shelter_EventPostModal.vue'
-import eventsCard from '@/components/shelter_EventFeaturedCard.vue'
+const route = useRoute();
 
-export default {
-    components: {
-        textvalue, datetoday, profileCard, detailCard, linkfooter, popupNewpost, popupNewEvent, eventsCard
-    },
-    methods: {
-        toggleModalPost() {
-            this.showModalCreatePost = !this.showModalCreatePost
-        },
-        toggleModalEvent() {
-            this.showModalNewEvent = !this.showModalNewEvent
-        },
-    },
-    data() {
-        return {
-            // pop up new event
-            showModalNewEvent: false,
-            // pop up new post
-            showModalCreatePost: false,
-            isOpen: false,
-            // to show hidden events
-            showEventInfo: false,
-        }
-    },
+// State variables
+const showModalNewEvent = ref(false);
+const showModalCreatePost = ref(false);
+const isOpen = ref(false);
+const showEventInfo = ref(false);
+const toastRef = ref(null);  // Ref for the Toast component
+
+// Methods
+const toggleModalPost = () => {
+  showModalCreatePost.value = !showModalCreatePost.value;
 };
+
+const toggleModalEvent = () => {
+  showModalNewEvent.value = !showModalNewEvent.value;
+};
+
+onMounted(() => {
+    if (route.query.showToast) {
+        const message = route.query.message || 'Success!';
+        if (toastRef.value) {
+            toastRef.value.showToast(message);
+        }
+    }
+});
 </script>
+
 <template>
     <div class="h-screen flex flex-col">
         <div class="flex justify-between items-center">
@@ -120,5 +124,6 @@ export default {
                 <linkfooter />
             </div>
         </footer>
+        <Toast ref="toastRef"  @closed="refreshRoute($router)" />
     </div>
 </template>

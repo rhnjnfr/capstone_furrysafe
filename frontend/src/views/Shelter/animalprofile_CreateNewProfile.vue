@@ -1,10 +1,11 @@
 <script setup>
-import axios from "axios"; 
+import axios from "axios";
 import { ref, watch, computed, onMounted, toRaw } from 'vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid'
 import linkfooter from '@/components/footerLink.vue'
 import prompt from '@/components/prompt_savecreatedacc.vue'
 import Toast from '@/components/toast.vue';  // Ensure correct case for the file name
+import { useRouter } from 'vue-router';
 
 const toastRef = ref(null);  // Create a ref for the Toast component
 const isModalpromptOpen = ref(false)
@@ -14,9 +15,14 @@ function showPrompt() {
     retrieveData()
 }
 
+const router = useRouter();
+function navigateTo(path) {
+    router.push(path);
+}
+
 function handleYesClick() {
-  console.log('Yes button clicked!')
-  // Perform actions when the Save button is clicked
+    console.log('Yes button clicked!')
+    // Perform actions when the Save button is clicked
 }
 //user details
 const userid = localStorage.getItem('u_id')
@@ -32,17 +38,17 @@ const age = ref('')
 const sizeweight = ref('')
 const energylevel = ref('')
 const coat = ref('')
-const about  = ref('')
+const about = ref('')
 const specialneed = ref('')
 const medicalcondition = ref('')
-const selectedGender = ref ('')
+const selectedGender = ref('')
 const selectedSterilization = ref('')
 
 const profileInput = ref(null); // Initialized with a value of null, but it will eventually hold a reference to the file input element. (profile photo)
 const selectedImage = ref(null); // Initialized with a value of null, but it will eventually hold the selected image data (e.g., a URL string or a blob)
-const profileToUpload =ref(null)
-const fileToUploadArray =ref(null) //holds the file in handlefilechanges event function
- //holds the file in handlefilechanges event function
+const profileToUpload = ref(null)
+const fileToUploadArray = ref(null) //holds the file in handlefilechanges event function
+//holds the file in handlefilechanges event function
 
 // multiple images
 const files = ref([])
@@ -65,8 +71,8 @@ const selectedBreedString = ref('')
 
 //for dropbox/options
 const animalCategory = ref([])
-const breedCategory = ref ([])
-const status = ref ([])
+const breedCategory = ref([])
+const status = ref([])
 
 watch(selectedAnimalType, (newVal, oldVal) => {
     if (newVal !== oldVal) {
@@ -86,15 +92,15 @@ const clearAnimalTypeBreed = () => {
 };
 
 // For Vaccines options
-const vaccines = ref({ });
+const vaccines = ref({});
 const other_vaccine = ({
     "Other": [
-            "Rabies",
-            "Distemper",
-            "Influenza",
-            "Tetanus",
-            "Bovine viral diarrhea (BVD)"
-        ]
+        "Rabies",
+        "Distemper",
+        "Influenza",
+        "Tetanus",
+        "Bovine viral diarrhea (BVD)"
+    ]
 })
 
 //VACCINES
@@ -110,7 +116,7 @@ const displayVaccines = computed(() => {
 
 const selectedstatus = ref('')
 
-const Vaccines = ref([]); 
+const Vaccines = ref([]);
 const selectedVaccines = ref([]) // initialize an empty array to store the selected vaccines
 const otherVaccines = ref(''); // initialize an empty string to store the other vaccines
 
@@ -120,7 +126,7 @@ const allVaccines = computed(() => {
 });
 
 // spayed or neutered
-const sterilization = ref([ ])
+const sterilization = ref([])
 const nonSurgical = ref([]);
 const surgical = ref([]);
 const spayNeuterOptions = ref([ //"other" option value
@@ -146,12 +152,12 @@ const spayNeuterOptions = ref([ //"other" option value
 
 const selectedValue = ref('')
 const categories = ref({
-  "non-surgical": [],
-  "surgical": [],
-  "others": []
+    "non-surgical": [],
+    "surgical": [],
+    "others": []
 })
 
-const categoriesRaw = computed(() => toRaw(categories.value)); 
+const categoriesRaw = computed(() => toRaw(categories.value));
 
 //image handling
 const handleMultipleFileChange = (event) => {
@@ -170,7 +176,7 @@ const handleMultipleFileChange = (event) => {
 }
 function handleFileChange(event) {
     const file = event.target.files[0]; // gets the first file selected by the user 
-    profileToUpload.value = file; 
+    profileToUpload.value = file;
 
     // console.log(file)
     console.log(profileToUpload.value)
@@ -182,76 +188,75 @@ function handleFileChange(event) {
     };
     reader.readAsDataURL(file); // starts reading the file as a data URL (a string representation of the file contents)
 }
-
-async function loadPetCategory(){ //type from db dog cats //pet type/category rendering
-    try{
+async function loadPetCategory() { //type from db dog cats //pet type/category rendering
+    try {
         const response = await axios.get("http://localhost:5000/load-category")
         console.log(response)
-        if(response.data){
+        if (response.data) {
             animalCategory.value = response.data
         }
     }
-    catch(err){
+    catch (err) {
         console.log("error", err)
     }
 }
-async function loadPetBreed(){ //breed from db //load pet breed when pet type (animalCategory) is selected
-    try{
+async function loadPetBreed() { //breed from db //load pet breed when pet type (animalCategory) is selected
+    try {
         const response = await axios.post("http://localhost:5000/pet_breed",
             {
                 _category_id: selectedAnimalType.value
             }
         )
-        if(response.data){
+        if (response.data) {
             breedCategory.value = response.data
         }
     }
-    catch(err){
+    catch (err) {
         console.log("error", err)
     }
 }
 //load vaccines when pet type (animalCategory) is selected
-async function loadVaccineOptions(){ //ovi nmn ;-; load vaccine
-    try{
-        const response = await axios.post("http://localhost:5000/vaccine", 
+async function loadVaccineOptions() { //ovi nmn ;-; load vaccine
+    try {
+        const response = await axios.post("http://localhost:5000/vaccine",
             {
                 _category_id: selectedAnimalType.value
             }
         )
-        if(response){
+        if (response) {
             Vaccines.value = response.data
         }
     }
-    catch(err){
+    catch (err) {
         console.log("error in loading vaccines", err)
     }
 }
 //load sterilization base on gender selectedGender
-async function loadSterilization(){ //kwaon tung sa db tas e load ;-; ovi
-    try{
+async function loadSterilization() { //kwaon tung sa db tas e load ;-; ovi
+    try {
         console.log(selectedGender.value)
-        const response = await axios.post("http://localhost:5000/sterilization", 
+        const response = await axios.post("http://localhost:5000/sterilization",
             {
                 _gender: selectedGender.value
             }
         )
-        if(response){
+        if (response) {
             sterilization.value = response.data
             categorizedSterilization() // Categorize after loading
             //
             categories.value = {
-            "non-surgical": [...categories.value["non-surgical"]],
-            "surgical": [...categories.value["surgical"]],
-            "others": [...categories.value["others"], ...spayNeuterOptions.value]
+                "non-surgical": [...categories.value["non-surgical"]],
+                "surgical": [...categories.value["surgical"]],
+                "others": [...categories.value["others"], ...spayNeuterOptions.value]
             }
         }
     }
-    catch(err){
+    catch (err) {
         console.log("error in loading sterilization", err)
     }
 }
-function categorizedSterilization(){ //categorize sterilization from load sterilization (e.g. surgical, non surgical)
-    try{
+function categorizedSterilization() { //categorize sterilization from load sterilization (e.g. surgical, non surgical)
+    try {
         const keys = Object.keys(categories.value);
 
         if (!Array.isArray(sterilization.value)) {
@@ -281,62 +286,62 @@ function categorizedSterilization(){ //categorize sterilization from load steril
         // Assign categorized data to separate refs
         nonSurgical.value = categories.value["non-surgical"];
         surgical.value = categories.value["surgical"];
-        
+
     }
-    catch(err){
+    catch (err) {
         console.log("error in categorizing sterilization", err)
     }
 }
-async function loadPetStatus(){ // load pet status... tf do u want 
-    try{
+async function loadPetStatus() { // load pet status... tf do u want 
+    try {
         const response = await axios.get("http://localhost:5000/pet_status")
-        if(response){
+        if (response) {
             status.value = response.data
         }
     }
-    catch(err){
+    catch (err) {
         console.log("error in loading sterilization", err)
     }
 }
-async function retrieveData(){
+async function retrieveData() {
     const formData = new FormData();
     dataEntries.value = [];
-    const vaccineArray = getSelectedVaccineIds(); 
-
+    const vaccineArray = getSelectedVaccineIds();
     dataEntries.value = [
-    ['id', localStorage.getItem('u_id')],
-    ['gender', `${genderchar.value}`],
-    ['pet_category_id', selectedAnimalType.value],
-    ['other_pet_category', animaltype.value],
-    ['breed_id', selectedAnimalBreed.value],
-    ['other_breed', animalbreed.value],
-    ['status', selectedstatus.value],
-    ['name', name.value],
-    ['nickname', nickname.value],
-    ['daterehomed', daterehomed.value],
-    ['energylevel', energylevel.value],
-    ['age', age.value],
-    ['sizeweight', sizeweight.value],
-    ['coat', coat.value],
-    ['about', about.value],
-    ['special_needs', specialneed.value],
-    ['med_condition', medicalcondition.value],
-    // ['vaccines', vaccineArray],
-    ['other_vaccines', otherVaccines.value],
-    ['other_sterilization', `${selectedSterilization.value}`],
-    ['sterilization_id', `${getSelectedSterilization()}`]
+        ['id', localStorage.getItem('u_id')],
+        ['gender', `${genderchar.value}`],
+        ['pet_category_id', selectedAnimalType.value],
+        ['other_pet_category', animaltype.value],
+        ['breed_id', selectedAnimalBreed.value],
+        ['other_breed', animalbreed.value],
+        ['status', selectedstatus.value],
+        ['name', name.value],
+        ['nickname', nickname.value],
+        ['daterehomed', daterehomed.value],
+        ['energylevel', energylevel.value],
+        ['age', age.value],
+        ['sizeweight', sizeweight.value],
+        ['coat', coat.value],
+        ['about', about.value],
+        ['special_needs', specialneed.value],
+        ['med_condition', medicalcondition.value],
+        // ['vaccines', vaccineArray],
+        ['other_vaccines', otherVaccines.value],
+        ['other_sterilization', `${selectedSterilization.value}`],
+        ['sterilization_id', `${getSelectedSterilization()}`]
     ];
 
     vaccineArray.forEach((vaccineId, index) => {
         formData.append(`vaccines`, vaccineId);
     });
+
     if (!profileToUpload.value) {
-        profileToUpload.value = url.value;
+        profileToUpload.value = null;
     }
     formData.append('profile', profileToUpload.value)
 
     files.value.forEach((fileobj) => {
-        formData.append(`extra_photo`, fileobj.file);  
+        formData.append(`extra_photo`, fileobj.file);
     })
 
     dataEntries.value.forEach(([key, value]) => formData.append(key, value));
@@ -348,29 +353,40 @@ async function retrieveData(){
     const steril_ = formData.get('other_sterilization');
     const steril2_ = formData.get('sterilization_id');
 
-    if(name_ && gender_ && status_ && (pet_ || pet2_) && (steril_ || steril2_)){
+    if (name_ && gender_ && status_ && (pet_ || pet2_) && (steril_ || steril2_)) {
         savePetProfile(formData)
     }
-    else{
+    else {
         if (toastRef.value) {
             toastRef.value.showToast('Error: Missing inputs');
         }
         // console.log("empty isa heee", name_, gender_, status_, pet_, pet2_, steril_,steril2_)
     }
 }
-async function savePetProfile(formData){ //Save pet profile, pet profile photo, and additional images
+async function savePetProfile(formData) { //Save pet profile, pet profile photo, and additional images
     console.log("profile picture to save", profileToUpload.value)
     console.log("extra photos", files.value)
 
-    try{
+    try {
         const response = await axios.post("http://localhost:5000/save_pet_profile",
-            formData, 
+            formData,
             {
                 headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
             }
         );
+
+        console.log("tite", response.data.success)
+        if (response.data.success) {
+            // navigateTo("/myshelter", { query: { showToast: true, message: 'Saved Successfully', from: 'edit' } });
+            navigateTo({
+                path: "/animalprofile",
+                query: { showToast: true, message: 'Pet Profile Saved Successfuly', from: 'create'}
+            });
+        } else {
+            console.error('Failed to save profile:', response.data.message);
+        }
     }
-    catch(err){
+    catch (err) {
         if (toastRef.value) {
             toastRef.value.showToast(err);
         }
@@ -392,75 +408,75 @@ function getSelectedVaccineIds() {
             const matchingVaccine = Vaccines.value.find(vaccine => vaccine.name === selectedName);
             return matchingVaccine ? matchingVaccine.id : null; // Handle unmatched names
         })
-        .filter(id => id !== null); 
+        .filter(id => id !== null);
 }
 function getSelectedSterilization() {
     console.log(sterilization.value)
-  const selectedSterilizationId = sterilization.value.find(sterilization => sterilization.name === selectedValue.value)?.id ?? null;
-  return selectedSterilizationId;
+    const selectedSterilizationId = sterilization.value.find(sterilization => sterilization.name === selectedValue.value)?.id ?? null;
+    return selectedSterilizationId;
 }
 
 //watcher
 watch(selectedGender, (value) => {//watch for breed
-    if(value=='male'){
+    if (value == 'male') {
         genderchar.value = 'm'
     }
-    else{
+    else {
         genderchar.value = 'f'
     }
 });
 watch(selectedAnimalType, (newValue) => { //watch for breed
-  if (newValue === 'Other') {
-    selectedAnimalTypeString.value = newValue;
-    breedCategory.value = ''
-  } 
-  else {
-    // Ensure animalCategory is an array and defined before using find
-    if (Array.isArray(animalCategory.value)) {
-      const selected = animalCategory.value.find(item => item.id === newValue);
-      selectedAnimalTypeString.value = selected ? selected.pet_category : '';
-      loadPetBreed()
-      loadVaccineOptions()
-        // console.log("string", selectedAnimalTypeString.value)
-    } else {
-      console.error("animalCategory is not an array or is undefined");
-      selectedAnimalTypeString.value = '';
+    if (newValue === 'Other') {
+        selectedAnimalTypeString.value = newValue;
+        breedCategory.value = ''
     }
-  }
+    else {
+        // Ensure animalCategory is an array and defined before using find
+        if (Array.isArray(animalCategory.value)) {
+            const selected = animalCategory.value.find(item => item.id === newValue);
+            selectedAnimalTypeString.value = selected ? selected.pet_category : '';
+            loadPetBreed()
+            loadVaccineOptions()
+            // console.log("string", selectedAnimalTypeString.value)
+        } else {
+            console.error("animalCategory is not an array or is undefined");
+            selectedAnimalTypeString.value = '';
+        }
+    }
 });
 watch(selectedAnimalBreed, (newValue) => { //watch for breed 
-  if (newValue === 'Other') {
-    selectedBreedString.value = newValue;
-  } 
-  else {
-    // Ensure animalCategory is an array and defined before using find
-    if (Array.isArray(breedCategory.value)) {
-        const selected = breedCategory.value.find(
-            item => item.id === newValue
-        );
-        selectedBreedString.value = selected ? selected.name : '';
-    } else {
-        console.error("breedCategory is not an array or is undefined");
-        selectedBreedString.value = '';
+    if (newValue === 'Other') {
+        selectedBreedString.value = newValue;
     }
-  }
+    else {
+        // Ensure animalCategory is an array and defined before using find
+        if (Array.isArray(breedCategory.value)) {
+            const selected = breedCategory.value.find(
+                item => item.id === newValue
+            );
+            selectedBreedString.value = selected ? selected.name : '';
+        } else {
+            console.error("breedCategory is not an array or is undefined");
+            selectedBreedString.value = '';
+        }
+    }
 });
 watch(selectedGender, (newValue) => { //watch for sterilization
-  if (newValue) {
-    selectedGender.value = newValue;
-    categories.value = {
-      "non-surgical": [],
-      "surgical": [],
-      "others": []
-    };
-    loadSterilization();
-  }
+    if (newValue) {
+        selectedGender.value = newValue;
+        categories.value = {
+            "non-surgical": [],
+            "surgical": [],
+            "others": []
+        };
+        loadSterilization();
+    }
 });
 const categoriesLoaded = ref(false);
 watch(() => categories.value, (newVal) => {//i forgot where dis used basta ayaw tanggala 
-  if (newVal && Object.keys(newVal).length > 0) {
-    categoriesLoaded.value = true;
-  }
+    if (newVal && Object.keys(newVal).length > 0) {
+        categoriesLoaded.value = true;
+    }
 })
 
 onMounted(() => { //pag load sa page mag load ni =)
@@ -525,7 +541,8 @@ onMounted(() => { //pag load sa page mag load ni =)
                             <label for="given-name"
                                 class="block text-sm font-medium leading-6 text-gray-900">Name</label>
                             <div class="mt-2">
-                                <input  v-model="name" type="text" name="given-name" id="given-name" autocomplete="given-name"
+                                <input v-model="name" type="text" name="given-name" id="given-name"
+                                    autocomplete="given-name"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -533,7 +550,7 @@ onMounted(() => { //pag load sa page mag load ni =)
                             <label for="alias"
                                 class="block text-sm font-medium leading-6 text-gray-900">Nickname</label>
                             <div class="mt-2">
-                                <input  v-model="nickname" type="text" name="alias" id="alias"
+                                <input v-model="nickname" type="text" name="alias" id="alias"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -546,26 +563,30 @@ onMounted(() => { //pag load sa page mag load ni =)
                             </div>
                         </div>
                         <div id="anitype" class="lg:col-span-2 sm:col-span-full">
-                            <label for="animaltype" class="block text-sm font-medium leading-6 text-gray-900">Pet Type</label>
-                                <div class="mt-2">
-                                    <select v-if="selectedAnimalType !== 'Other'" id="animaltype"
-                                        name="animaltype" v-model="selectedAnimalType"
-                                        class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                        <option value="" selected disabled hidden>Select Animal Type</option>
-                                        <option v-for="(item, index) in animalCategory" :key="index" :value="item.id">{{ item.pet_category }}</option>
-                                        <option value="Other">Other</option> <!-- Make sure this value matches the check -->
-                                    </select>
-                                    <div v-else class="flex gap-2 items-center">
-                                        <input type="text" v-model="animaltype" name="animaltype" id="animaltype"
-                                            placeholder="Type of Furry Animal"
-                                            class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
-                                        <button @click="clearAnimalTypeInput" class="w-4 h-4">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                            <label for="animaltype" class="block text-sm font-medium leading-6 text-gray-900">Pet
+                                Type</label>
+                            <div class="mt-2">
+                                <select v-if="selectedAnimalType !== 'Other'" id="animaltype" name="animaltype"
+                                    v-model="selectedAnimalType"
+                                    class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                    <option value="" selected disabled hidden>Select Animal Type</option>
+                                    <option v-for="(item, index) in animalCategory" :key="index" :value="item.id">{{
+                                        item.pet_category }}</option>
+                                    <option value="Other">Other</option> <!-- Make sure this value matches the check -->
+                                </select>
+                                <div v-else class="flex gap-2 items-center">
+                                    <input type="text" v-model="animaltype" name="animaltype" id="animaltype"
+                                        placeholder="Type of Furry Animal"
+                                        class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
+                                    <button @click="clearAnimalTypeInput" class="w-4 h-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
+                            </div>
                         </div>
                         <div id="breed" class="lg:col-span-2 sm:col-span-full">
                             <label for="animalbreed" class="block text-sm font-medium leading-6 text-gray-900">
@@ -575,8 +596,10 @@ onMounted(() => { //pag load sa page mag load ni =)
                                 <select v-if="selectedAnimalTypeString && selectedBreedString !== 'Other'"
                                     id="animalbreed" name="animalbreed" v-model="selectedAnimalBreed"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                                    <option value="" selected disabled hidden>Select {{selectedAnimalTypeString}} Breed/Mix</option>
-                                    <option v-for="(breed, index) in breedCategory" :key="index" :value="breed.id">{{ breed.name }}</option>
+                                    <option value="" selected disabled hidden>Select {{ selectedAnimalTypeString }}
+                                        Breed/Mix</option>
+                                    <option v-for="(breed, index) in breedCategory" :key="index" :value="breed.id">{{
+                                        breed.name }}</option>
                                     <option value="Other">Other</option>
                                 </select>
 
@@ -585,9 +608,12 @@ onMounted(() => { //pag load sa page mag load ni =)
                                     <input type="text" v-model="animalbreed" name="animalbreed" id="animalbreed"
                                         :placeholder="selectedBreedString === 'Other' ? 'Type of Furry Animal Breed/Mix' : `Type of ${selectedAnimalTypeString} Breed/Mix`"
                                         class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
-                                    <button v-if="selectedBreedString === 'Other'" @click.prevent="clearAnimalTypeBreed" class="w-4 h-4 lg:mr-[1rem]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    <button v-if="selectedBreedString === 'Other'" @click.prevent="clearAnimalTypeBreed"
+                                        class="w-4 h-4 lg:mr-[1rem]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
                                 </div>
@@ -597,7 +623,7 @@ onMounted(() => { //pag load sa page mag load ni =)
                             <label for="animalGender"
                                 class="block text-sm font-medium leading-6 text-gray-900">Gender</label>
                             <div class="mt-2">
-                                <select v-model= "selectedGender" id="animalGender" name="animalGender"
+                                <select v-model="selectedGender" id="animalGender" name="animalGender"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                     <option value="" selected disabled hidden>Select Gender</option>
                                     <option value="male">Male</option>
@@ -609,14 +635,16 @@ onMounted(() => { //pag load sa page mag load ni =)
                             <label for="coatfur" class="block text-sm font-medium leading-6 text-gray-900">
                                 Coat / Fur</label>
                             <div class="mt-2">
-                                <input v-model="coat" type="text" name="coatfur" id="coatfur" placeholder="ex. Short, dark-brown coat with a slight wave"
+                                <input v-model="coat" type="text" name="coatfur" id="coatfur"
+                                    placeholder="ex. Short, dark-brown coat with a slight wave"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
                         <div id="age" class="md:col-span-2 sm:col-span-full">
                             <label for="animalAge" class="block text-sm font-medium leading-6 text-gray-900">Age</label>
                             <div class="mt-2">
-                                <input v-model="age" type="text" name="animalAge" id="animalAge" placeholder="Ex. 2 yrs old"
+                                <input v-model="age" type="number" name="animalAge" id="animalAge"
+                                    placeholder="Ex. 2 yrs old"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -632,7 +660,7 @@ onMounted(() => { //pag load sa page mag load ni =)
                         <div id="lvl" class="md:col-span-2 sm:col-span-full">
                             <label for="energyLvl" class="block text-sm font-medium leading-6 text-gray-900">Energy
                                 Level</label>
-                            <div class="mt-2"> 
+                            <div class="mt-2">
                                 <select id="energyLvl" name="energyLvl" @change="getSelectedOption($event)"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                     <option value="" selected disabled hidden>Select Energy Level Status</option>
@@ -650,7 +678,8 @@ onMounted(() => { //pag load sa page mag load ni =)
                                 <select id="status" name="status" v-model="selectedstatus"
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:max-w-xs sm:text-sm sm:leading-6">
                                     <option value="" selected disabled hidden>Select Pet Status</option>
-                                    <option v-for="(status, index) in status" :key="index" :value="status.id">{{ status.name }} </option>
+                                    <option v-for="(status, index) in status" :key="index" :value="status.id">{{
+                                        status.name }} </option>
                                 </select>
                             </div>
                         </div>
@@ -669,24 +698,26 @@ onMounted(() => { //pag load sa page mag load ni =)
                                 <p class="font-normal text-[13px] text-gray-500">( Please select one or more of the
                                     following vaccination options this animal has received. )</p>
                             </div>
-                            <div class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-1 gap-y-2 text-sm leading-6">
-                                <div v-for="(option, index) in displayVaccines" :key="index" class="flex items-center mx-6">
+                            <div
+                                class="mt-4 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-1 gap-y-2 text-sm leading-6">
+                                <div v-for="(option, index) in displayVaccines" :key="index"
+                                    class="flex items-center mx-6">
                                     <div>
-                                        <input type="checkbox" 
-                                            :id="'checkbox' + (index + 1)" 
-                                            v-model="selectedVaccines" 
-                                            :value="option.name"  
+                                        <input type="checkbox" :id="'checkbox' + (index + 1)" v-model="selectedVaccines"
+                                            :value="option.name"
                                             class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600">
                                     </div>
                                     <div>
-                                        <label :for="'checkbox' + (index + 1)" class="font-medium text-gray-600 pl-[.50rem]">{{ option.name }}</label>
+                                        <label :for="'checkbox' + (index + 1)"
+                                            class="font-medium text-gray-600 pl-[.50rem]">{{ option.name }}</label>
                                     </div>
                                 </div>
                                 <div class="col-span-full">
-                                    <label for="" class="block text-sm font-medium leading-6 text-gray-900">Other Vaccines</label>
+                                    <label for="" class="block text-sm font-medium leading-6 text-gray-900">Other
+                                        Vaccines</label>
                                     <div class="mt-2 flex gap-x-3">
-                                        <textarea v-model="otherVaccines" 
-                                                class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"></textarea>
+                                        <textarea v-model="otherVaccines"
+                                            class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -709,35 +740,32 @@ onMounted(() => { //pag load sa page mag load ni =)
                                     class="block w-full rounded-md border-0 py-1.5 px-[1rem] text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
-                            <div v-if="categoriesLoaded" class="sm:col-span-full">
-                                <h4 class="font-medium text-gray-900">
-                                    Has this animal been sterilized?
-                                </h4>
-                                <div v-for="[categoryname, options] in Object.entries(categoriesRaw)" :key="categoryname" class="mt-4 space-y-2">
-                                    <span v-if="categoryname !== 'None'" class="font-medium text-sm text-gray-900">
-                                            {{ categoryname }}
-                                    </span>
-                                    <div v-if="options.length > 0" v-for="(option, index) in options" :key="index" class="relative flex gap-x-3">
-                                        <div class="flex h-6 items-center">
-                                            <input 
-                                            :id="option.id" 
-                                            name="spayNeuterStatus" 
-                                            type="radio"
-                                            :value="option.name" 
-                                            v-model="selectedSterilization" 
-                                            class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600" 
-                                            @input="selectedValue = $event.target.value" 
-                                            />
-                                        </div>
+                        <div v-if="categoriesLoaded" class="sm:col-span-full">
+                            <h4 class="font-medium text-gray-900">
+                                Has this animal been sterilized?
+                            </h4>
+                            <div v-for="[categoryname, options] in Object.entries(categoriesRaw)" :key="categoryname"
+                                class="mt-4 space-y-2">
+                                <span v-if="categoryname !== 'None'" class="font-medium text-sm text-gray-900">
+                                    {{ categoryname }}
+                                </span>
+                                <div v-if="options.length > 0" v-for="(option, index) in options" :key="index"
+                                    class="relative flex gap-x-3">
+                                    <div class="flex h-6 items-center">
+                                        <input :id="option.id" name="spayNeuterStatus" type="radio" :value="option.name"
+                                            v-model="selectedSterilization"
+                                            class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-600"
+                                            @input="selectedValue = $event.target.value" />
+                                    </div>
                                     <div class="lg:flex text-sm leading-6">
-                                            <label :for="option.id" class="font-medium text-gray-700 pr-[1rem]">
+                                        <label :for="option.id" class="font-medium text-gray-700 pr-[1rem]">
                                             {{ option.name }}
-                                            </label>
-                                            <p class="text-gray-600">{{ option.description }}</p>
-                                        </div> 
+                                        </label>
+                                        <p class="text-gray-600">{{ option.description }}</p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         <div class="col-span-full border-t border-gray-900/10">
                             <div class="border-b border-gray-900/10 py-5">
                                 <h2 class="text-base font-semibold leading-7 text-gray-900">Other Information
@@ -801,13 +829,13 @@ onMounted(() => { //pag load sa page mag load ni =)
                 <div class="flex items-center justify-end gap-x-6">
                     <RouterLink to="/animalprofile" class="text-sm font-semibold leading-6 text-gray-900">
                         Cancel</RouterLink>
-                    <button type="button" @click="showPrompt"
+                    <button type="button" @click.prevent="retrieveData"
                         class="rounded-md bgteal px-[2rem] py-2 text-sm font-semibold text-white shadow-sm hover:bg-bgteal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
                         Create Profile</button>
                 </div>
             </div>
         </form>
-        <prompt v-model:isOpen="isModalpromptOpen" @yes-clicked="handleYesClick"/>
+        <prompt v-model:isOpen="isModalpromptOpen" @yes-clicked="handleYesClick" />
         <footer class="mt-auto">
             <div>
                 <linkfooter />

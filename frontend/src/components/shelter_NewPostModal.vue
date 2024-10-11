@@ -29,25 +29,25 @@
                     Create New Post
                   </DialogTitle>
                   <div>
-                    <PetList />
-                  </div>
+                    <PetList @petSelected="handlePetSelected" />
+                  </div> 
                   <div class="text-sm mt-1.5">
                     <div class="flex flex-col">
                       <label for="petName" class="font-medium leading-6 text-gray-700">
-                        Name</label>
-                      <input type="text" name="petName" id="petName" placeholder="petname"
+                        Nickname</label>
+                      <input v-model="nickname" type="text" name="petName" id="petName" placeholder="Nickname"
                         class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
                     </div>
                     <div class="flex flex-col mt-1.5">
                       <label for="rehomed" class="font-medium leading-6 text-gray-700">
                         Date Re-homed</label>
-                      <input type="text" name="rehomed" id="rehomed" placeholder="rehomed"
+                      <input v-model="daterehomed" type="text" name="rehomed" id="rehomed" placeholder="Date Rehomed"
                         class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
                     </div>
                     <div class="flex flex-col mt-1.5">
                       <label for="petBreed" class="font-medium leading-6 text-gray-700">
                         Breed / Mix</label>
-                      <input type="text" name="petName" id="petName" placeholder="petbreed"
+                      <input v-model="breed" type="text" name="petName" id="petName" placeholder="Breed"
                         class="mt-1.5 border rounded-md p-1.5 px-6" readonly>
                     </div>
                   </div>
@@ -92,36 +92,53 @@
     </Dialog>
   </TransitionRoot>
 </template>
-<script>
+<script setup>
 import { ref } from 'vue'
 import PetList from '@/components/dropdown_PetList.vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
-export default {
-  components: { PetList, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, },
-  data() {
-    return {
-      open: true,
-      fileInput: null,
-      imageUrls: [],
-      images: 'https://img.icons8.com/fluency/48/stack-of-photos.png',
-    }
-  },
-  methods: {
-    handleFileChange(event) {
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          this.imageUrls.push(event.target.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    removeImage(index) {
-      this.imageUrls.splice(index, 1);
-    },
+// Component registration
+const components = { PetList, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot };
+
+// Reactive state
+const open = ref(true);
+const fileInput = ref(null);
+const imageUrls = ref([]);
+const images = 'https://img.icons8.com/fluency/48/stack-of-photos.png';
+
+// Handle file change and load images
+const handleFileChange = (event) => {
+  const files = event.target.files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      imageUrls.value.push(event.target.result);
+    };
+    reader.readAsDataURL(file);
   }
+}
+
+// Remove image from list
+const removeImage = (index) => {
+  imageUrls.value.splice(index, 1);
+}
+
+const selectedPetInfo = ref([]);
+const name = ref('');
+const nickname = ref('');
+const breed = ref('');
+const daterehomed = ref('');
+
+// Handle the event from the child component
+function handlePetSelected(info) {
+  selectedPetInfo.value = info;
+  name.value = selectedPetInfo.value[0].name
+  nickname.value = selectedPetInfo.value[0].nickname
+  breed.value = selectedPetInfo.value[0].breed
+  daterehomed.value = selectedPetInfo.value[0].rehomed
+  imageUrls.value.push(
+    selectedPetInfo.value[0].profile
+  )
 }
 </script>

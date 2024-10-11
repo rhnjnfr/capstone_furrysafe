@@ -254,9 +254,6 @@ export const retrievePetStatus = async (req, res) => {
 //saving || used in create 
 export const savepetprofie = async (req, res) => {
     try {
-        console.log(req.body);
-        console.log(req.files);
-
         let {
             id, gender, pet_category_id, other_pet_category, breed_id, other_breed,
             status, name, nickname, daterehomed, age, sizeweight, coat, about, special_needs,
@@ -267,6 +264,14 @@ export const savepetprofie = async (req, res) => {
             sterilization_id = null
         }
 
+        if (typeof vaccines === 'string') {
+            vaccines = [vaccines]; // Convert string to array
+        } else if (!Array.isArray(vaccines)) {
+            vaccines = []; // Default to empty array if not an array or string
+        }
+
+        age = Number(age)
+        // age = typeof age == 'string' ? 0 : age
         let pet_type = null;
         let pet_breed = null;
 
@@ -277,7 +282,7 @@ export const savepetprofie = async (req, res) => {
 
         const status_id = parseInt(status, 10);
         const sterilization_id_int = parseInt(sterilization_id, 10);
-        const vaccine_ids = vaccines.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+        // const vaccine_ids = vaccines.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
 
         const files = req.files;
 
@@ -368,15 +373,11 @@ export const savepetprofie = async (req, res) => {
                 return res.status(500).send({ message: "Failed to save image URLs to the database." });
             }
             else {
-                console.log("saved successfully check db")
+                res.status(200).send({ success: true });
             }
 
             // Success response
-            res.status(200).send({ message: "Pet profile and images saved successfully." });
         } else {
-            if (toastRef.value) {
-                toastRef.value.showToast('Error: Missing inputs');
-            }
             return res.status(400).send({ message: "Error: Missing inputs." });
         }
 
@@ -508,13 +509,10 @@ export const updatepetprofile = async (req, res) => {
         if (err) {
             console.log("Error:", err);
         } else {
-            // return res.status(200).json(data);
-            console.log("saved. . . check db")
-            console.log(data)
+            return res.status(200).json({
+                "success": true
+            });
         }
-        console.log("RPC Data:", data);
-        console.log("RPC Error:", err);
-
     }
     catch (err) {
         console.log("an error occured when updating", err)

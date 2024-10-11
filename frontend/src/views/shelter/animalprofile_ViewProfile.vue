@@ -35,10 +35,6 @@ async function loadPetProfiles() {
                 const _name_nickname = profile.name_nickname;
                 const [name, nickname] = _name_nickname.split('/');
 
-                // Handle extra photos check
-                // let extraphotosArray = [];
-                // if()
-
                 if (profile.additionalphotos && profile.additionalphotos != "No additional photos") {
                     extraphotos = profile.additionalphotos.split(',').map(url => ({
                         source: url.trim()
@@ -121,6 +117,14 @@ async function downloadQR() {
 onMounted(() => {
     loadPetProfiles()
     generateQR()
+
+    if (route.query.showToast && route.query.from == 'edit') {
+        console.log("D:", route.query)
+        const message = route.query.message || 'Pet Profile Saved Successfully';
+        if (toastRef.value) {
+            toastRef.value.showToast(message);
+        }
+    }
 })
 </script>
 

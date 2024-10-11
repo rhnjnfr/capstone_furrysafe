@@ -1,6 +1,6 @@
 <script setup>
 import axios from "axios";
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ref, watch, computed, onMounted, toRaw, reactive } from 'vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid'
 import linkfooter from '@/components/footerLink.vue'
@@ -13,6 +13,10 @@ const isModalpromptOpen = ref(false)
 // Toggle the modal's visibility
 function showPrompt() {
     retrieveData()
+}
+const router = useRouter();
+function navigateTo(path) {
+    router.push(path);
 }
 
 function handleYesClick() {
@@ -507,11 +511,16 @@ async function updatePetDetails(formData) {
                 headers: { 'Content-Type': 'multipart/form-data' } // Correct header placement
             }
         )
-        if (response.data) {
-            console.log(response.data)
+        if (response.data.success) {
+            navigateTo({
+                path: `/view_animalprofileform/${petid}`,
+                query: { showToast: true, message: 'Pet Profile Saved Successfuly', from: 'edit' }
+            });
         }
         else {
-            console.log("ahhahahsha pain onli")
+            if (toastRef.value) {
+                toastRef.value.showToast(response.data.message);
+            }
         }
     }
     catch (err) {
@@ -618,7 +627,7 @@ onMounted(() => { //pag load sa page mag load ni =)
     <div>
         <div id="marginright" class="pb-[1rem] lg:mx-[3rem] flex justify-between items-center">
             <div>
-                <RouterLink :to="{ name: 'viewanimalprofile', params: { petid }}" class="flex items-center">
+                <RouterLink :to="{ name: 'viewanimalprofile', params: { petid } }" class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>

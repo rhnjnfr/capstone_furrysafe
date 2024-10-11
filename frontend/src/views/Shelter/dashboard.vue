@@ -10,8 +10,6 @@ export default {
     beforeMount() {
         // this.address_exists = localStorage.getItem("address_exists")
         const address_exist = localStorage.getItem('address_exists')
-        console.log("here")
-        console.log(address_exist)
 
         if(address_exist.startsWith(false)){
             this.toggleModal()
