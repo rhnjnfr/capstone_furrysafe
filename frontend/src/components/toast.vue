@@ -1,32 +1,82 @@
+<!-- if warining
+toastRef.value.showToast('warning', 'Missing inputs');
+
+if error:
+toastRef.value.showToast('error', err);
+
+if success:
+toastRef.value.showToast('success', 'succesfully save'); -->
+
 <template>
-    <div
-      v-if="visible"
-      class="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity"
-      :class="{'opacity-100': visible, 'opacity-0': !visible}"
-      role="alert"
-    >
-        {{ message }}
+    <div v-if="visible" :class="['fixed top-4 right-4 bg-white border', bordercolor, textcolor, 'text-gray-700 px-4 py-2 rounded-lg drop-shadow-lg transition-opacity animate-bounce',
+        { 'opacity-100': visible, 'opacity-0': !visible }]" role="alert" @click="hideToast">
+        <div class="flex gap-x-2">
+            <component :is="iconComponent" :class="['h-6 w-6', iconColor]" />
+            {{ message }}
+        </div>
     </div>
 </template>
-
 <script setup>
-    import { ref, defineExpose } from 'vue';
+import { ref, defineExpose } from 'vue';
+import { CheckCircleIcon, ExclamationTriangleIcon, ExclamationCircleIcon } from '@heroicons/vue/20/solid';
 
-    const visible = ref(false);
-    const message = ref('');
+const visible = ref(false);
+const message = ref('');
+const textcolor = ref('');
+const bordercolor = ref('');
+const iconComponent = ref(null);
+const iconColor = ref('');
 
-    function showToast(msg) {
-        message.value = msg;
-        visible.value = true;
-        setTimeout(() => {
-            hideToast();
-        }, 3000);
+function showToast(type, msgOrErr) {
+
+    if (typeof msgOrErr === 'string') {
+        message.value = msgOrErr;
+    } else if (msgOrErr instanceof Error) {
+        message.value = msgOrErr.message;
+    } else {
+        message.value = 'An unknown error occurred';
     }
 
-    function hideToast() {
+    switch (type) {
+        case 'success':
+            textcolor.value = 'text-green-500';
+            bordercolor.value = 'border-green-500';
+            iconComponent.value = CheckCircleIcon;
+            iconColor.value = 'text-green-500';
+            break;
+        case 'error':
+            textcolor.value = 'text-red-500';
+            bordercolor.value = 'border-red-500';
+            iconComponent.value = ExclamationTriangleIcon;
+            iconColor.value = 'text-red-500';
+            break;
+        case 'warning':
+            textcolor.value = 'text-yellow-500';
+            bordercolor.value = 'border-yellow-500';
+            iconComponent.value = ExclamationCircleIcon;
+            iconColor.value = 'text-yellow-500';
+            break;
+        default:
+            textcolor.value = 'text-gray-500';
+            bordercolor.value = 'border-gray-800';
+            iconComponent.value = null;
+            iconColor.value = '';
+    }
+
+    visible.value = true;
+
+    let toastTimer = null;
+
+    toastTimer = setTimeout(() => {
         visible.value = false;
-    }
+    }, 3000);
+}
 
-    // Expose the showToast function to the parent component
-    defineExpose({ showToast });
+function hideToast() {
+    clearTimeout(toastTimer);
+    visible.value = false;
+}
+
+// Expose the showToast function to the parent component
+defineExpose({ showToast });
 </script>

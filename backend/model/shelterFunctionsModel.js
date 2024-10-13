@@ -555,4 +555,59 @@ const comparePetExtraPhoto = async (newPhotos, oldPhotos) => {
 
     return filesToDelete
 }
-export default addShelterAddress;
+//chat 
+export const searchUser = async (req, res) => {
+    const { value } = req.body
+    const { data, error } = await supabase.rpc('search', {
+        search_text: value
+    })
+    if (error) {
+        console.error('Error deleting file:', error);
+    } else {
+        res.status(200).send(data);
+    }
+}
+export const loadInbox = async (req, res) => {
+    let { id, chat_id } = req.body
+    id = id.toString();
+    console.log("chat", chat_id);
+
+    if (!chat_id) {
+        chat_id = null
+    }
+    else {
+        chat_id = chat_id.toString()
+    }
+    const { data, error } = await supabase.rpc('get_chat_function', {
+        user1_id: id,
+        _chat_id: chat_id
+    })
+    if (error) {
+        console.error('Error deleting file:', error);
+    } else {
+        console.log("loading...")
+        console.table(data)
+        res.status(200).send(data);
+    }
+}
+export const sendMessage = async (req, res) => {
+    const { chat_id, user_id, message, url } = req.body
+    try {
+        const { data, error } = await supabase.rpc('insert_chat_message', {
+            _user_id: user_id,
+            _chat_id: chat_id,
+            _message: message,
+            _photourl: url
+        })
+        if (error) {
+            console.error('Error sending message:', error);
+        } else {
+            console.log("sent!")
+            res.status(200).send({ success: true });
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+export default { addShelterAddress };

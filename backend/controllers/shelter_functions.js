@@ -1,6 +1,7 @@
 import { addShelterAddress, retrieveShelterDetails, saveShelter_and_Link, 
          retrieveProfile, retrievePetProfile, retrievePetBreed, retrieveVaccineCategory,
-         retrieveSterilization, retrievePetStatus, savepetprofie, updatepetprofile
+         retrieveSterilization, retrievePetStatus, savepetprofie, updatepetprofile, searchUser,
+         loadInbox, sendMessage
 } from "../model/shelterFunctionsModel.js";
 
 export const insertShelterAddress = (req, res) => {
@@ -35,4 +36,13 @@ export const insertPetProfile = (req, res) => {
 }
 export const updatePetProfile = (req, res) => {
     updatepetprofile(req, res)
+}
+export const searchUserName = (req, res) => {
+    searchUser(req, res)
+}
+export const loadInboxMessages = (req, res) => {
+    loadInbox(req, res)
+}
+export const insertMessage = (req, res) => {
+    sendMessage(req, res)
 }

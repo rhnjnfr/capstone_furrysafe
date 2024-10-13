@@ -9,7 +9,8 @@ import { checkUser, insertUser, Userlogout, //user
 
 import { insertShelterAddress, getShelterDetails, insertShelterLink,
          getProfile, getPetProfile, getPetBreed, getVaccineCategory,
-         getSterilization, getPetStatus, insertPetProfile, updatePetProfile
+         getSterilization, getPetStatus, insertPetProfile, updatePetProfile, searchUserName,
+         loadInboxMessages, insertMessage
 } from "../controllers/shelter_functions.js"
 
 const storage = multer.memoryStorage({
@@ -62,5 +63,10 @@ router.post("/sterilization", getSterilization)
 router.get("/pet_status", getPetStatus)
 router.post("/save_pet_profile", upload2.any(), insertPetProfile)
 router.post("/update_pet_profile", upload2.any(), updatePetProfile)
+//chat 
+router.post("/search", searchUserName)
+router.post("/loadinbox", loadInboxMessages)
+router.post("/sendmessage", upload2.any(), insertMessage)
+
 
 export default router;
