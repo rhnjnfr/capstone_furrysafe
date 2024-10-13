@@ -1,10 +1,7 @@
 <script setup>
-import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from 'vue';
-import { io } from 'socket.io-client'; // Import Socket.io client
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { MagnifyingGlassIcon, PaperAirplaneIcon, PaperClipIcon } from "@heroicons/vue/20/solid";
 import axios from 'axios';
-
-const socket = io('http://localhost:5000');
 
 // Reactive user_id
 const user_id = ref(localStorage.getItem('u_id'));
@@ -126,17 +123,8 @@ const sendMessage = async () => {
                 ...messageData,
 
             });
-            const sentMessage = {
-                ...messageData,
-                date: new Date().toISOString(), // Ensure the message has a timestamp
-                sender_name: 'You' // Update based on your backend response
-            };
-            selectedConversation.value.messages.push(sentMessage);
             newMessage.value = ''; // Clear the input field
             scrollToBottom(); // Scroll after sending a new message
-
-            // Emit the message via Socket.io to notify other clients
-            socket.emit('send_message', sentMessage);
         } else {
             console.error("Failed to send message:", response.data.message);
         }
@@ -218,42 +206,6 @@ watch(searchValue, (newValue) => {
 // On mounted
 onMounted(() => {
     fetchInbox();
-
-    // Emit an event to notify the server about the connected user
-    socket.emit('user_connected', { user_id: user_id.value });
-
-    // Listen for incoming messages
-    socket.on('receive_message', (message) => {
-        console.log('New message received:', message);
-
-        // Check if the message belongs to the currently selected conversation
-        if (message.chat_id === selectedChat_id.value) {
-            // Append the new message to the conversation
-            selectedConversation.value.messages.push(message);
-            scrollToBottom();
-        } else {
-            // Optionally, handle messages from other conversations (e.g., notify the user)
-            // You can implement badge counts or highlight the conversation in the inbox
-            // For simplicity, we'll log it here
-            console.log('Message from a different conversation:', message);
-        }
-    });
-
-    // Optionally, listen for updates to the conversation list (e.g., new conversations)
-    socket.on('update_conversations', (updatedConversations) => {
-        conversations.value = updatedConversations;
-    });
-});
-onBeforeUnmount(() => {
-    // Remove all listeners related to this component
-    socket.off('receive_message');
-    socket.off('update_conversations');
-
-    // Optionally, notify the server that the user has disconnected
-    socket.emit('user_disconnected', { user_id: user_id.value });
-
-    // Disconnect the socket if no longer needed
-    // socket.disconnect(); // Uncomment if you want to fully disconnect
 });
 </script>
 
