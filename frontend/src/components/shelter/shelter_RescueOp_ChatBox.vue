@@ -109,8 +109,7 @@ const updateConversationsList = (messageData) => {
 };
 // Select a conversation
 const selectConversation = async (conversation) => {
-    console.log("converstation", conversation)
-
+    receiverName.value = conversation.other_participant_name || conversation.p2_name
     receiverId.value = null; // Corrected spelling
     if (!conversation || !conversation.chat_id) {
         console.log("Invalid conversation selected.");
@@ -123,15 +122,16 @@ const selectConversation = async (conversation) => {
 
     try {
         // Fetch messages for the selected chat
-        console.log("try")
         const response = await axios.post("http://localhost:5000/loadinbox", {
             id: user_id.value,
             chat_id: selectedChat_id.value
         });
         if (response.data) {
             console.log("response", response.data)
+            console.log("response 2", conversation.other_participant_name, conversation.p2_name)
+
             selectedConversation.value = {
-                NameFrom: conversation.other_participant_name || conversation.p2_name,
+                NameFrom: receiverName.value,
                 messages: response.data, // Array of messages
                 timestamp: conversation.date,
                 lastMessageDate: new Date(conversation.date)
@@ -140,7 +140,7 @@ const selectConversation = async (conversation) => {
             scrollToBottom(); // Scroll after messages are loaded
         } else {
             selectedConversation.value = {
-                NameFrom: conversation.other_participant_name || conversation.p2_name,
+                NameFrom: receiverName.value,
                 messages: [],
                 timestamp: conversation.date,
                 lastMessageDate: new Date(conversation.date)
@@ -153,13 +153,12 @@ const selectConversation = async (conversation) => {
     }
 };
 
-// Send a message
 const sendMessage = async () => {
     if (!newMessage.value.trim()) return;
 
     // Ensure a chat ID is selected
     if (!selectedChat_id.value) {
-        createNewMessage()
+        createNewMessage();
         return;
     }
 
@@ -167,25 +166,23 @@ const sendMessage = async () => {
 
     let messageData = {
         chat_id: selectedChat_id.value,
-        user_id: parseInt(user_id.value), // Ensure it's a number if needed
+        user_id: parseInt(user_id.value),
         message: newMessage.value,
         url: tempurl,
-        date: new Date().toISOString(), // Add current timestamp
-        sender_name: userFullName, // Assuming 'You' is the sender
-        p1_name: userFullName, // Set p1_name as the current user
-        p2_name: receiverName.value // Set p2_name as the receiver
+        date: new Date().toISOString(),
+        sender_name: userFullName,
+        p1_name: userFullName,
+        p2_name: receiverName.value // Ensure receiverName is set
     };
 
+    console.log("send message, message data", messageData)
     try {
-        // Send the message to your backend
         const response = await axios.post("http://localhost:5000/sendmessage", messageData);
 
-        console.log(response)
-        if (response.data.success) {
-            createConversation.value = false
+        if (response.data.success) { //true
+            createConversation.value = false;
 
             const date = new Date(messageData.date);
-
             const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-` +
                 `${date.getDate().toString().padStart(2, '0')}-` +
                 `${date.getFullYear()} ` +
@@ -194,22 +191,23 @@ const sendMessage = async () => {
 
             const formattedMessageData = {
                 ...messageData,
-                date: formattedDate // Add formatted timestamp
+                date: formattedDate
             };
 
             // Update local messages for the sender
             selectedConversation.value.messages.push({
                 ...formattedMessageData,
-                date: new Date(formattedMessageData.date) // Store as Date object
+                date: new Date(formattedMessageData.date)
             });
 
             selectedConversation.value.lastMessageDate = new Date(formattedMessageData.date);
 
-            console.log("message data", messageData)
-
             // Update the conversations list for the sender
             updateConversationsList(formattedMessageData);
-            selectConversation(messageData)
+
+            // **Removed the incorrect selectConversation call**
+            // selectConversation(messageData)
+
             // Emit the message to the receiver
             socket.emit('send-message', formattedMessageData);
 
@@ -222,6 +220,7 @@ const sendMessage = async () => {
         console.error("Error sending message:", error);
     }
 };
+
 // Create a new message (conversation)
 const createNewMessage = async () => {
     try {
