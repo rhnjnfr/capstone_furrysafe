@@ -29,11 +29,13 @@ const iconColor = ref('');
 
 function showToast(type, msgOrErr) {
 
+    console.log("type", type)
     if (typeof msgOrErr === 'string') {
         message.value = msgOrErr;
     } else if (msgOrErr instanceof Error) {
         message.value = msgOrErr.message;
     } else {
+        console.log("toast message", message.value)
         message.value = 'An unknown error occurred';
     }
 
@@ -43,27 +45,29 @@ function showToast(type, msgOrErr) {
             bordercolor.value = 'border-green-500';
             iconComponent.value = CheckCircleIcon;
             iconColor.value = 'text-green-500';
+            visible.value = true;
             break;
         case 'error':
             textcolor.value = 'text-red-500';
             bordercolor.value = 'border-red-500';
             iconComponent.value = ExclamationTriangleIcon;
             iconColor.value = 'text-red-500';
+            visible.value = true;
             break;
         case 'warning':
             textcolor.value = 'text-yellow-500';
             bordercolor.value = 'border-yellow-500';
             iconComponent.value = ExclamationCircleIcon;
             iconColor.value = 'text-yellow-500';
+            visible.value = true;
             break;
         default:
             textcolor.value = 'text-gray-500';
-            bordercolor.value = 'border-gray-800';
+            bordercolor.value = 'border-red-800';
             iconComponent.value = null;
             iconColor.value = '';
     }
 
-    visible.value = true;
 
     let toastTimer = null;
 

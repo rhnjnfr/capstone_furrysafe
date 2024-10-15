@@ -1,7 +1,7 @@
 import { addShelterAddress, retrieveShelterDetails, saveShelter_and_Link, 
          retrieveProfile, retrievePetProfile, retrievePetBreed, retrieveVaccineCategory,
          retrieveSterilization, retrievePetStatus, savepetprofie, updatepetprofile, searchUser,
-         loadInbox, sendMessage
+         loadInbox, sendMessage, getFullName, createNewChat
 } from "../model/shelterFunctionsModel.js";
 
 export const insertShelterAddress = (req, res) => {
@@ -45,4 +45,10 @@ export const loadInboxMessages = (req, res) => {
 }
 export const insertMessage = (req, res) => {
     sendMessage(req, res)
+}
+export const getUserFullName = (req, res) => {
+    getFullName(req, res)
+}
+export const insertNewChat = (req, res) => {
+    createNewChat(req, res)
 }

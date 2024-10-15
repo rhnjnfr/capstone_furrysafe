@@ -586,28 +586,70 @@ export const loadInbox = async (req, res) => {
         console.error('Error deleting file:', error);
     } else {
         console.log("loading...")
-        console.table(data)
         res.status(200).send(data);
     }
 }
+//save message 
 export const sendMessage = async (req, res) => {
-    const { chat_id, user_id, message, url } = req.body
+    const { chat_id, user_id, message, url } = req.body;
     try {
         const { data, error } = await supabase.rpc('insert_chat_message', {
             _user_id: user_id,
             _chat_id: chat_id,
             _message: message,
             _photourl: url
+        });
+
+        if (error) {
+            console.error('Error sending message:', error);
+            res.status(500).send({ success: false, error: error.message });
+        } else {
+            res.status(200).send({ success: true });
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send({ success: false, error: 'Internal server error' });
+    }
+};
+//get full name for sender info 
+export const getFullName = async (req, res) => {
+    const { id } = req.body
+
+    try{
+        const { data, err } = await supabase.rpc('get_user_fullname', {
+            _user_id: id
+        })
+        if (err) {
+            console.error('Error sending message:', err);
+            res.status(500).send({ success: false, error: err.message });
+        } else {
+            res.status(200).send(data);
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send({ success: false, error: 'Internal server error' });
+    }
+}
+export const createNewChat = async (req, res) =>{
+    console.log("create new chat function")
+    const {senderid, receiverid } = req.body
+    try{
+        console.log("create new chat function", senderid, receiverid)
+        const { data, error } = await supabase.rpc('create_chat', {
+            p1_id: senderid, 
+            p2_id: receiverid
         })
         if (error) {
             console.error('Error sending message:', error);
+            res.status(500).send({ success: false, error: error.message });
         } else {
-            console.log("sent!")
-            res.status(200).send({ success: true });
+            res.status(200).json(data);
+            console.log("yipie", data)
         }
     }
-    catch (err) {
+    catch(err){
         console.log(err)
     }
 }
+
 export default { addShelterAddress };

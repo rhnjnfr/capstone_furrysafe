@@ -130,25 +130,18 @@ async function populateForm(data) {
                 {
                     profileUrl: data.profile
                 })
-            // console.log("response", response.data.data)
             selectedImage.value = response.data.data
-
         }
         catch (err) {
             console.log(err)
         }
-
-        // selectedImage.value = data.profile; // Assuming 'profile' contains the image URL or base64
     }
 }
 
 async function saveProfile() {
     if (!fileToUpload) {
-        console.log("saving... url", url.value)
         fileToUpload = url.value;
     }
-
-    console.log("file to upload", fileToUpload)
 
     const transformedLinks = links.value.map(linkObj => linkObj.value);
     const id = localStorage.getItem('c_id')
@@ -178,17 +171,17 @@ async function saveProfile() {
             }
         );
 
-        console.log("response :D", response)
-
         if (response.data.success) {
-            // navigateTo("/myshelter", { query: { showToast: true, message: 'Saved Successfully', from: 'edit' } });
             navigateTo({
                 path: "/myshelter",
-                query: { showToast: true, message: 'Saved Successfully'}
+                query: { showToast: true, message: 'Saved Successfully', status: 'success'}
             });
         } else {
-            console.error('Failed to save profile:', response.data.message);
-            alert(`Error: ${response.data.message}`);
+            if (route.query.showToast) {
+                if (toastRef.value) {
+                    toastRef.value.showToast('error', response.data.message);
+                }
+            }
         }
     }
     catch (err) {

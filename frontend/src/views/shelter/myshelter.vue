@@ -31,9 +31,8 @@ const toggleModalEvent = () => {
 
 onMounted(() => {
     if (route.query.showToast) {
-        const message = route.query.message || 'Success!';
         if (toastRef.value) {
-            toastRef.value.showToast(message);
+            toastRef.value.showToast(route.query.status, route.query.message);
         }
     }
 });
