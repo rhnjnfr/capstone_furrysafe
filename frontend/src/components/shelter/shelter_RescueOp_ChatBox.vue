@@ -20,6 +20,9 @@ const lastMessage = ref(null); // For alternative scrolling
 let receiverId = ref(null);
 let receiverName = ref('');
 let userFullName; //user fullname
+const url = ref([])
+
+let tempurl = 'https://iwdfzrnksrvgrkpptfah.supabase.co/storage/v1/object/public/message_images/pets_photos/1729076713966_kebin.jpg'
 
 // Selected conversation
 const selectedConversation = ref({
@@ -29,7 +32,7 @@ const selectedConversation = ref({
     lastMessageDate: null
 });
 
-//socket conncections, and routese
+//socket connections, and routes
 const socket = io('http://localhost:5000');
 socket.on('connect', () => {
     console.log("Connected to socket with id", socket.id);
@@ -44,7 +47,6 @@ socket.on('receive-message', (messageData) => {
     updateConversationsList(messageData);
 });
 
-
 // Fetch all conversations
 const fetchInbox = async () => {
     try {
@@ -57,6 +59,7 @@ const fetchInbox = async () => {
             let room = chat.chat_id;
             socket.emit('join-chat', room); // Ensure both users emit this to join the room
         });
+        // console.log
         if (response.data) {
             // Map conversations to include lastMessageDate
             conversations.value = response.data.map(conversation => ({
@@ -111,6 +114,8 @@ const updateConversationsList = (messageData) => {
 const selectConversation = async (conversation) => {
     receiverName.value = conversation.other_participant_name || conversation.p2_name
     receiverId.value = null; // Corrected spelling
+    console.log("ambot basta kani", conversation)
+
     if (!conversation || !conversation.chat_id) {
         console.log("Invalid conversation selected.");
         return;
@@ -126,16 +131,16 @@ const selectConversation = async (conversation) => {
             id: user_id.value,
             chat_id: selectedChat_id.value
         });
-        if (response.data) {
-            console.log("response", response.data)
-            console.log("response 2", conversation.other_participant_name, conversation.p2_name)
 
+        if (response.data) {
             selectedConversation.value = {
                 NameFrom: receiverName.value,
                 messages: response.data, // Array of messages
+                photo_url: parsedPhotos(conversation.photo_url),
                 timestamp: conversation.date,
                 lastMessageDate: new Date(conversation.date)
             };
+
             await nextTick(); // Ensure DOM is updated
             scrollToBottom(); // Scroll after messages are loaded
         } else {
@@ -153,34 +158,124 @@ const selectConversation = async (conversation) => {
     }
 };
 
-const sendMessage = async () => {
-    if (!newMessage.value.trim()) return;
+// async function sendMessage(formData) {
+//     for (let pair of formData.entries()) {
+//         console.log("send messsae", pair[0], pair[1]);
+//     }
 
-    // Ensure a chat ID is selected
-    if (!selectedChat_id.value) {
-        createNewMessage();
-        return;
+//     if (!newMessage.value.trim()) {
+//         newMessage.value = null;
+//     }
+
+//     // Ensure a chat ID is selected
+//     if (!selectedChat_id.value) {
+//         createNewMessage();
+//         return;
+//     }
+
+//     console.log("message agjsagdsak", newMessage.value);
+//     if (!newMessage.value) {
+//         console.log("conssdghakjsgdalsjdg ");
+//     }
+//     // Removed incorrect log for messageData since it's defined later
+//     try {
+//         const response = await axios.post("http://localhost:5000/sendmessage", formData, {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data'
+//             }
+//         });
+//         console.log("under response", response.data);
+//         if (response.data.success) { // true
+//             createConversation.value = false;
+
+//             url.value = response.data.url;
+
+//             let messageData = {
+//                 chat_id: selectedChat_id.value,
+//                 user_id: parseInt(user_id.value),
+//                 message: newMessage.value,
+//                 photo_url: url.value.join(','), // Changed from 'url' to 'photo_url' and removed space after comma
+//                 date: new Date().toISOString(),
+//                 sender_name: userFullName,
+//                 p1_name: userFullName,
+//                 p2_name: receiverName.value // Ensure receiverName is set
+//             };
+
+//             const date = new Date(messageData.date);
+//             const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-` +
+//                 `${date.getDate().toString().padStart(2, '0')}-` +
+//                 `${date.getFullYear()} ` +
+//                 `${date.getHours().toString().padStart(2, '0')}:` +
+//                 `${date.getMinutes().toString().padStart(2, '0')}`;
+
+//             const formattedMessageData = {
+//                 ...messageData,
+//                 date: formattedDate
+//             };
+
+//             // Update local messages for the sender
+//             selectedConversation.value.messages.push({
+//                 ...formattedMessageData,
+//                 date: new Date(formattedMessageData.date)
+//             });
+
+//             selectedConversation.value.lastMessageDate = new Date(formattedMessageData.date);
+
+//             updateConversationsList(formattedMessageData);
+//             // **Removed the incorrect selectConversation call**
+//             // selectConversation(messageData)
+//             socket.emit('send-message', formattedMessageData); // Emit the message to the receiver
+
+//             newMessage.value = ''; // Clear the input field
+//             files.value = [];
+//             scrollToBottom(); // Scroll after sending a new message
+//         } else {
+//             console.error("Failed to send message:", response.data.message);
+//         }
+//     } catch (error) {
+//         console.error("Error sending message:", error);
+//     }
+// };
+//check here
+async function sendMessage(thisformData) {
+    for (let pair of thisformData.entries()) {
+        console.log("send message", pair[0], pair[1]);
+    }
+    if (!newMessage.value) {
+        newMessage.value = null;
     }
 
-    const tempurl = null;
+    console.log("send message data", selectedChat_id.value)
+    // Ensure a chat ID is selected
+    if (!selectedChat_id.value) {
+        createNewMessage(); // Await the creation of a new chat
+        // After creating a new chat, selectedChat_id should be set
+    }
 
-    let messageData = {
-        chat_id: selectedChat_id.value,
-        user_id: parseInt(user_id.value),
-        message: newMessage.value,
-        url: tempurl,
-        date: new Date().toISOString(),
-        sender_name: userFullName,
-        p1_name: userFullName,
-        p2_name: receiverName.value // Ensure receiverName is set
-    };
-
-    console.log("send message, message data", messageData)
+    // Proceed to send the message
     try {
-        const response = await axios.post("http://localhost:5000/sendmessage", messageData);
-
-        if (response.data.success) { //true
+        const response = await axios.post("http://localhost:5000/sendmessage", thisformData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        console.log("under response", response.data);
+        if (response.data.success) { // true
             createConversation.value = false;
+
+            url.value = response.data.url;
+
+            // console.log(selectedChat_id.value) 45 (new chat id jd)
+            let messageData = {
+                chat_id: selectedChat_id.value,
+                user_id: parseInt(user_id.value),
+                message: newMessage.value,
+                photo_url: url.value.join(','), // Changed from 'url' to 'photo_url' and removed space after comma
+                date: new Date().toISOString(),
+                sender_name: userFullName,
+                p1_name: userFullName,
+                p2_name: receiverName.value // Ensure receiverName is set
+            };
 
             const date = new Date(messageData.date);
             const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-` +
@@ -202,16 +297,13 @@ const sendMessage = async () => {
 
             selectedConversation.value.lastMessageDate = new Date(formattedMessageData.date);
 
-            // Update the conversations list for the sender
             updateConversationsList(formattedMessageData);
-
-            // **Removed the incorrect selectConversation call**
-            // selectConversation(messageData)
-
+            selectConversation(messageData)
             // Emit the message to the receiver
-            socket.emit('send-message', formattedMessageData);
+            socket.emit('send-message', formattedMessageData); // Emit the message to the receiver
 
             newMessage.value = ''; // Clear the input field
+            files.value = [];
             scrollToBottom(); // Scroll after sending a new message
         } else {
             console.error("Failed to send message:", response.data.message);
@@ -219,9 +311,31 @@ const sendMessage = async () => {
     } catch (error) {
         console.error("Error sending message:", error);
     }
-};
+}
 
 // Create a new message (conversation)
+// const createNewMessage = async () => {
+//     try {
+//         const response = await axios.post("http://localhost:5000/newchat", {
+//             senderid: user_id.value,
+//             receiverid: receiverId.value
+//         });
+
+//         if (response.data) {
+//             // console.log("response data", response.data[0].chat_id)
+//             selectedChat_id.value = response.data[0].chat_id;
+//             // receiverName.value =  response.data[0].chat_id
+
+//             console.log("tite", response.data);
+//             // sendMessage()
+//             retrieveMessage();
+//         }
+//     }
+//     catch (err) {
+//         console.log("D:", err);
+//     }
+// };
+
 const createNewMessage = async () => {
     try {
         const response = await axios.post("http://localhost:5000/newchat", {
@@ -229,17 +343,17 @@ const createNewMessage = async () => {
             receiverid: receiverId.value
         });
 
+        console.log("this is create new message")
         if (response.data) {
-            //        console.log("response data", response.data[0].chat_id)
-            selectedChat_id.value = response.data[0].chat_id
-            // receiverName.value =  response.data[0].chat_id
-
-            console.log("tite", response.data)
-            sendMessage()
+            selectedChat_id.value = response.data[0].chat_id;
+            // Join the new chat room
+            socket.emit('join-chat', selectedChat_id.value);
+            console.log("New chat created with ID:", selectedChat_id.value);
+            await retrieveMessage(); // Ensure that retrieveMessage is awaited
         }
     }
     catch (err) {
-        console.log("D:", err)
+        console.log("Error creating new chat:", err);
     }
 };
 
@@ -272,6 +386,22 @@ const scrollToBottom = async () => {
     //     lastMessage.value.scrollIntoView({ behavior: 'smooth' });
     // }
 }
+// const getUserFullName = async () => {
+//     try {
+//         const response = await axios.post("http://localhost:5000/getfullname", {
+//             id: user_id.value,
+//         });
+
+//         if (response.data) {
+//             userFullName = response.data;
+//         } else {
+//             console.log("No data received.");
+//         }
+//     } catch (err) {
+//         console.log("Error fetching inbox:", err);
+//     }
+// }
+
 const getUserFullName = async () => {
     try {
         const response = await axios.post("http://localhost:5000/getfullname", {
@@ -279,39 +409,134 @@ const getUserFullName = async () => {
         });
 
         if (response.data) {
-            userFullName = response.data;
+            userFullName = response.data.fullName; // Adjust based on your API response structure
+            console.log("User full name:", userFullName);
         } else {
-            console.log("No data received.");
+            console.log("No data received for user full name.");
         }
     } catch (err) {
-        console.log("Error fetching inbox:", err);
+        console.log("Error fetching user full name:", err);
+    }
+};
+
+//------------------------------------ this image
+const fileInput = ref(null);
+const files = ref([])
+const handleMultipleFileChange = (event) => {
+    const filesArray = event.target.files
+    console.log("handle multiple file change", filesArray)
+
+    for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i]
+        const reader = new FileReader()
+        reader.onload = (event) => {
+            // files.value.push({ source: file.name, url: event.target.result })
+            files.value.push({ file: file, url: event.target.result });
+        }
+        reader.readAsDataURL(file)
     }
 }
+const triggerFileInput = () => {
+    console.log("trigger")
+    if (fileInput.value) {
+        fileInput.value.click(); // Accessing the DOM element
+    }
+    else {
+        console.log("tite")
+    }
+};
+const removeImage = (index) => {
+    files.value.splice(index, 1)
+}
+// --------------------------------- this image functions 
+async function retrieveMessage() {
+    const formData = new FormData();
+    const tempurl = [null];
+
+    files.value.forEach((fileobj) => { //append images
+        formData.append(`url`, fileobj.file);
+    })
+
+    console.log("start of retrieveMessage",selectedChat_id.value)
+
+    let messageData = [
+        ["chat_id", selectedChat_id.value],
+        ["user_id", parseInt(user_id.value)],
+        ["message", newMessage.value],
+        ["date", new Date().toISOString()],
+        ["sender_name", userFullName],
+        ["p1_name", userFullName],
+        ["p2_name", receiverName.value] // Ensure receiverName is set
+    ];
+
+    console.log("start of retrieveMessage",selectedChat_id.value)
+    messageData.forEach(([key, value]) => formData.append(key, value));
+
+    for (let pair of formData.entries()) {
+        console.log("retrieveMessage", pair[0], pair[1]);
+    }
+    console.log("end of retrieveMessage")
+    sendMessage(formData)
+}
+const parsedPhotos = (photoUrl) => {
+    if (!photoUrl) return [];
+
+    if (Array.isArray(photoUrl)) {
+        return photoUrl;
+    }
+
+    if (typeof photoUrl === 'string') {
+        if (photoUrl.includes(',')) {
+            return photoUrl.split(',').map(photo => photo.trim());
+        }
+        return [photoUrl];
+    }
+
+    return [];
+};
 
 // SEARCH SUB FUNCTIONS
 let timeout;
-const handleInput = (value) => { //if mag input si user, mag req siya sa backend every 500s 
+const handleInput = (value) => { //if user types, send a request to the backend every 500ms 
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         fetchData(value);
     }, 500); // 500ms debounce
 };
-const handleItemClick = (itemId, name) => { // Handle item selection from search
+// const handleItemClick = (itemId, name) => { // Handle item selection from search
+//     searchValue.value = '';
+//     receiverId.value = itemId;
+//     receiverName.value = name;
+//     selectedChat_id.value = null
+
+//     conversations.value.forEach(chat => {
+//         if (receiverName.value == chat.other_participant_name) {
+//             selectConversation({ chat_id: chat.chat_id })
+//             createConversation.value = false
+//         }
+//         else {
+//             console.log("else")
+//         }
+//     });
+// };
+
+const handleItemClick = (itemId, name) => {
     searchValue.value = '';
     receiverId.value = itemId;
     receiverName.value = name;
-    selectedChat_id.value = null
+    selectedChat_id.value = null;
 
-    conversations.value.forEach(chat => {
-        if (receiverName.value == chat.other_participant_name) {
-            selectConversation({ chat_id: chat.chat_id })
-            createConversation.value = false
-        }
-        else {
-            console.log("else")
-        }
-    });
+    console.log("Selected receiver:", receiverId.value, receiverName.value);
 
+    const existingChat = conversations.value.find(chat => chat.other_participant_name === name);
+    console.log("exisiting chat", existingChat)
+    if (existingChat) {
+        selectConversation(existingChat);
+        createConversation.value = false;
+    } else {
+        // If no existing chat, ensure that a new chat will be created when sending a message
+        console.log("No existing chat found, will create a new chat when sending a message.");
+    }
 };
 
 // Computed property for sorted messages
@@ -332,7 +557,13 @@ function formatTime(dateString) {
 const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
-        sendMessage();
+        // sendMessage();
+        if(!selectedChat_id.value){
+            createNewMessage()
+        }
+        else{
+            retrieveMessage()
+        }
     }
 };
 function closeNewMessage() {
@@ -348,11 +579,16 @@ watch(searchValue, (newValue) => {
     handleInput(newValue);
 });
 
-onMounted(() => {
-    fetchInbox();
-    getUserFullName();
+// onMounted(() => {
+//     fetchInbox();
+//     getUserFullName();
+// });
+onMounted(async () => {
+    await getUserFullName();
+    await fetchInbox();
 });
 </script>
+
 
 <template>
     <!-- Gi change nko height kay samok T-T -->
@@ -421,7 +657,50 @@ onMounted(() => {
                             <span class="font-medium truncate">{{ conversation.other_participant_name }}</span>
                             <span class="text-[12px] sm:hidden xl:flex">{{ formatTime(conversation.date) }}</span>
                         </div>
-                        <p class="text-sm truncate">{{ conversation.message }}</p>
+                        <div v-if="conversation.message">
+                            <p class="text-sm truncate">{{ conversation.message }}</p>
+                        </div>
+                        <div v-else>
+                            <div v-if="conversation.user_id == user_id">
+                                <p> You sent a photo.</p>
+                            </div>
+                            <div v-else>
+                                <p> {{ conversation.other_participant_name }} sent a photo.</p>
+                            </div>
+                        </div>
+
+
+                        <!-- photo_url: conversation.photo_url, -->
+                        <!-- 
+                <div v-for="(message, messageIndex) in sortedMessages" :key="messageIndex" class="message">
+                    <div v-if="message.user_id == user_id && message.message"
+                        class="flex text-sm text-gray-600 p-3 justify-end">
+                        <div class="text-sm text-gray-600 p-3">
+                            <div class="text-right">
+                                <span class="font-medium">You</span>
+                                <span class="text-[10px] ml-2">{{ formatTime(message.date) }}</span>
+                            </div>
+                            <div class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
+                                <p>{{ message.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else-if="message.message" class="flex justify-start mb-2">
+                        <div class="text-sm text-gray-600 p-3">
+                            <div class="text-left">
+                                <span class="font-medium">{{ message.sender_name }}</span>
+                                <span class="text-[10px] ml-2">{{ formatTime(message.date) }}</span>
+                            </div>
+                            <div class="mt-1 bg-amber-200 px-4 py-2 rounded-lg">
+                                <p>{{ message.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="messageIndex === sortedMessages.length - 1" ref="lastMessage"></div>
+                </div> -->
+
                     </div>
                 </div>
             </div>
@@ -445,21 +724,52 @@ onMounted(() => {
                                 <span class="font-medium">You</span>
                                 <span class="text-[10px] ml-2">{{ formatTime(message.date) }}</span>
                             </div>
-                            <div class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
+                            <div v-if="message.message && message.photo_url">
+                                <div class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
+                                    <p>{{ message.message }}</p>
+                                </div>
+                                <div class="pt-2 flex space-x-2">
+                                    <template v-for="photo in parsedPhotos(message.photo_url)" :key="photo">
+                                        <img :src="photo" alt=""
+                                            class="pointer-events-none h-20 w-20 object-cover rounded">
+                                    </template>
+                                </div>
+                            </div>
+                            <div v-else-if="message.message" class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
                                 <p>{{ message.message }}</p>
+                            </div>
+                            <div v-else class="pt-2 flex space-x-2">
+                                <template v-for="photo in parsedPhotos(message.photo_url)" :key="photo">
+                                    <img :src="photo" alt="" class="pointer-events-none h-20 w-20 object-cover rounded">
+                                </template>
                             </div>
                         </div>
                     </div>
 
+
+
                     <!-- Incoming Messages (Sent by Other Participant) -->
                     <div v-else class="flex justify-start mb-2">
                         <div class="text-sm text-gray-600 p-3">
-                            <div class="text-left">
-                                <span class="font-medium">{{ message.sender_name }}</span>
+                            <div class="text-right">
+                                <span class="font-medium">You</span>
                                 <span class="text-[10px] ml-2">{{ formatTime(message.date) }}</span>
                             </div>
-                            <div class="mt-1 bg-amber-200 px-4 py-2 rounded-lg">
+                            <div v-if="message.message && message.photo_url">
+                                <div class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
+                                    <p>{{ message.message }}</p>
+                                </div>
+                                <div class="pt-2">
+                                    <img :src="message.photo_url" alt=""
+                                        class="pointer-events-none h-20 w-20 object-cover rounded">
+                                </div>
+                            </div>
+                            <div v-else-if="message.message" class="mt-1 bg-teal-200 px-4 py-2 rounded-lg">
                                 <p>{{ message.message }}</p>
+                            </div>
+                            <div v-else class="pt-2">
+                                <img :src="message.photo_url" alt=""
+                                    class="pointer-events-none h-20 w-20 object-cover rounded">
                             </div>
                         </div>
                     </div>
@@ -470,17 +780,40 @@ onMounted(() => {
             </div>
 
             <!-- Message Input Form -->
-            <form @submit.prevent="sendMessage">
+            <form @submit.prevent="retrieveMessage">
                 <div class="mt-auto flex border items-center">
                     <div class="flex justify-start w-full">
+                        <!-- @click="messagesent=false"  -->
                         <textarea v-model="newMessage" placeholder="Write a message..." @keydown="handleKeyDown"
                             class="w-full px-6 py-6 outline-none resize-none" />
                     </div>
                     <div class="flex px-6 gap-x-3 justify-end">
-                        <PaperClipIcon class="h-7 w-7 text-gray-400" aria-hidden="true" />
-                        <PaperAirplaneIcon @click.prevent="sendMessage" class="h-7 w-7 text-gray-400"
+                        <div>
+                            <input type="file" ref="fileInput" multiple class="hidden"
+                                @change="handleMultipleFileChange" />
+                            <PaperClipIcon class="h-7 w-7 text-gray-400" aria-hidden="true" @click="triggerFileInput" />
+                        </div>
+                        <PaperAirplaneIcon @click.prevent="retrieveMessage" class="h-7 w-7 text-gray-400"
                             aria-hidden="true" />
                     </div>
+                </div>
+                <div class="px-4 sm:col-span-2 sm:px-0">
+                    <ul role="list"
+                        class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                        <li v-for="(file, index) in files" :key="file.source" class="relative">
+                            <div
+                                class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                                <img :src="file.url" alt="" class="pointer-events-none h-20 w-20 object-cover" />
+                                <button @click="removeImage(index)"
+                                    class="absolute top-0 right-0 p-1 text-gray-600 hover:text-red-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </form>
         </div>
@@ -520,17 +853,40 @@ onMounted(() => {
             </div>
 
             <!-- New Conversation Message Input Form -->
-            <form @submit.prevent="sendMessage">
+            <form @submit.prevent="createNewMessage">
                 <div class="mt-auto flex border items-center">
                     <div class="flex justify-start w-full">
+                        <!-- @click="messagesent=false"  -->
                         <textarea v-model="newMessage" placeholder="Write a message..." @keydown="handleKeyDown"
                             class="w-full px-6 py-6 outline-none resize-none" />
                     </div>
                     <div class="flex px-6 gap-x-3 justify-end">
-                        <PaperClipIcon class="h-7 w-7 text-gray-400" aria-hidden="true" />
-                        <PaperAirplaneIcon @click.prevent="sendMessage" class="h-7 w-7 text-gray-400"
+                        <div>
+                            <input type="file" ref="fileInput" multiple class="hidden"
+                                @change="handleMultipleFileChange" />
+                            <PaperClipIcon class="h-7 w-7 text-gray-400" aria-hidden="true" @click="triggerFileInput" />
+                        </div>
+                        <PaperAirplaneIcon @click.prevent="createNewMessage" class="h-7 w-7 text-gray-400"
                             aria-hidden="true" />
                     </div>
+                </div>
+                <div class="px-4 sm:col-span-2 sm:px-0">
+                    <ul role="list"
+                        class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                        <li v-for="(file, index) in files" :key="file.source" class="relative">
+                            <div
+                                class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                                <img :src="file.url" alt="" class="pointer-events-none h-20 w-20 object-cover" />
+                                <button @click="removeImage(index)"
+                                    class="absolute top-0 right-0 p-1 text-gray-600 hover:text-red-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </form>
         </div>

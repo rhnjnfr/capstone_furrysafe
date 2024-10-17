@@ -289,6 +289,7 @@ export const savepetprofie = async (req, res) => {
         // Upload Profile Photo
         const profileFile = files.find(file => file.fieldname === 'profile');
         const extraPhotos = files.filter(file => file.fieldname === 'extra_photo');
+        console.log("extra photos", extraPhotos)
 
         if (breed_id == 'Other') {
             breed_id = null
@@ -591,20 +592,53 @@ export const loadInbox = async (req, res) => {
 }
 //save message 
 export const sendMessage = async (req, res) => {
-    const { chat_id, user_id, message, url } = req.body;
+    //here
+    console.log("send message function backend")
+    const files = req.files;
+    const sentimage = files.filter(file => file.fieldname === 'url');
+    const extraPhotoUrls = [];
+
+    let url = null
+    let { chat_id, user_id, message } = req.body;
+
+    console.log(req.body)
     try {
+        for (const photo of sentimage) {
+            const photoPath = `pets_photos/${Date.now()}_${photo.originalname}`;
+            const { data: photoUploadData, error: photoUploadError } = await supabase.storage
+                .from('message_images') // Ensure this is your correct bucket name
+                .upload(photoPath, photo.buffer, {
+                    contentType: photo.mimetype,
+                });
+
+            if (!photoUploadError) {
+                const { data: photoUrlData } = supabase.storage
+                    .from('message_images')
+                    .getPublicUrl(photoPath);
+                extraPhotoUrls.push(photoUrlData.publicUrl);  // Collecting extra photo URLs
+            } else {
+                console.error('Extra photo upload error:', photoUploadError);
+                return res.status(500).send({ message: "Failed to upload extra photos." });
+            }
+        }
+        console.log(extraPhotoUrls)
+
+        if(message == null){
+            message = null 
+            console.log("NULL NA")
+        }
         const { data, error } = await supabase.rpc('insert_chat_message', {
             _user_id: user_id,
             _chat_id: chat_id,
             _message: message,
-            _photourl: url
+            _photourl: extraPhotoUrls
         });
 
         if (error) {
             console.error('Error sending message:', error);
             res.status(500).send({ success: false, error: error.message });
         } else {
-            res.status(200).send({ success: true });
+            res.status(200).send({ success: true, url: extraPhotoUrls});
         }
     } catch (err) {
         console.error('Error:', err);
@@ -615,7 +649,7 @@ export const sendMessage = async (req, res) => {
 export const getFullName = async (req, res) => {
     const { id } = req.body
 
-    try{
+    try {
         const { data, err } = await supabase.rpc('get_user_fullname', {
             _user_id: id
         })
@@ -630,13 +664,13 @@ export const getFullName = async (req, res) => {
         res.status(500).send({ success: false, error: 'Internal server error' });
     }
 }
-export const createNewChat = async (req, res) =>{
+export const createNewChat = async (req, res) => {
     console.log("create new chat function")
-    const {senderid, receiverid } = req.body
-    try{
+    const { senderid, receiverid } = req.body
+    try {
         console.log("create new chat function", senderid, receiverid)
         const { data, error } = await supabase.rpc('create_chat', {
-            p1_id: senderid, 
+            p1_id: senderid,
             p2_id: receiverid
         })
         if (error) {
@@ -647,7 +681,7 @@ export const createNewChat = async (req, res) =>{
             console.log("yipie", data)
         }
     }
-    catch(err){
+    catch (err) {
         console.log(err)
     }
 }

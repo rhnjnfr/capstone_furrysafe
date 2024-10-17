@@ -18,7 +18,7 @@ export default {
         ]
         return {
             tabs,
-            currentTab: tabs[0].name
+            currentTab: 'Chats' //change this
         }
     },
     methods: {

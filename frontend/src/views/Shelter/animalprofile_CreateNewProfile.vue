@@ -307,7 +307,7 @@ async function retrieveData() {
     const formData = new FormData();
     dataEntries.value = [];
     const vaccineArray = getSelectedVaccineIds();
-    dataEntries.value = [
+    dataEntries.value = [ //details eg: name, nickname
         ['id', localStorage.getItem('u_id')],
         ['gender', `${genderchar.value}`],
         ['pet_category_id', selectedAnimalType.value],
@@ -331,7 +331,7 @@ async function retrieveData() {
         ['sterilization_id', `${getSelectedSterilization()}`]
     ];
 
-    vaccineArray.forEach((vaccineId, index) => {
+    vaccineArray.forEach((vaccineId, index) => { //vaccine details
         formData.append(`vaccines`, vaccineId);
     });
 
