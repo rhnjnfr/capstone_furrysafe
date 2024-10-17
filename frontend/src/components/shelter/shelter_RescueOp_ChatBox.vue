@@ -457,7 +457,7 @@ async function retrieveMessage() {
         formData.append(`url`, fileobj.file);
     })
 
-    console.log("start of retrieveMessage",selectedChat_id.value)
+    console.log("start of retrieveMessage", selectedChat_id.value)
 
     let messageData = [
         ["chat_id", selectedChat_id.value],
@@ -469,7 +469,7 @@ async function retrieveMessage() {
         ["p2_name", receiverName.value] // Ensure receiverName is set
     ];
 
-    console.log("start of retrieveMessage",selectedChat_id.value)
+    console.log("start of retrieveMessage", selectedChat_id.value)
     messageData.forEach(([key, value]) => formData.append(key, value));
 
     for (let pair of formData.entries()) {
@@ -558,10 +558,10 @@ const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
         // sendMessage();
-        if(!selectedChat_id.value){
+        if (!selectedChat_id.value) {
             createNewMessage()
         }
-        else{
+        else {
             retrieveMessage()
         }
     }
@@ -658,7 +658,12 @@ onMounted(async () => {
                             <span class="text-[12px] sm:hidden xl:flex">{{ formatTime(conversation.date) }}</span>
                         </div>
                         <div v-if="conversation.message">
-                            <p class="text-sm truncate">{{ conversation.message }}</p>
+                            <div v-if="conversation.user_id == user_id">
+                                <p class="text-sm truncate">You: {{ conversation.message }}</p>
+                            </div>
+                            <div v-else>
+                                <p class="text-sm truncate">{{conversation.other_participant_name}}: {{ conversation.message }}</p>
+                            </div>
                         </div>
                         <div v-else>
                             <div v-if="conversation.user_id == user_id">
